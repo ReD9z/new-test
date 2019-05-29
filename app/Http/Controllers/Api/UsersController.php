@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\User;
+use App\Http\Resources\Users as UsersResource;
+
+class UsersController extends Controller
+{
+   /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+        if ($request->search) {
+            $users = User::where('name', 'like', '%' . $request->search . '%')
+            ->orWhere('email', 'like', '%' . $request->search . '%')
+            ->paginate(6); 
+            //TODO сделать метод в модели с несколькими параметрами find('title', 'text' ..).paginate(4)
+        } else {
+            $users = User::orderBy($request->sortTable, $request->sort)->paginate(6);
+        }
+        
+        return UsersResource::collection($users);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $users = $request->isMethod('put') ? User::findOrFail($request->id) : new User;
+
+        $users->id = $request->input('id');
+        $users->name = $request->input('name');
+        $users->email = $request->input('email');
+        if ($request->isMethod('post')) {
+            $users->password = bcrypt($request->input('password'));
+
+            $token = $users->createToken('Laravel Password Grant Client')->accessToken;
+        }
+    
+        if($users->save()) { 
+            return new UsersResource($users);
+        }
+        
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $users = User::findOrFail($id);
+        return new UsersResource($users);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $users = User::findOrFail($id);
+
+        if($users->delete()) {
+            return new UsersResource($users);
+        }
+    }
+}
