@@ -24,6 +24,7 @@
             ref="excel"
             accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             @change="elementLoadToFile"
+            multiple
         >
         </v-btn>
         <v-dialog v-model="dialog" max-width="500px">
@@ -43,9 +44,24 @@
                         <v-flex xs12 sm6 md4>
                             <v-text-field v-model="editedItem.text" label="Текст"></v-text-field>
                         </v-flex>
-                        <v-flex xs12 sm6 md4>
-                            {{editedItem.files}}
-                            <!-- <v-text-field v-model="editedItem.files" label="Текст"></v-text-field> -->
+                        <v-flex xs12>
+                            <v-btn
+                                color="blue-grey"
+                                class="white--text"
+                                @click='pickImages'
+                            >
+                                Добавить изображения
+                                <v-icon right dark>cloud_upload</v-icon>
+                                <input
+                                    type="file"
+                                    ref="images"
+                                    name='file[]'
+                                    accept="image/*"
+                                    style="display: none"
+                                    @change="elementLoadToFileImage"
+                                    multiple
+                                >
+                            </v-btn>
                         </v-flex> 
                     </v-layout>
                     </v-container>
@@ -116,6 +132,7 @@ export default {
             { text: 'Изображения', value: 'files', sortable: false},
             { text: 'Параметры', value: 'name', sortable: false }
         ],
+        files: [],
         desserts: [],
         editedIndex: -1,
         editedItem: {
@@ -127,7 +144,8 @@ export default {
             title: '',
             text: '',
             files: []
-        }
+        },
+        formData: new FormData(),
     }),
     props: {
         params: Object
@@ -159,6 +177,13 @@ export default {
             ).catch(error => {
                 console.log(error);
             })
+        },
+        pickImages () {
+            this.$refs.images.click();
+        },
+        elementLoadToFileImage() {
+            this.files = this.$refs.images.files;
+            console.log(this.$refs.images.files);
         },
         elementLoadToFile() {
             this.loadingExcel = true;
@@ -200,7 +225,6 @@ export default {
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
         },
-
         deleteItem (item) {
             const index = this.desserts.indexOf(item);
             if (confirm('Are you sure you want to delete this item?')) {
@@ -217,7 +241,6 @@ export default {
                 })
             }
         },
-
         close () {
             this.dialog = false
             setTimeout(() => {
@@ -225,7 +248,6 @@ export default {
                 this.editedIndex = -1
             }, 300)
         },
-
         save () {
             let method = null;
             if (this.editedIndex > -1) {
@@ -233,23 +255,60 @@ export default {
             } else {
                 method = 'post'
             }
-            axios({
-                method: method,
-                url: this.params.baseUrl,
-                data: this.editedItem
-            })
-            .then(
-                response => {
-                    if (this.editedIndex > -1) {
-                        Object.assign(this.desserts[this.editedIndex], this.editedItem);
-                    } else {
-                        this.desserts.push(this.editedItem);
+            // if(this.files) {
+                // console.log(this.files);
+                // Array.from(this.files).forEach(files => {
+                //     this.formData.append('file[]', files);
+                // });
+                // console.log(this.formData);
+                // axios.post('api/files', this.formData, {
+                //     headers: {'Content-Type': 'multipart/form-data'}
+                // })
+                // .then(
+                //     res => {
+                //         axios({
+                //             method: method,
+                //             url: this.params.baseUrl,
+                //             data: this.editedItem,
+                //             images: res.data.files
+                //         })
+                //         .then(
+                //             response => {
+                //                 if (this.editedIndex > -1) {
+                //                     Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                //                 } else {
+                //                     this.desserts.push(this.editedItem);
+                //                 }
+                //                 this.close();
+                //             }
+                //         ).catch(error => {
+                //             console.log(error);
+                //         })
+                //     }
+                // ).catch(
+                //     error => {
+                //         console.log(error);
+                //     }
+                // );
+            // } else {
+                axios({
+                    method: method,
+                    url: this.params.baseUrl,
+                    data: this.editedItem
+                })
+                .then(
+                    response => {
+                        if (this.editedIndex > -1) {
+                            Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                        } else {
+                            this.desserts.push(this.editedItem);
+                        }
+                        this.close();
                     }
-                    this.close();
-                }
-            ).catch(error => {
-                console.log(error);
-            })
+                ).catch(error => {
+                    console.log(error);
+                })
+            // }
         },
     }
 }
