@@ -1,15 +1,9 @@
 <template>
 <div>
-    <v-toolbar flat color="white">
-        <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Search"
-            single-line
-            hide-details
-        ></v-text-field>
+    <v-toolbar color="#fff" fixed app clipped-righ>
+        <v-toolbar-title>Toolbar</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn
+         <v-btn
             color="blue-grey"
             class="white--text"
             :loading="loadingExcel"
@@ -29,7 +23,7 @@
         </v-btn>
         <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on }">
-                <v-btn color="primary" dark class="mb-2" v-on="on">Добавить</v-btn>
+                <v-btn color="green" dark class="mb-2" v-on="on">Добавить</v-btn>
             </template>
             <v-card>
                 <v-card-title>
@@ -55,7 +49,7 @@
                                 <input
                                     type="file"
                                     ref="images"
-                                    name='file[]'
+                                    name='file'
                                     accept="image/*"
                                     style="display: none"
                                     @change="elementLoadToFileImage"
@@ -66,7 +60,6 @@
                     </v-layout>
                     </v-container>
                 </v-card-text>
-
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" flat @click="close">Закрыть</v-btn>
@@ -75,26 +68,39 @@
             </v-card>
         </v-dialog>
     </v-toolbar>
+    <v-toolbar flat color="#fff">
+        <v-flex xs12 sm6 md3>
+        <v-text-field
+            v-model="search"
+            append-icon="search"
+            label="Search"
+            single-line
+            hide-details
+        ></v-text-field>
+        </v-flex>
+        <v-spacer></v-spacer>
+        <v-btn icon>
+            <v-icon>more_vert</v-icon>
+        </v-btn>
+    </v-toolbar>
     <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:items="props">
             <td>{{ props.item.title }}</td>
             <td class="text-xs-right">{{ props.item.text}}</td>
             <td class="text-xs-right">
-                {{ props.item.files}}
+                <div class="" v-for="img in props.item.files" :key="img.id">
+                    <img :src="'/storage/' + img.url" alt="" style="width:200px">
+                    <button type="button" class="close" aria-label="Close" v-on:click="removeImg(img)">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
             </td>
             <td class="justify-center layout px-0">
-            <v-icon
-                small
-                class="mr-2"
-                @click="editItem(props.item)"
-            >
+            <v-icon small class="mr-2" @click="editItem(props.item)">
                 edit
             </v-icon>
-            <v-icon
-                small
-                @click="deleteItem(props.item)"
-            >
+            <v-icon small @click="deleteItem(props.item)">
                 delete
             </v-icon>
         </td>
@@ -183,7 +189,6 @@ export default {
         },
         elementLoadToFileImage() {
             this.files = this.$refs.images.files;
-            console.log(this.$refs.images.files);
         },
         elementLoadToFile() {
             this.loadingExcel = true;
@@ -217,6 +222,32 @@ export default {
                 file.value = '';
             };
         },
+        removeImg(data) {
+            axios.post('api/files/remove', data)
+            .then(
+                res => {
+                    axios({
+                        method: 'delete',
+                        url: this.params.baseUrl,
+                        data: res,
+                        params: { 
+                            images: data.id
+                        }
+                    })
+                    .then(
+                        response => {
+                           this.initialize();
+                        }
+                    ).catch(error => {
+                        console.log(error);
+                    })
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            );
+        },
         pickExcel () {
             this.$refs.excel.click();
         },
@@ -248,6 +279,11 @@ export default {
                 this.editedIndex = -1
             }, 300)
         },
+        resetFilesLoad() {
+            this.files = [];
+            this.$refs.images.value = '';
+            this.formData.delete('file[]');
+        },
         save () {
             let method = null;
             if (this.editedIndex > -1) {
@@ -255,42 +291,39 @@ export default {
             } else {
                 method = 'post'
             }
-            // if(this.files) {
-                // console.log(this.files);
-                // Array.from(this.files).forEach(files => {
-                //     this.formData.append('file[]', files);
-                // });
-                // console.log(this.formData);
-                // axios.post('api/files', this.formData, {
-                //     headers: {'Content-Type': 'multipart/form-data'}
-                // })
-                // .then(
-                //     res => {
-                //         axios({
-                //             method: method,
-                //             url: this.params.baseUrl,
-                //             data: this.editedItem,
-                //             images: res.data.files
-                //         })
-                //         .then(
-                //             response => {
-                //                 if (this.editedIndex > -1) {
-                //                     Object.assign(this.desserts[this.editedIndex], this.editedItem);
-                //                 } else {
-                //                     this.desserts.push(this.editedItem);
-                //                 }
-                //                 this.close();
-                //             }
-                //         ).catch(error => {
-                //             console.log(error);
-                //         })
-                //     }
-                // ).catch(
-                //     error => {
-                //         console.log(error);
-                //     }
-                // );
-            // } else {
+            if(this.files.length > 0) {
+                Array.from(this.files).forEach(files => {
+                    this.formData.append('file[]', files);
+                });
+                axios.post('api/files', this.formData, {
+                    headers: {'Content-Type': 'multipart/form-data'}
+                })
+                .then(
+                    res => {
+                        axios({
+                            method: method,
+                            url: this.params.baseUrl,
+                            data: this.editedItem,
+                            params: {
+                                images: res.data.files
+                            }
+                        })
+                        .then(
+                            response => {
+                                this.initialize();
+                                this.close();
+                                this.resetFilesLoad();
+                            }
+                        ).catch(error => {
+                            console.log(error);
+                        })
+                    }
+                ).catch(
+                    error => {
+                        console.log(error);
+                    }
+                );
+            } else {
                 axios({
                     method: method,
                     url: this.params.baseUrl,
@@ -308,7 +341,7 @@ export default {
                 ).catch(error => {
                     console.log(error);
                 })
-            // }
+            }
         },
     }
 }

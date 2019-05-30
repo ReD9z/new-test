@@ -1,22 +1,15 @@
 <template>
     <v-app id="inspire">
-        <v-navigation-drawer fixed v-model="drawerRight" clipped app >
-        </v-navigation-drawer>
-        <v-toolbar color="blue-grey" dark fixed app clipped-righ>
-        <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-        <v-toolbar-title>Toolbar</v-toolbar-title>
-        <v-spacer></v-spacer>
-        </v-toolbar>
-        <v-navigation-drawer fixed v-model="drawer" app>
-            <v-toolbar flat>
-                <v-list dense>
+        <v-navigation-drawer fixed :width="180" v-model="drawer" app>
+            <!-- <v-toolbar flat> -->
+                <!-- <v-list dense>
                     <v-list-tile>
                         <v-list-tile-title class="title">
                             Application
                         </v-list-tile-title>
                     </v-list-tile>
-                </v-list>
-            </v-toolbar>
+                </v-list> -->
+            <!-- </v-toolbar> -->
             <v-divider></v-divider>
             <v-list dense class="pt-0">
                 <router-link :to="{ name: 'home' }">
@@ -53,11 +46,6 @@
                 </v-layout>
             </v-container>
         </v-content>
-        <v-footer color="blue-grey" class="white--text" app>
-            <span>Vuetify</span>
-            <v-spacer></v-spacer>
-            <span>&copy; 2017</span>
-        </v-footer>
     </v-app>
     <!-- <div class="container">
         <div class="row justify-content-center">
@@ -113,8 +101,8 @@
 <script>
 export default {
     data: () => ({
-        drawer: false,
-        drawerRight: false,
+        drawer: true,
+        drawerRight: true,
         left: null
     }),
     props: {

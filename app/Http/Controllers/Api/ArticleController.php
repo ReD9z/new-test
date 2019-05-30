@@ -48,7 +48,6 @@ class ArticleController extends Controller
                 return new ArticleResource($article);
             }
         }
-
     }
 
     public function addExcelData(Request $request)
