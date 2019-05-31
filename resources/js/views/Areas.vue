@@ -10,14 +10,17 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/areas',
-            fields: [
-                {   
-                    key: "name", 
-                    label: "Название",
-                    sort: true, 
+            headers: [
+                {
+                    text: 'Название',
+                    align: 'left',
+                    sortable: true,
+                    value: 'name'
+                },
+                { 
+                    text: 'Параметры', 
+                    sortable: false,
                     edit: true,
-                    type: "text",
-                    input: "input"
                 }
             ],
             search: true,

@@ -16,19 +16,9 @@ class TypesToWorksController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->search) {
-            $types = TypesToWorks::where('title', 'like', '%' . $request->search . '%')->paginate(6); 
-            //TODO сделать метод в модели с несколькими параметрами find('title', 'text' ..).paginate(4)
-        } else {
-            $types = TypesToWorks::orderBy($request->sortTable, $request->sort)->paginate(6);
-        }
         
-        return TypesToWorksResource::collection($types);
-    }
-
-    public function allTypesToWorks(Request $request)
-    {
-        $types = TypesToWorks::get();
+        $types = TypesToWorks::get(); 
+        
         return TypesToWorksResource::collection($types);
     }
 

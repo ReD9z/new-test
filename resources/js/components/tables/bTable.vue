@@ -31,33 +31,21 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container grid-list-md>
-                    <v-layout wrap>
-                        <v-flex xs12 sm6 md4>
-                            <v-text-field v-model="editedItem.title" label="Название"></v-text-field>
-                        </v-flex>
-                        <v-flex xs12 sm6 md4>
-                            <v-text-field v-model="editedItem.text" label="Текст"></v-text-field>
-                        </v-flex>
-                        <v-flex xs12>
-                            <v-btn
-                                color="blue-grey"
-                                class="white--text"
-                                @click='pickImages'
-                            >
-                                Добавить изображения
-                                <v-icon right dark>cloud_upload</v-icon>
-                                <input
-                                    type="file"
-                                    ref="images"
-                                    name='file'
-                                    accept="image/*"
-                                    style="display: none"
-                                    @change="elementLoadToFileImage"
-                                    multiple
-                                >
-                            </v-btn>
-                        </v-flex> 
-                    </v-layout>
+                        <v-layout wrap>
+                            <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
+                                <v-text-field v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field> 
+                                <v-flex xs12 v-if="param.input == 'images'">
+                                    <v-flex v-for="file in editedItem.files" :key="file.id" xs4 d-flex>
+                                        <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" class="grey lighten-2" ></v-img>
+                                    </v-flex>
+                                    <v-btn color="blue-grey" class="white--text" @click='pickImages' block>
+                                        Добавить изображения
+                                        <v-icon right dark>cloud_upload</v-icon>
+                                        <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
+                                    </v-btn>
+                                </v-flex>
+                            </v-flex>
+                        </v-layout>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -83,27 +71,30 @@
             <v-icon>more_vert</v-icon>
         </v-btn>
     </v-toolbar>
-    <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:items="props">
-            <td>{{ props.item.title }}</td>
-            <td class="text-xs-right">{{ props.item.text}}</td>
-            <td class="text-xs-right">
-                <div class="" v-for="img in props.item.files" :key="img.id">
-                    <img :src="'/storage/' + img.url" alt="" style="width:200px">
-                    <button type="button" class="close" aria-label="Close" v-on:click="removeImg(img)">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
+            <td v-for="(param, key) in params.headers" :key="key">
+                <v-flex v-if="param.input !== 'images'">
+                    {{props.item[param.value]}}
+                </v-flex>
+                <v-flex v-if="param.edit">
+                    <v-icon small class="mr-2" @click="editItem(props.item)">
+                        edit
+                    </v-icon>
+                    <v-icon small @click="deleteItem(props.item)">
+                        delete
+                    </v-icon>
+                </v-flex>
+                <v-flex xs12 v-if="param.input == 'images'">
+                    <v-flex v-for="file in props.item[param.value]" :key="file.id" xs12 d-flex>
+                        <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" class="grey lighten-2"></v-img>
+                        <button type="button" class="close" aria-label="Close" v-on:click="removeImg(file)">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </v-flex>
+                </v-flex>
             </td>
-            <td class="justify-center layout px-0">
-            <v-icon small class="mr-2" @click="editItem(props.item)">
-                edit
-            </v-icon>
-            <v-icon small @click="deleteItem(props.item)">
-                delete
-            </v-icon>
-        </td>
         </template>
         <template v-slot:no-data>
             <v-btn color="primary" @click="initialize">Сброс</v-btn>
@@ -127,30 +118,11 @@ export default {
         dialog: false,
         loading: true,
         loadingExcel: false,
-        headers: [
-            {
-            text: 'Название',
-            align: 'left',
-            sortable: true,
-            value: 'title'
-            },
-            { text: 'Текст', value: 'text' },
-            { text: 'Изображения', value: 'files', sortable: false},
-            { text: 'Параметры', value: 'name', sortable: false }
-        ],
         files: [],
         desserts: [],
         editedIndex: -1,
-        editedItem: {
-            title: '',
-            text: '',
-            files: []
-        },
-        defaultItem: {
-            title: '',
-            text: '',
-            files: []
-        },
+        editedItem: {},
+        defaultItem: {},
         formData: new FormData(),
     }),
     props: {
@@ -185,10 +157,10 @@ export default {
             })
         },
         pickImages () {
-            this.$refs.images.click();
+            this.$refs.images[0].click();
         },
         elementLoadToFileImage() {
-            this.files = this.$refs.images.files;
+            this.files =  this.$refs.images[0].files;
         },
         elementLoadToFile() {
             this.loadingExcel = true;

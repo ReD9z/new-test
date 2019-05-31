@@ -10,14 +10,17 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/types_to_work',
-            fields: [
-                {   
-                    key: "title", 
-                    label: "Название",
-                    sort: true,
+            headers: [
+                {
+                    text: 'Название',
+                    align: 'left',
+                    sortable: true,
+                    value: 'title'
+                },
+                { 
+                    text: 'Параметры',
+                    sortable: false,
                     edit: true,
-                    type: "text",
-                    input: "input"
                 }
             ],
             search: true,

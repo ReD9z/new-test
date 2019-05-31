@@ -11,51 +11,38 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/address',
-            fields: [
-                {   
-                    key: "city", 
-                    label: "Город",
-                    sort: true, // false состояние
-                    edit: true, // false состояние
-                    type: "text", // Сделать отображение картинок
-                    input: "input"
+            headers: [
+                {
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city'
                 },
-                {   
-                    key: "area", 
-                    label: "Район",
-                    sort: true, // false состояние
-                    edit: true, // false состояние
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'Район', 
+                    value: 'area' 
                 },
-                {   
-                    key: "street", 
-                    label: "Улица",
-                    sort: true, // false состояние
-                    edit: true, // false состояние
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'Улица', 
+                    value: 'street' 
                 },
-                {   
-                    key: "house_number", 
-                    label: "Номер дома",
-                    sort: true, // false состояние
-                    edit: true, // false состояние
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'Номер дома', 
+                    value: 'house_number' 
                 },
-                {   
-                    key: "number_entrances", 
-                    label: "Количество подъездов",
-                    sort: true, // false состояние
-                    edit: true, // false состояние
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'Количество подъездов', 
+                    value: 'number_entrances' 
+                },
+                { 
+                    text: 'Параметры',
+                    sortable: false,
+                    edit: true,
                 }
             ],
-            excel: true,
             search: true,
             pagination: true,
+            excel: true
         }
     })
 }

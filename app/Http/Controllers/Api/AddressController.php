@@ -16,26 +16,10 @@ class AddressController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->search) {
-           $address = Address::where('city', 'like', '%' . $request->search . '%')
-            ->orWhere('area', 'like', '%' . $request->search . '%')
-            ->orWhere('street', 'like', '%' . $request->search . '%')
-            ->orWhere('house_number', 'like', '%' . $request->search . '%')
-            ->orWhere('number_entrances', 'like', '%' . $request->search . '%')
-            ->paginate(6); 
-            //TODO сделать метод в модели с несколькими параметрами find('title', 'text' ..).paginate(4)
-        } else {
-           $address = Address::orderBy($request->sortTable, $request->sort)->paginate(6);
-        }  
-        return AddressResource::collection($address);
-    }
-
-    public function allAddress(Request $request)
-    {
         $address = Address::get();
         return AddressResource::collection($address);
     }
- 
+
     /**
      * Store a newly created resource in storage.
      *

@@ -16,20 +16,9 @@ class AreasController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->search) {
-            $areas = Areas::where('name', 'like', '%' . $request->search . '%')->paginate(6); 
-            //TODO сделать метод в модели с несколькими параметрами find('title', 'text' ..).paginate(4)
-        } else {
-            $areas = Areas::orderBy($request->sortTable, $request->sort)->paginate(6);
-        }
-        
-        return AreasResource::collection($areas);
-    }
-
-    public function allAreas(Request $request)
-    {
        
         $areas = Areas::get();
+        
         
         return AreasResource::collection($areas);
     }

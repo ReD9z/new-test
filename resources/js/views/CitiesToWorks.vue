@@ -10,15 +10,18 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/cities_to_works',
-            fields: [
-                {   
-                    key: "name", 
-                    label: "Название",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input"
+            headers: [
+                {
+                    text: 'Название',
+                    align: 'left',
+                    sortable: true,
+                    value: 'name'
                 },
+                { 
+                    text: 'Параметры', 
+                    sortable: false,
+                    edit: true,
+                }
             ],
             search: true,
             pagination: true,

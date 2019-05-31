@@ -67,7 +67,6 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('types_to_work', 'Api\TypesToWorksController@store');  // Edit one item
         Route::delete('types_to_work/{id}', 'Api\TypesToWorksController@destroy'); // Delete one item
         Route::get('types_to_work', 'Api\TypesToWorksController@index'); // Show list
-        Route::get('types_to_work/allTypesToWorks', 'Api\TypesToWorksController@allTypesToWorks'); // Show all list
 
         // Areas
         Route::post('areas', 'Api\AreasController@store'); // Add one item
@@ -75,7 +74,6 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('areas', 'Api\AreasController@store');  // Edit one item
         Route::delete('areas/{id}', 'Api\AreasController@destroy'); // Delete one item
         Route::get('areas', 'Api\AreasController@index'); // Show list
-        Route::get('areas/allAreas', 'Api\AreasController@allAreas'); // Show all list
 
         // AddressToOrders 
         Route::post('address_to_orders', 'Api\AddressToOrdersController@store'); // Add one item
@@ -90,7 +88,6 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('cities_to_works', 'Api\CitiesToWorksController@store');  // Edit one item
         Route::delete('cities_to_works/{id}', 'Api\CitiesToWorksController@destroy'); // Delete one item
         Route::get('cities_to_works', 'Api\CitiesToWorksController@index'); // Show list
-        Route::get('cities_to_works/allCities', 'Api\CitiesToWorksController@allCities'); // Show all list
 
         // Clients 
         Route::post('clients', 'Api\ClientsController@store'); // Add one item  
@@ -98,17 +95,13 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('clients', 'Api\ClientsController@store');  // Edit one item
         Route::delete('clients/{id}', 'Api\ClientsController@destroy'); // Delete one item
         Route::get('clients', 'Api\ClientsController@index'); // Show list
-        Route::get('clients/allClients', 'Api\ClientsController@allClients'); // Show all list
 
-
-        // Installers   
+        // Installers
         Route::post('installers', 'Api\InstallersController@store');  // Add one item
         Route::get('installers', 'Api\InstallersController@show'); // Show one item
         Route::put('installers', 'Api\InstallersController@store');  // Edit one item
         Route::delete('installers/{id}', 'Api\InstallersController@destroy'); // Delete one item
         Route::get('installers', 'Api\InstallersController@index'); // Show list
-        Route::get('installers/allInstallers', 'Api\InstallersController@allInstallers'); // Show all list
-
 
         // Managers   
         Route::post('managers', 'Api\ManagersController@store');  // Add one item
@@ -123,7 +116,6 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('orders', 'Api\OrdersController@store');  // Edit one item
         Route::delete('orders/{id}', 'Api\OrdersController@destroy'); // Delete one item
         Route::get('orders', 'Api\OrdersController@index'); // Show list
-        Route::get('orders/allOrders', 'Api\OrdersController@allOrders'); // Show all list
 
         // Roles
         Route::post('roles', 'Api\OrdersController@store');  // Add one item   
@@ -138,6 +130,5 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('tasks', 'Api\TasksController@store');  // Edit one item
         Route::delete('tasks/{id}', 'Api\TasksController@destroy'); // Delete one item
         Route::get('tasks', 'Api\TasksController@index'); // Show list
-    
     });
 });
