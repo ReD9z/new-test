@@ -3,7 +3,7 @@
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>Toolbar</v-toolbar-title>
         <v-spacer></v-spacer>
-         <v-btn
+        <v-btn
             color="blue-grey"
             class="white--text"
             :loading="loadingExcel"
@@ -67,6 +67,12 @@
         ></v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
+        <v-icon>filter_list</v-icon>
+        <div v-for="(item, key) in chips">
+        <div class="text-xs-center">
+            <v-chip close @input="remove(item)">{{item}}</v-chip>
+        </div>
+        </div>
         <v-btn icon>
             <v-icon>more_vert</v-icon>
         </v-btn>
@@ -124,6 +130,8 @@ export default {
         editedItem: {},
         defaultItem: {},
         formData: new FormData(),
+        chips: ['Streaming', 'Eating'],
+        chipsItem: ['Streaming', 'Eating']
     }),
     props: {
         params: Object
@@ -315,6 +323,10 @@ export default {
                 })
             }
         },
+        remove(item) {
+            this.chips.splice(this.chips.indexOf(item), 1)
+            this.chips = [...this.chips]
+        }
     }
 }
 </script>

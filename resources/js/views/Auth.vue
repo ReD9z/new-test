@@ -1,52 +1,34 @@
 <template>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-7 mt-4 mb-4">
-                <div class="card">
-                    <div class="card-header">Авторизация</div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">Email</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control" name="email" v-model="user.email" required autofocus>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">Пароль</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control" name="password" v-model="user.password" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-6 offset-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" v-model="user.remember_me" :value="isActive" @click="remember()">
-                                    <label class="form-check-label" for="remember">
-                                        Запомнить
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" @click="login" class="btn btn-primary">
-                                    Войти
-                                </button>
-                                <a class="btn btn-link" href="/">
-                                    Забыли ваш пароль?
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <v-layout justify-center align-center>
+        <v-flex sm6>
+            <v-card>
+                <v-toolbar color="teal" dark>
+                    <v-toolbar-title>Авторизация</v-toolbar-title>
+                </v-toolbar>
+                <v-text-field
+                    class="mt-4 pl-4 pr-4"
+                    solo
+                    label="E-mail"
+                    prepend-inner-icon="person"
+                    v-model="user.email"
+                    required 
+                    autofocus
+                ></v-text-field>
+                <v-text-field
+                    class="pl-4 pr-4"
+                    solo
+                    label="Пароль"
+                    prepend-inner-icon="work"
+                    v-model="user.password"
+                    required
+                ></v-text-field>
+                <v-checkbox class="pl-4 pr-4" v-model="user.remember_me"  label="Запомнить?" :value="isActive" @click="remember()"></v-checkbox>
+                <v-btn class="mb-4 ml-4 mr-4" color="success" @click="login" >
+                    Войти
+                </v-btn>
+            </v-card>
+        </v-flex>
+    </v-layout>
 </template>
 
 <script>
