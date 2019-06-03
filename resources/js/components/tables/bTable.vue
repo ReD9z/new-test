@@ -68,10 +68,10 @@
         </v-flex>
         <v-spacer></v-spacer>
         <v-icon>filter_list</v-icon>
-        <div v-for="(item, key) in chips">
-        <div class="text-xs-center">
-            <v-chip close @input="remove(item)">{{item}}</v-chip>
-        </div>
+        <div v-for="(item, key) in chips" :key="key">
+            <div class="text-xs-center">
+                <v-chip close @input="remove(item)">{{item}}</v-chip>
+            </div>
         </div>
         <v-btn icon>
             <v-icon>more_vert</v-icon>
