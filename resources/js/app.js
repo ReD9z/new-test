@@ -5,10 +5,16 @@ import store from './store.js';
 import routers from './routes.js';
 import Vue from 'vue';
 import Vuetify from 'vuetify';
-
-Vue.use(Vuetify);
-
+import ru from 'vuetify/es5/locale/ru'
 import 'vuetify/dist/vuetify.min.css';
+
+Vue.use(Vuetify, {
+    lang: {
+        locales: { ru },
+        current: 'ru'
+    }
+});
+
 
 require('./bootstrap');
 
@@ -30,8 +36,6 @@ Vue.component('home-component', require('./views/Home.vue').default);
 Vue.component('home-layout', require('./views/Layout.vue').default);
 Vue.component('home-address', require('./views/Address.vue').default);
 Vue.component('b-table', require('./components/tables/bTable.vue').default);
-Vue.component('b-table-item', require('./components/tables/bTableItem.vue').default);
-Vue.component('b-pagination', require('./components/pagination/pagination.vue').default);
 
 /**
  * VueRouter components

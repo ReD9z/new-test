@@ -1,7 +1,7 @@
 <template>
 <div>
     <v-toolbar color="#fff" fixed app clipped-righ>
-        <v-toolbar-title>Toolbar</v-toolbar-title>
+        <v-toolbar-title>Атом</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn
             color="blue-grey"
@@ -21,61 +21,105 @@
             multiple
         >
         </v-btn>
-        <v-dialog v-model="dialog" max-width="500px">
-            <template v-slot:activator="{ on }">
-                <v-btn color="green" dark class="mb-2" v-on="on">Добавить</v-btn>
-            </template>
-            <v-card>
-                <v-card-title>
-                    <span class="headline">{{ formTitle }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-container grid-list-md>
-                        <v-layout wrap>
-                            <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                                <v-text-field v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field> 
-                                <v-flex xs12 v-if="param.input == 'images'">
-                                    <v-flex v-for="file in editedItem.files" :key="file.id" xs4 d-flex>
-                                        <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" class="grey lighten-2" ></v-img>
-                                    </v-flex>
-                                    <v-btn color="blue-grey" class="white--text" @click='pickImages' block>
-                                        Добавить изображения
-                                        <v-icon right dark>cloud_upload</v-icon>
-                                        <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
-                                    </v-btn>
-                                </v-flex>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" flat @click="close">Закрыть</v-btn>
-                    <v-btn color="blue darken-1" flat @click="save">Сохранить</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        <v-btn color="green" dark class="mb-2" @click.stop="dialog = !dialog">Добавить</v-btn>
     </v-toolbar>
+    <v-navigation-drawer v-model="dialog" right temporary fixed>
+        <v-card height="100%">
+            <v-toolbar color="pink" dark>
+                <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon @click="close">
+                    <v-icon>close</v-icon>
+                </v-btn>
+            </v-toolbar>
+            <v-card-text>
+                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
+                    <v-text-field v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field> 
+                    <v-flex xs12 v-if="param.input == 'images'">
+                        <v-flex v-for="file in editedItem.files" :key="file.id" xs4 d-flex>
+                            <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" class="grey lighten-2" ></v-img>
+                        </v-flex>
+                        <v-btn color="blue-grey" class="white--text" @click='pickImages' block>
+                            Добавить изображения
+                            <v-icon right dark>cloud_upload</v-icon>
+                            <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
+                        </v-btn>
+                    </v-flex>
+                </v-flex>
+            </v-card-text>
+            <div class="text-xs-center">
+                <v-btn color="info" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
+                    Сохранить
+                    <template v-slot:loaderSaveBtn>
+                        <span class="custom-loader">
+                        <v-icon light>cached</v-icon>
+                        </span>
+                    </template>
+                </v-btn>
+             </div>
+        </v-card>
+    </v-navigation-drawer>
+      <v-dialog v-model="dialogImages" max-width="500px">
+        <v-card>
+            <v-card-title>
+                <span class="headline">{{ formTitle }}</span>
+            </v-card-title>
+            <v-card-text>
+                <v-container grid-list-md>
+                    <v-layout wrap>
+                        
+                        <v-flex v-for="file in editedItem.files" :key="file.id" xs4 d-flex>
+                            <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" class="grey lighten-2" ></v-img>
+                        </v-flex>
+                        {{editedItem}}
+                        <!-- <v-btn color="blue-grey" class="white--text" @click='pickImages' block>
+                            Добавить изображения
+                            <v-icon right dark>cloud_upload</v-icon>
+                            <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
+                        </v-btn> -->
+                         
+                    </v-layout>
+                </v-container>
+            </v-card-text>
+        </v-card>
+    </v-dialog>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
         <v-text-field
             v-model="search"
             append-icon="search"
-            label="Search"
+            label="Поиск"
             single-line
             hide-details
         ></v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
         <v-icon>filter_list</v-icon>
-        <div v-for="(item, key) in chips" :key="key">
-            <div class="text-xs-center">
-                <v-chip close @input="remove(item)">{{item}}</v-chip>
-            </div>
+        <div>
+            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
         </div>
-        <v-btn icon>
-            <v-icon>more_vert</v-icon>
-        </v-btn>
+        <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
+            <template v-slot:activator="{ on }">
+                <v-btn icon v-on="on">
+                    <v-icon>more_vert</v-icon>
+                </v-btn>
+            </template>
+            <v-card>
+                <v-divider></v-divider>
+                <v-list>
+                    <v-list-tile>
+                        <v-list-tile-action>
+                            <v-checkbox v-model="chips" label="Jacob" value="Jacob"></v-checkbox>
+                        </v-list-tile-action>
+                    </v-list-tile>
+                    <v-list-tile>
+                        <v-list-tile-action>
+                            <v-checkbox v-model="chips" label="John" value="John"></v-checkbox>
+                        </v-list-tile-action>
+                    </v-list-tile>
+                </v-list>
+            </v-card>
+        </v-menu>
     </v-toolbar>
     <v-data-table :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
@@ -93,12 +137,38 @@
                     </v-icon>
                 </v-flex>
                 <v-flex xs12 v-if="param.input == 'images'">
-                    <v-flex v-for="file in props.item[param.value]" :key="file.id" xs12 d-flex>
-                        <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" class="grey lighten-2"></v-img>
-                        <button type="button" class="close" aria-label="Close" v-on:click="removeImg(file)">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </v-flex>
+                    <v-btn color="green" dark class="mb-2" @click.stop="dialogImages = !dialogImages">Добавить</v-btn>
+                    <!-- <v-dialog v-if="props.item[param.value].length > 0" v-model="dialogImages" width="500">
+                        <template v-slot:activator="{ on }">
+                            <v-btn color="red lighten-2" dark v-on="on" >
+                                Click Me
+                            </v-btn>
+                        </template>
+                        <v-card>
+                            {{props.item[param.value]}} 
+                        </v-card>
+                    </v-dialog> -->
+                    <!-- <v-dialog v-for="file in props.item[param.value]" :key="file.id" v-model="dialogImages" width="500">
+                        <template v-slot:activator="{ on }">
+                            <v-btn color="red lighten-2" dark v-on="on" >
+                                Click Me
+                            </v-btn>
+                        </template>
+                        <v-card>
+                            <v-card-title class="headline grey lighten-2" primary-title>
+                            Изображения
+                            </v-card-title>
+
+                            <v-card-text>
+                                <v-flex xs12 d-flex>
+                                    <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" class="grey lighten-2"></v-img>
+                                    <button type="button" class="close" aria-label="Close" v-on:click="removeImg(file)">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </v-flex>
+                            </v-card-text>
+                        </v-card>
+                    </v-dialog> -->
                 </v-flex>
             </td>
         </template>
@@ -107,11 +177,8 @@
         </template>
         <template v-slot:no-results>
             <v-alert :value="true" color="error" icon="warning">
-            Your search for "{{ search }}" found no results.
+                Your search for "{{ search }}" found no results.
             </v-alert>
-        </template>
-        <template v-slot:pageText="props">
-            {{ props.pageStart }} - {{ props.pageStop }} из {{ props.itemsLength }}
         </template>
     </v-data-table>
 </div>
@@ -122,6 +189,7 @@ export default {
     data: () => ({
         search: '',
         dialog: false,
+        dialogImages: false,
         loading: true,
         loadingExcel: false,
         files: [],
@@ -129,9 +197,11 @@ export default {
         editedIndex: -1,
         editedItem: {},
         defaultItem: {},
+        loadingSaveBtn: false,
+        loaderSaveBtn: null,
         formData: new FormData(),
-        chips: ['Streaming', 'Eating'],
-        chipsItem: ['Streaming', 'Eating']
+        chips: [],
+        chipsItem: ['Фильтер1', 'Фильтер2']
     }),
     props: {
         params: Object
@@ -265,6 +335,8 @@ export default {
             this.formData.delete('file[]');
         },
         save () {
+            this.loaderSaveBtn = true;
+            this.loadingSaveBtn = true;
             let method = null;
             if (this.editedIndex > -1) {
                 method = 'put'
@@ -291,6 +363,8 @@ export default {
                         .then(
                             response => {
                                 this.initialize();
+                                this.loadingSaveBtn = false;
+                                this.loaderSaveBtn = null;
                                 this.close();
                                 this.resetFilesLoad();
                             }
@@ -316,6 +390,8 @@ export default {
                         } else {
                             this.desserts.push(this.editedItem);
                         }
+                        this.loaderSaveBtn = null;
+                        this.loadingSaveBtn = false;
                         this.close();
                     }
                 ).catch(error => {

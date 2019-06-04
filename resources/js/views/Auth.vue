@@ -18,6 +18,7 @@
                     class="pl-4 pr-4"
                     solo
                     label="Пароль"
+                    type="password"
                     prepend-inner-icon="work"
                     v-model="user.password"
                     required

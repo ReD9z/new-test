@@ -1,14 +1,6 @@
 <template>
     <v-app id="inspire">
-        <v-navigation-drawer
-            v-model="drawer"
-            :mini-variant.sync="mini"
-            hide-overlay
-            stateless
-            fixed
-            app  
-            v-if="isLoggedIn"
-        >
+        <v-navigation-drawer v-model="drawer" :mini-variant.sync="mini" hide-overlay stateless fixed app v-if="isLoggedIn">
             <v-toolbar flat class="transparent">
                 <v-list class="pa-0">
                     <v-list-tile avatar>
@@ -86,7 +78,7 @@ export default {
                 [
                     { title: 'Менеджеры', icon: 'question_answer', src: 'managers'},
                     { title: 'Модераторы', icon: 'question_answer', src: 'moderators'},
-                    { title: 'Пользователи', icon: 'question_answer', src: 'users'},
+                    { title: 'Администраторы', icon: 'question_answer', src: 'users'},
                     { title: 'Монтажники', icon: 'question_answer',src: 'installers'},
                     { title: 'Роли', icon: 'question_answer', src: 'roles'},
                 ] 
