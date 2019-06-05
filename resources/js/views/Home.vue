@@ -18,7 +18,6 @@ export default {
                     value: 'text' 
                 },
                 { 
-                    text: 'Изображения',
                     value: 'files', 
                     sortable: false,
                     input: "images"
@@ -28,6 +27,9 @@ export default {
                     sortable: false,
                     edit: true,
                 }
+            ],
+            filters: [
+
             ],
             search: true,
             pagination: true,

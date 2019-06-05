@@ -37,7 +37,6 @@ class ArticleController extends Controller
     
         if($request->isMethod('delete') && $request->images) {
             $article::removeTableFiles($request->images);
-            return new ArticleResource($article);
         } else {
             if($article->save()) {
                 if ($request->isMethod('post') && is_array($request->images) || $request->isMethod('put') && is_array($request->images)) {
@@ -45,9 +44,9 @@ class ArticleController extends Controller
                         $article::saveTableFiles(json_decode($request->images[$key])->id, $article->id);    
                     }
                 }
-                return new ArticleResource($article);
             }
         }
+        return new ArticleResource($article);
     }
 
     public function addExcelData(Request $request)

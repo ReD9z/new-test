@@ -16,19 +16,8 @@ class OrdersController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->search) {
-            $orders = Orders::join('clients', 'clients.id', '=', 'orders.id')->where('clients.actual_title', 'like', '%' . $request->search . '%')->paginate(6); 
-            //TODO сделать метод в модели с несколькими параметрами find('title', 'text' ..).paginate(4)
-        } else {
-            $orders = Orders::with('clients')->orderBy($request->sortTable, $request->sort)->paginate(6);
-        }
+        $orders = Orders::get(); 
         
-        return OrdersResource::collection($orders);
-    }
-
-    public function allOrders(Request $request)
-    {
-        $orders = Orders::get();
         return OrdersResource::collection($orders);
     }
 

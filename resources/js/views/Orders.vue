@@ -10,34 +10,36 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/orders',
-            fields: [
-                {   
-                    key: "client_id", 
+            headers: [
+                {
+                    text: 'Клиент',
+                    align: 'left',
+                    sortable: true,
+                    value: 'client_id',
+                    selectApi: 'api/clients',
                     keyValue: "clients",  
-                    label: "Клиент",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
                     input: "select",
-                    selectApi: 'api/clients/allClients',
-                    selectKey: 'actual_title',
                 },
-                {   
-                    key: "order_start_date", 
-                    label: "Дата начала размещения",
-                    sort: true, 
-                    edit: true,
-                    type: "datetime-local",
-                    input: "input"
+                { 
+                    text: 'Дата начала размещения', 
+                    input: "text",
+                    sortable: false,
+                    value: 'order_start_date' 
                 },
-                {   
-                    key: "order_end_date", 
-                    label: "Дата окончания размещения",
-                    sort: true, 
+                { 
+                    text: 'Дата начала размещения', 
+                    input: "text",
+                    sortable: false,
+                    value: 'order_end_date' 
+                },
+                { 
+                    text: 'Параметры',
+                    sortable: false,
                     edit: true,
-                    type: "datetime-local",
-                    input: "input"
                 }
+            ],
+            filters: [
+
             ],
             search: true,
             pagination: true,

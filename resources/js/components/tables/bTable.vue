@@ -9,17 +9,18 @@
             :loading="loadingExcel"
             :disabled="loadingExcel"
             @click='pickExcel'
+            v-show="params.excel"
         >
-        Добавить Excel
-        <v-icon right dark>cloud_upload</v-icon>
-        <input
-            type="file"
-            style="display: none"
-            ref="excel"
-            accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            @change="elementLoadToFile"
-            multiple
-        >
+            Добавить Excel
+            <v-icon right dark>cloud_upload</v-icon>
+            <input
+                type="file"
+                style="display: none"
+                ref="excel"
+                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                @change="elementLoadToFile"
+                multiple
+            >
         </v-btn>
         <v-btn color="green" dark class="mb-2" @click.stop="dialog = !dialog">Добавить</v-btn>
     </v-toolbar>
@@ -34,17 +35,23 @@
             </v-toolbar>
             <v-card-text>
                 <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                    <v-text-field v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field> 
-                    <v-flex xs12 v-if="param.input == 'images'">
-                        <v-flex v-for="file in editedItem.files" :key="file.id" xs4 d-flex>
-                            <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" class="grey lighten-2" ></v-img>
-                        </v-flex>
-                        <v-btn color="blue-grey" class="white--text" @click='pickImages' block>
-                            Добавить изображения
-                            <v-icon right dark>cloud_upload</v-icon>
-                            <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
-                        </v-btn>
-                    </v-flex>
+                    <div v-if="param.input == 'select'">
+                        <div v-for="items in select" :key="items[0]">
+                            <div v-if="items.url == param.selectApi">
+                                {{items.data}}
+                                <!-- <div class="form-group">
+                                    <label for="select">{{param.label}}</label>
+                                    <select class="form-control" id="select" v-model="list[param.key]">
+                                        <option v-for="item in items.data" :key="item.id" :value="item.id">{{item[param.selectKey]}}</option>
+                                    </select>
+                                </div> -->
+                            </div>
+                        </div>
+                        <!-- <v-combobox :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-combobox> -->
+                    </div>
+                    <div v-if="param.input == 'text'">
+                        <v-text-field v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
+                    </div>
                 </v-flex>
             </v-card-text>
             <div class="text-xs-center">
@@ -59,39 +66,50 @@
              </div>
         </v-card>
     </v-navigation-drawer>
-      <v-dialog v-model="dialogImages" max-width="500px">
-        <v-card>
-            <v-card-title>
-                <span class="headline">{{ formTitle }}</span>
-            </v-card-title>
+    <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
+        <v-card height="100%">
+            <v-toolbar color="pink" dark>
+                <v-toolbar-title>Изображения</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-icon right dark @click='pickImages'>control_point</v-icon>
+                <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
+                <v-btn icon @click="close">
+                    <v-icon>close</v-icon>
+                </v-btn>
+            </v-toolbar>
+            <v-progress-linear value="15" :indeterminate="true" v-show="loadImages" color="blue" class="ma-0"></v-progress-linear>
             <v-card-text>
-                <v-container grid-list-md>
-                    <v-layout wrap>
-                        
-                        <v-flex v-for="file in editedItem.files" :key="file.id" xs4 d-flex>
-                            <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" class="grey lighten-2" ></v-img>
-                        </v-flex>
-                        {{editedItem}}
-                        <!-- <v-btn color="blue-grey" class="white--text" @click='pickImages' block>
-                            Добавить изображения
-                            <v-icon right dark>cloud_upload</v-icon>
-                            <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
-                        </v-btn> -->
-                         
-                    </v-layout>
-                </v-container>
+                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
+                    <v-flex xs12 v-if="param.input == 'images'">
+                        <v-layout row wrap>
+                            <v-flex v-for="(file, key) in editedItem.files" :key="key" xs4 d-flex>
+                            <v-card flat tile class="d-flex pr-1 pb-1">
+                                <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
+                                    <template v-slot:placeholder>
+                                        <v-layout fill-height align-center justify-center ma-0 >
+                                            <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                        </v-layout>
+                                    </template>
+                                    <template>
+                                        <v-layout fill-height right top ma-0 >
+                                            <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
+                                                <v-icon>close</v-icon>
+                                            </v-btn>
+                                        </v-layout>
+                                    </template>
+                                </v-img>
+                            </v-card>
+                            </v-flex>
+                        </v-layout>
+                    </v-flex>
+                </v-flex>
             </v-card-text>
         </v-card>
-    </v-dialog>
+    </v-navigation-drawer>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
-        <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Поиск"
-            single-line
-            hide-details
-        ></v-text-field>
+            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details>
+            </v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
         <v-icon>filter_list</v-icon>
@@ -107,14 +125,9 @@
             <v-card>
                 <v-divider></v-divider>
                 <v-list>
-                    <v-list-tile>
+                    <v-list-tile v-for="(item, key) in chipsItem" :key="key">
                         <v-list-tile-action>
-                            <v-checkbox v-model="chips" label="Jacob" value="Jacob"></v-checkbox>
-                        </v-list-tile-action>
-                    </v-list-tile>
-                    <v-list-tile>
-                        <v-list-tile-action>
-                            <v-checkbox v-model="chips" label="John" value="John"></v-checkbox>
+                            <v-checkbox v-model="chips" :label="item" :value="item"></v-checkbox>
                         </v-list-tile-action>
                     </v-list-tile>
                 </v-list>
@@ -129,46 +142,15 @@
                     {{props.item[param.value]}}
                 </v-flex>
                 <v-flex v-if="param.edit">
+                    <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
+                        image
+                    </v-icon>
                     <v-icon small class="mr-2" @click="editItem(props.item)">
                         edit
                     </v-icon>
                     <v-icon small @click="deleteItem(props.item)">
                         delete
                     </v-icon>
-                </v-flex>
-                <v-flex xs12 v-if="param.input == 'images'">
-                    <v-btn color="green" dark class="mb-2" @click.stop="dialogImages = !dialogImages">Добавить</v-btn>
-                    <!-- <v-dialog v-if="props.item[param.value].length > 0" v-model="dialogImages" width="500">
-                        <template v-slot:activator="{ on }">
-                            <v-btn color="red lighten-2" dark v-on="on" >
-                                Click Me
-                            </v-btn>
-                        </template>
-                        <v-card>
-                            {{props.item[param.value]}} 
-                        </v-card>
-                    </v-dialog> -->
-                    <!-- <v-dialog v-for="file in props.item[param.value]" :key="file.id" v-model="dialogImages" width="500">
-                        <template v-slot:activator="{ on }">
-                            <v-btn color="red lighten-2" dark v-on="on" >
-                                Click Me
-                            </v-btn>
-                        </template>
-                        <v-card>
-                            <v-card-title class="headline grey lighten-2" primary-title>
-                            Изображения
-                            </v-card-title>
-
-                            <v-card-text>
-                                <v-flex xs12 d-flex>
-                                    <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" class="grey lighten-2"></v-img>
-                                    <button type="button" class="close" aria-label="Close" v-on:click="removeImg(file)">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </v-flex>
-                            </v-card-text>
-                        </v-card>
-                    </v-dialog> -->
                 </v-flex>
             </td>
         </template>
@@ -177,7 +159,7 @@
         </template>
         <template v-slot:no-results>
             <v-alert :value="true" color="error" icon="warning">
-                Your search for "{{ search }}" found no results.
+                По запросу "{{ search }}" ничего не найдено.
             </v-alert>
         </template>
     </v-data-table>
@@ -193,10 +175,13 @@ export default {
         loading: true,
         loadingExcel: false,
         files: [],
+        deleteImage: false,
         desserts: [],
         editedIndex: -1,
+        loadImages: false,
         editedItem: {},
         defaultItem: {},
+        select: [],
         loadingSaveBtn: false,
         loaderSaveBtn: null,
         formData: new FormData(),
@@ -218,6 +203,7 @@ export default {
     },
     created () {
         this.initialize();
+        this.selectStatus();
     },
     methods: {
         initialize () {
@@ -235,10 +221,65 @@ export default {
             })
         },
         pickImages () {
-            this.$refs.images[0].click();
+            this.$refs.images.click();
+        },
+        selectStatus() {
+            this.params.headers.forEach(element => {
+                if(element.selectApi != undefined) {
+                    axios.get(element.selectApi)
+                    .then(
+                        res => {
+                            if(res) {
+                                this.select.push(
+                                    {
+                                        data: res.data,
+                                        url: element.selectApi
+                                    }
+                                );
+                            }
+                        }
+                    ).catch(
+                        error => {
+                            console.log(error);
+                        }
+                    ); 
+                }
+            });
         },
         elementLoadToFileImage() {
-            this.files =  this.$refs.images[0].files;
+            this.loadImages = true;
+            this.files = this.$refs.images.files;
+            Array.from(this.files).forEach(files => {
+                this.formData.append('file[]', files);
+            });
+            axios.post('api/files', this.formData, {
+                headers: {'Content-Type': 'multipart/form-data'}
+            })
+            .then(
+                res => {
+                    axios({
+                        method: 'put',
+                        url: this.params.baseUrl,
+                        data: this.editedItem,
+                        params: {
+                            images: res.data.files
+                        }
+                    })
+                    .then(
+                        response => {
+                            Object.assign(this.editedItem, response.data);
+                            this.loadImages = false;
+                            this.resetFilesLoad();
+                        }
+                    ).catch(error => {
+                        console.log(error);
+                    })
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            );
         },
         elementLoadToFile() {
             this.loadingExcel = true;
@@ -273,6 +314,7 @@ export default {
             };
         },
         removeImg(data) {
+            this.loadImages = true;
             axios.post('api/files/remove', data)
             .then(
                 res => {
@@ -286,7 +328,8 @@ export default {
                     })
                     .then(
                         response => {
-                           this.initialize();
+                            this.editedItem.files.splice(this.editedItem.files.indexOf(data.id), 1);
+                            this.loadImages = false;
                         }
                     ).catch(error => {
                         console.log(error);
@@ -306,6 +349,11 @@ export default {
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
         },
+        editPhotos(item) {
+            this.editedIndex = this.desserts.indexOf(item);
+            this.editedItem = Object.assign({}, item);
+            this.dialogImages = true;
+        },
         deleteItem (item) {
             const index = this.desserts.indexOf(item);
             if (confirm('Are you sure you want to delete this item?')) {
@@ -324,6 +372,7 @@ export default {
         },
         close () {
             this.dialog = false
+            this.dialogImages = false
             setTimeout(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
                 this.editedIndex = -1
@@ -343,61 +392,26 @@ export default {
             } else {
                 method = 'post'
             }
-            if(this.files.length > 0) {
-                Array.from(this.files).forEach(files => {
-                    this.formData.append('file[]', files);
-                });
-                axios.post('api/files', this.formData, {
-                    headers: {'Content-Type': 'multipart/form-data'}
-                })
-                .then(
-                    res => {
-                        axios({
-                            method: method,
-                            url: this.params.baseUrl,
-                            data: this.editedItem,
-                            params: {
-                                images: res.data.files
-                            }
-                        })
-                        .then(
-                            response => {
-                                this.initialize();
-                                this.loadingSaveBtn = false;
-                                this.loaderSaveBtn = null;
-                                this.close();
-                                this.resetFilesLoad();
-                            }
-                        ).catch(error => {
-                            console.log(error);
-                        })
+            axios({
+                method: method,
+                url: this.params.baseUrl,
+                data: this.editedItem
+            })
+            .then(
+                response => {
+                    if (this.editedIndex > -1) {
+                        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                    } else {
+                        this.desserts.push(response.data);
                     }
-                ).catch(
-                    error => {
-                        console.log(error);
-                    }
-                );
-            } else {
-                axios({
-                    method: method,
-                    url: this.params.baseUrl,
-                    data: this.editedItem
-                })
-                .then(
-                    response => {
-                        if (this.editedIndex > -1) {
-                            Object.assign(this.desserts[this.editedIndex], this.editedItem);
-                        } else {
-                            this.desserts.push(this.editedItem);
-                        }
-                        this.loaderSaveBtn = null;
-                        this.loadingSaveBtn = false;
-                        this.close();
-                    }
-                ).catch(error => {
-                    console.log(error);
-                })
-            }
+                    this.loaderSaveBtn = null;
+                    this.loadingSaveBtn = false;
+                    this.close();
+                }
+            ).catch(error => {
+                console.log(error);
+            })
+            
         },
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)
