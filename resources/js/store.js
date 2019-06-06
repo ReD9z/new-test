@@ -3,8 +3,6 @@ let store = {
         status: '',
         token: localStorage.getItem('token') || '',
         user:  localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : '',
-        data: [],
-        pagination: {}
     },
     mutations: {
         auth_request(state){
@@ -22,45 +20,6 @@ let store = {
         auth_error(state){
             state.status = 'error';
         },
-        data_list(state, data) {
-            state.data = data;
-        },
-        data_edit(state, data) {
-            state.data = data;
-        },
-        data_push(state, data) {
-            state.data.push(data);
-        },
-        data_push_excel(state, data) {
-            data.forEach(element => {
-                state.data.push(element);
-            });
-        },
-        data_edit_new(state, data) {
-            state.data = state.data.map((item) => {
-                return item.id === data.id ? data : item;
-            })
-        },
-        data_delete(state, id) {
-            state.data.splice(state.data.indexOf(id), 1);
-        },
-        pagination(state, data) {
-            let paginate = {
-                first: data.links.first,
-                last: data.links.last,
-                next: data.links.next,
-                prev: data.links.prev,
-                last_page: data.meta.last_page,
-                path: data.meta.path+"/?page=",
-                currentPage: data.meta.current_page,
-                per_page: data.meta.per_page,
-                from: data.meta.from,
-                to: data.meta.to,
-                urlCurrent: data.meta.path + "/?page=" + data.meta.current_page
-            }
-            // перенести вызов в другое место в list
-            state.pagination = paginate; 
-        }
     },
     actions: {
         login({commit}, user) {
@@ -100,98 +59,11 @@ let store = {
                 });
             })
         },
-        call({ commit }, data) {
-            return new Promise((resolve, reject) => {
-                axios({
-                    method: data.method,
-                    url: data.url
-                })
-                .then(
-                    response => {
-                        console.log(response);
-                        commit('data_list', response.data);
-                           
-                        resolve(response);
-                    }
-                ).catch(error => {
-                    reject(error);
-                })
-            })
-        },
-        add({ commit }, data) {
-            axios({
-                method: data.method,
-                url: data.url,
-                data: data.list,
-                params: {
-                    images: data.images
-                }
-            })
-            .then(
-                response => {
-                    console.log(response);
-                    let array = response.data;
-                    commit('data_push', array);
-                }
-            ).catch(error => {
-                console.log(error);
-            })
-        },
-        addExcel({ commit }, data) {
-            axios({
-                method: data.method,
-                url: data.url +'/excel',
-                data: data.list
-            })
-            .then(
-                response => {
-                    let array = response.data.data;
-                    commit('data_push_excel', array);
-                }
-            ).catch(error => {
-                console.log(error);
-            })
-        },
-        save({ commit }, data) {
-            axios({
-                method: data.method,
-                url: data.url,
-                data: data.list,
-                params: { 
-                    images: data.images
-                }
-            })
-            .then(
-                response => {
-                    // console.log(data.images);
-                    // console.log(response.data);
-                    commit('data_edit_new', response.data);
-                }
-            ).catch(error => {
-                console.log(error);
-            })
-        },
-        remove({ commit }, data) {
-            axios({
-                method: data.method,
-                url: data.url,
-            })
-            .then(
-                response => {
-                    let id = response.data.id;
-                    commit('data_delete', id);
-                }
-            ).catch(error => {
-                console.log(error);
-            })
-        }
     },
     getters : {
         isLoggedIn: state => !!state.token,
         isLoggedUser: state => state.user,
-        authStatus: state => state.status,
-        dataCall: state => state.data,
-        paginate: state => state.pagination
+        authStatus: state => state.status
     }
 };
 

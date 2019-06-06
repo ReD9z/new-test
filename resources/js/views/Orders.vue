@@ -15,21 +15,23 @@ export default {
                     text: 'Клиент',
                     align: 'left',
                     sortable: true,
-                    value: 'client_id',
+                    value: 'actual_title',
+                    selectText: 'client_id',
                     selectApi: 'api/clients',
-                    keyValue: "clients",  
                     input: "select",
                 },
                 { 
                     text: 'Дата начала размещения', 
-                    input: "text",
-                    sortable: false,
+                    input: "date",
+                    sortable: true,
+                    close: false,
                     value: 'order_start_date' 
                 },
                 { 
-                    text: 'Дата начала размещения', 
-                    input: "text",
-                    sortable: false,
+                    text: 'Дата конца размещения', 
+                    input: "date",
+                    sortable: true,
+                    close: false,
                     value: 'order_end_date' 
                 },
                 { 

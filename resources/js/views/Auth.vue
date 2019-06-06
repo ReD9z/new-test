@@ -24,7 +24,7 @@
                     required
                 ></v-text-field>
                 <v-checkbox class="pl-4 pr-4" v-model="user.remember_me"  label="Запомнить?" :value="isActive" @click="remember()"></v-checkbox>
-                <v-btn class="mb-4 ml-4 mr-4" color="success" @click="login" >
+                <v-btn class="mb-4 ml-4 mr-4" color="success" @click="login">
                     Войти
                 </v-btn>
             </v-card>

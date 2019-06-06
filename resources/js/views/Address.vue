@@ -16,22 +16,27 @@ export default {
                     text: 'Город',
                     align: 'left',
                     sortable: true,
+                    input: "text",
                     value: 'city'
                 },
                 { 
                     text: 'Район', 
+                    input: "text",
                     value: 'area' 
                 },
                 { 
                     text: 'Улица', 
+                    input: "text",
                     value: 'street' 
                 },
                 { 
                     text: 'Номер дома', 
+                    input: "text",
                     value: 'house_number' 
                 },
                 { 
                     text: 'Количество подъездов', 
+                    input: "text",
                     value: 'number_entrances' 
                 },
                 { 

@@ -11,11 +11,13 @@ export default {
                     text: 'Название',
                     align: 'left',
                     sortable: true,
-                    value: 'title'
+                    value: 'title',
+                    input: "text",
                 },
                 { 
                     text: 'Текст', 
-                    value: 'text' 
+                    value: 'text',
+                    input: "text",
                 },
                 { 
                     value: 'files', 

@@ -35,22 +35,48 @@
             </v-toolbar>
             <v-card-text>
                 <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                    <div v-if="param.input == 'select'">
-                        <div v-for="items in select" :key="items[0]">
-                            <div v-if="items.url == param.selectApi">
-                                {{items.data}}
-                                <!-- <div class="form-group">
-                                    <label for="select">{{param.label}}</label>
-                                    <select class="form-control" id="select" v-model="list[param.key]">
-                                        <option v-for="item in items.data" :key="item.id" :value="item.id">{{item[param.selectKey]}}</option>
-                                    </select>
-                                </div> -->
-                            </div>
-                        </div>
-                        <!-- <v-combobox :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-combobox> -->
-                    </div>
                     <div v-if="param.input == 'text'">
                         <v-text-field v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
+                    </div>
+                    <div v-if="param.input == 'select'">
+                        <div v-for="item in select" :key="item[0]">
+                            <div v-if="item.url == param.selectApi">
+                               <v-autocomplete
+                                    :items="item.data"
+                                    v-model="editedItem[param.value]"
+                                    :item-text="param.selectText"
+                                    item-value="id"
+                                    :label="param.text"
+                                    >
+                                </v-autocomplete>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="param.input == 'date'">
+                         <v-menu
+                            v-model="param.close"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            lazy
+                            transition="scale-transition"
+                            offset-y
+                            full-width
+                            max-width="290px"
+                            min-width="290px"
+                            >
+                            <template v-slot:activator="{ on }">
+                                <v-text-field
+                                    v-model="editedItem[param.value]"
+                                    hint="DD-MM-YYYY формат"
+                                    persistent-hint
+                                    @blur="editedItem[param.value] = parseDate(picker)"
+                                    prepend-icon="event"
+                                    :label="param.text"
+                                    v-on="on"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                        </v-menu>
                     </div>
                 </v-flex>
             </v-card-text>
@@ -186,7 +212,8 @@ export default {
         loaderSaveBtn: null,
         formData: new FormData(),
         chips: [],
-        chipsItem: ['Фильтер1', 'Фильтер2']
+        chipsItem: ['Фильтер1', 'Фильтер2'],
+        picker: new Date().toISOString().substr(0, 10),
     }),
     props: {
         params: Object
@@ -194,6 +221,9 @@ export default {
     computed: {
         formTitle () {
             return this.editedIndex === -1 ? 'Добавить' : 'Редактировать'
+        },
+        computedDateFormatted () {
+            return this.formatDate(this.date)
         }
     },
     watch: {
@@ -222,6 +252,12 @@ export default {
         },
         pickImages () {
             this.$refs.images.click();
+        },
+        parseDate (date) {
+            if (!date) return null
+
+            const [year, month, day] = date.split('-')
+            return `${month}-${day}-${year}`
         },
         selectStatus() {
             this.params.headers.forEach(element => {

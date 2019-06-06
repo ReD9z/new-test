@@ -16,7 +16,7 @@ class OrdersController extends Controller
      */
     public function index(Request $request)
     {
-        $orders = Orders::get(); 
+        $orders = Orders::with('clients')->get(); 
         
         return OrdersResource::collection($orders);
     }
@@ -33,8 +33,8 @@ class OrdersController extends Controller
 
         $orders->id = $request->input('id');
         $orders->client_id = $request->input('client_id');
-        $orders->order_start_date = $request->input('order_start_date');
-        $orders->order_end_date = $request->input('order_end_date');
+        $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request->input('order_start_date')));
+        $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request->input('order_end_date')));
 
         if($orders->save()) {
             return new OrdersResource($orders);

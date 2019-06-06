@@ -16,10 +16,10 @@ class Orders extends JsonResource
     {
         return [
             'id' => $this->id,
-            'clients' => $this->clients->actual_title,
+            'actual_title' => $this->clients->actual_title,
             'client_id' => $this->client_id,
-            'order_start_date' => $this->order_start_date,
-            'order_end_date' => $this->order_end_date
+            'order_start_date' => date("d-m-Y", strtotime($this->order_start_date)),
+            'order_end_date' => date("d-m-Y", strtotime($this->order_end_date))
         ];
     }
 }

@@ -16,7 +16,6 @@ class TypesToWorksController extends Controller
      */
     public function index(Request $request)
     {
-        
         $types = TypesToWorks::get(); 
         
         return TypesToWorksResource::collection($types);
