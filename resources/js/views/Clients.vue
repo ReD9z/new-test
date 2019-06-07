@@ -10,82 +10,73 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/clients',
-            fields: [
-                {   
-                    key: "city_id",
-                    keyValue: "city",  
-                    label: "Город",
-                    sort: true,
-                    edit: true,
-                    type: "text",
+            headers: [
+                {
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city_id',
+                    selectText: 'name',
+                    TableGetIdName: 'city',
+                    selectApi: 'api/cities_to_works',
                     input: "select",
-                    selectApi: 'api/cities_to_works/allCities',
-                    selectKey: 'name',
                 },
-                {   
-                    key: "legal_name", 
-                    label: "Юридическое название",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input",
+                { 
+                    text: 'Юридическое название', 
+                    input: "text",
+                    sortable: true,
+                    value: 'legal_name' 
                 },
-                 {   
-                    key: "actual_title", 
-                    label: "Фактическое название",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'Фактическое название', 
+                    input: "text",
+                    sortable: true,
+                    value: 'actual_title' 
                 },
-                {   
-                    key: "legal_address", 
-                    label: "Юридический адрес",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'Юридический адрес', 
+                    input: "text",
+                    sortable: true,
+                    value: 'legal_address' 
                 },
-                 {   
-                    key: "actual_address", 
-                    label: "Фактический адрес",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'Фактический адрес', 
+                    input: "text",
+                    sortable: true,
+                    value: 'actual_address' 
                 },
-                {   
-                    key: "bank_name", 
-                    label: "Название банка",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'Название банка', 
+                    input: "text",
+                    sortable: true,
+                    value: 'bank_name' 
                 },
-                 {   
-                    key: "bik", 
-                    label: "БИК",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'БИК', 
+                    input: "text",
+                    sortable: true,
+                    value: 'bik' 
                 },
-                {   
-                    key: "cor_score", 
-                    label: "Кор. счёт",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'Кор. счёт', 
+                    input: "text",
+                    sortable: true,
+                    value: 'cor_score' 
                 },
-                {   
-                    key: "settlement_account", 
-                    label: "Расчётный счёт",
-                    sort: true, 
+                { 
+                    text: 'Расчётный счёт', 
+                    input: "text",
+                    sortable: true,
+                    value: 'settlement_account' 
+                },
+                { 
+                    text: 'Параметры',
+                    sortable: false,
                     edit: true,
-                    type: "text",
-                    input: "input"
                 }
+            ],
+            filters: [
+
             ],
             search: true,
             pagination: true,

@@ -17,21 +17,11 @@ class InstallersController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->search) {
-            $installers = Installers::with('users', 'address')->where('title', 'like', '%' . $request->search . '%')->paginate(6); 
-            //TODO сделать метод в модели с несколькими параметрами find('title', 'text' ..).paginate(4)
-        } else {
-            $installers = Installers::with('users', 'address')->paginate(6);
-        }
+        $installers = Installers::with('users', 'address')->get(); 
         
         return InstallersResource::collection($installers);
     }
 
-    public function allInstallers(Request $request)
-    {
-        $clients = Installers::with('users')->get();
-        return InstallersResource::collection($clients);
-    }
 
     /**
      * Store a newly created resource in storage.

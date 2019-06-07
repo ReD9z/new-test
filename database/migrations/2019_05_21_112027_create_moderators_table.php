@@ -15,8 +15,10 @@ class CreateModeratorsTable extends Migration
     {
         Schema::create('moderators', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('users_id')->nullable();
-            $table->integer('city_id')->nullable();
+            $table->bigInteger('users_id')->unsigned()->nullable();
+            $table->foreign('users_id')->references('id')->on('users')->onDelete('cascade');
+            $table->bigInteger('city_id')->unsigned()->nullable();
+            $table->foreign('city_id')->references('id')->on('cities_to_works')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -16,7 +16,7 @@ class AddressController extends Controller
      */
     public function index(Request $request)
     {
-        $address = Address::get();
+        $address = Address::with('cities')->get();
         return AddressResource::collection($address);
     }
 
@@ -28,15 +28,16 @@ class AddressController extends Controller
      */
     public function store(Request $request)
     {
-       $address = $request->isMethod('put') ? Address::findOrFail($request->id) : new Address;
+        $address = $request->isMethod('put') ? Address::findOrFail($request->id) : new Address;
 
-       $address->id = $request->input('id');
-       $address->city = $request->input('city');
-       $address->area = $request->input('area');
-       $address->street = $request->input('street');
-       $address->house_number = $request->input('house_number');
-       $address->number_entrances = $request->input('number_entrances');
-
+        $address->id = $request->input('id');
+        $address->city_id = $request->input('city_id');
+        $address->area = $request->input('area');
+        $address->street = $request->input('street');
+        $address->house_number = $request->input('house_number');
+        $address->number_entrances = $request->input('number_entrances');
+        $address->management_company = $request->input('management_company');
+    
         if($address->save()) {
             return new AddressResource($address);
         }

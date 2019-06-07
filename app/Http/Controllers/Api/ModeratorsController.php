@@ -16,17 +16,10 @@ class ModeratorsController extends Controller
     */
     public function index(Request $request)
     {
-        if ($request->search) {
-            $moderators = Moderators::with('users')->where('name', 'like', '%' . $request->search . '%')
-            ->orWhere('email', 'like', '%' . $request->search . '%')
-            ->paginate(6); 
-            //TODO сделать метод в модели с несколькими параметрами find('title', 'text' ..).paginate(4)
-        } else {
-            $moderators = Moderators::with('users')->paginate(6);
-        }
-        
+ 
+        $moderators = Moderators::with('users')->get();
+    
         return ModeratorsResource::collection($moderators);
-        // return response()->json(['errors' => [], 'data' => $request, 'status' => 200], 200);
     }
 
     /**

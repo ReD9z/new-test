@@ -19,6 +19,7 @@ class AddressToOrders extends JsonResource
             'order_id' => $this->order_id,
             'address_id' => $this->address_id,
             'address' => $this->address->city,
+            'orders' => $this->orders->clients->actual_title,
             'status' => $this->status
         ];
     }

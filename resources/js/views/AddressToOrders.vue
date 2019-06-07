@@ -10,45 +10,46 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/address_to_orders',
-            fields: [
-                {   
-                    key: "order_id",
-                    keyValue: "order_id",
-                    label: "Заказ",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
+            headers: [
+                {
+                    text: 'Заказ',
+                    align: 'left',
+                    sortable: true,
+                    value: 'order_id',
+                    selectText: 'actual_title',
+                    TableGetIdName: 'orders',
+                    selectApi: 'api/clients',
                     input: "select",
-                    selectApi: 'api/orders/allOrders',
-                    selectKey: 'id',
                 },
-                {   
-                    key: "address_id", 
-                    keyValue: "address",  
-                    label: "Адрес",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
+                {
+                    text: 'Адрес',
+                    align: 'left',
+                    sortable: true,
+                    value: 'address_id',
+                    selectText: 'city',
+                    TableGetIdName: 'address',
+                    selectApi: 'api/address',
                     input: "select",
-                    selectApi: 'api/address/allAddress',
-                    selectKey: 'city',
                 },
-                {   
-                    key: "files", 
-                    label: "Изображение",
-                    sort: false, 
-                    edit: true, 
-                    type: "file",
+                { 
+                    value: 'files', 
+                    sortable: false,
                     input: "images"
                 },
-                {   
-                    key: "status", 
-                    label: "Статус",
-                    sort: true, 
+                { 
+                    text: 'Статус', 
+                    input: "text",
+                    sortable: true,
+                    value: 'status' 
+                },
+                { 
+                    text: 'Параметры',
+                    sortable: false,
                     edit: true,
-                    type: "text",
-                    input: "input"
                 }
+            ],
+            filters: [
+
             ],
             search: true,
             pagination: true,

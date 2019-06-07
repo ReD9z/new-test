@@ -16,12 +16,7 @@ class ManagersController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->search) {
-            $managers = Managers::where('title', 'like', '%' . $request->search . '%')->paginate(6); 
-            //TODO сделать метод в модели с несколькими параметрами find('title', 'text' ..).paginate(4)
-        } else {
-            $managers = Managers::orderBy($request->sortTable, $request->sort)->paginate(6);
-        }
+        $managers = Managers::get(); 
         
         return ManagersResource::collection($managers);
     }

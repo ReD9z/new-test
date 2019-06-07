@@ -10,35 +10,51 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/users',
-            fields: [
-                {   
-                    key: "name", 
-                    label: "Имя",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input"
+            headers: [
+                { 
+                    text: 'Имя', 
+                    input: "text",
+                    sortable: true,
+                    value: 'name' 
                 },
-                {   
-                    key: "email", 
-                    label: "Email",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input"
+                { 
+                    text: 'Email', 
+                    input: "text",
+                    sortable: true,
+                    value: 'email' 
                 },
-                {   
-                    key: "password", 
-                    label: "Пароль",
-                    sort: false, 
-                    edit: false,
-                    type: "password",
-                    input: "input"
+                { 
+                    text: 'Телефон', 
+                    input: "text",
+                    sortable: true,
+                    value: 'phone' 
+                },
+                { 
+                    text: 'Логин', 
+                    input: "text",
+                    sortable: true,
+                    value: 'login' 
+                },
+                { 
+                    text: 'Роль', 
+                    input: "text",
+                    sortable: true,
+                    value: 'role' 
+                },
+                // Сброс пароля
+                // Роль пользователя
+                {
+                    text: 'Пароль', 
+                    input: "text",
+                    sortable: true,
+                    value: 'password' 
+                },
+                { 
+                    text: 'Параметры',
+                    sortable: false,
+                    edit: true,
                 }
-            ],
-            search: true,
-            pagination: true,
-            excel: false
+            ]
         }
     })
 }

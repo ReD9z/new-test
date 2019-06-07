@@ -10,55 +10,54 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/tasks',
-            fields: [
-                {   
-                    key: "orders_id",
-                    keyValue: "orders_id",
-                    label: "Заказ",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
+            headers: [
+                {
+                    text: 'Заказ',
+                    align: 'left',
+                    sortable: true,
+                    value: 'order_id',
+                    selectText: 'actual_title',
+                    TableGetIdName: 'orders',
+                    selectApi: 'api/orders',
                     input: "select",
-                    selectApi: 'api/orders/allOrders',
-                    selectKey: 'id',
                 },
-                {   
-                    key: "installer_id", 
-                    keyValue: "installers",
-                    label: "Монтажник",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
+                {
+                    text: 'Монтажник',
+                    align: 'left',
+                    sortable: true,
+                    value: 'installer_id',
+                    selectText: 'name',
+                    TableGetIdName: 'installers',
+                    selectApi: 'api/installers',
                     input: "select",
-                    selectApi: 'api/installers/allInstallers',
-                    selectKey: 'name',
                 },
-                {   
-                    key: "types_to_works_id",
-                    keyValue: "types", 
-                    label: "Тип работы",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
+                {
+                    text: 'Тип работы',
+                    align: 'left',
+                    sortable: true,
+                    value: 'types_to_works_id',
+                    selectText: 'title',
+                    TableGetIdName: 'types',
+                    selectApi: 'api/types_to_work',
                     input: "select",
-                    selectApi: 'api/types_to_work/allTypesToWorks',
-                    selectKey: 'title',
                 },
-                {   
-                    key: "task_date_completion", 
-                    label: "Дата выполнения",
-                    sort: true, 
-                    edit: true,
-                    type: "datetime-local",
-                    input: "input"
+                { 
+                    text: 'Дата начала размещения', 
+                    input: "date",
+                    sortable: true,
+                    close: false,
+                    value: 'task_date_completion' 
                 },
-                {   
-                    key: "comment", 
-                    label: "Комментарий",
-                    sort: true, 
+                { 
+                    text: 'Комментарий', 
+                    input: "text",
+                    sortable: true,
+                    value: 'comment' 
+                },
+                { 
+                    text: 'Параметры',
+                    sortable: false,
                     edit: true,
-                    type: "text",
-                    input: "input"
                 }
             ],
             search: true,

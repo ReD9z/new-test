@@ -165,7 +165,12 @@
         <template v-slot:items="props">
             <td v-for="(param, key) in params.headers" :key="key">
                 <v-flex v-if="param.input !== 'images'">
-                    {{props.item[param.value]}}
+                    <div v-if="param.selectText">
+                        {{props.item[param.TableGetIdName]}}
+                    </div>
+                    <div v-else>
+                        {{props.item[param.value]}}
+                    </div>
                 </v-flex>
                 <v-flex v-if="param.edit">
                     <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">

@@ -15,6 +15,7 @@ export default {
                     text: 'Название',
                     align: 'left',
                     sortable: true,
+                    input: "text",
                     value: 'title'
                 },
                 { 

@@ -17,11 +17,12 @@ class Tasks extends JsonResource
         return [
             'id' => $this->id,
             'orders_id' => $this->orders_id,
+            'orders' => $this->orders->clients->actual_title,
             'installer_id' => $this->installer_id,
             'installers' => $this->installers->users->name,
             'types' => $this->types->title,
             'types_to_works_id' => $this->types_to_works_id,
-            'task_date_completion' => $this->task_date_completion,
+            'task_date_completion' =>date("d-m-Y", strtotime( $this->task_date_completion)),
             'comment' => $this->comment,
         ];
     }

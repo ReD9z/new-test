@@ -15,8 +15,12 @@ class CreateManagersTable extends Migration
     {
         Schema::create('managers', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('user_id')->nullable();
-            $table->integer('city_id')->nullable();
+            $table->bigInteger('users_id')->unsigned()->nullable();
+            $table->bigInteger('city_id')->unsigned()->nullable();
+            $table->bigInteger('moderator_id')->unsigned()->nullable();
+            $table->foreign('users_id')->references('id')->on('users');
+            $table->foreign('city_id')->references('id')->on('cities_to_works');
+            $table->foreign('moderator_id')->references('id')->on('moderators');
             $table->timestamps();
         });
     }

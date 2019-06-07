@@ -15,7 +15,10 @@ class CreateImagesToOrdersTable extends Migration
     {
         Schema::create('images_to_orders', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('url')->nullable();
+            $table->bigInteger('orders_id')->unsigned()->nullable();
+            $table->foreign('orders_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->bigInteger('files_id')->unsigned()->nullable();
+            $table->foreign('files_id')->references('id')->on('files')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -17,17 +17,8 @@ class AddressToOrdersController extends Controller
 
     public function index(Request $request)
     {
-        if ($request->search) {
-            $torders = AddressToOrders::join('addresses', 'addresses.id', '=', 'address_to_orders.address_id')->with('orders')
-            ->where('status', 'like', '%' . $request->search . '%')
-            ->orWhere('order_id', 'like', '%' . $request->search . '%')
-            ->orWhere('addresses.city', 'like', '%' . $request->search . '%')
-            ->paginate(6); 
-            //TODO сделать метод в модели с несколькими параметрами find('title', 'text' ..).paginate(4)
-        } else {
-            $torders = AddressToOrders::with('address', 'orders')->orderBy($request->sortTable, $request->sort)->paginate(6);
-        }
-        
+        $torders = AddressToOrders::with('address', 'orders.clients')->get();
+            
         return AddressToOrdersResource::collection($torders);
     }
 

@@ -79,8 +79,7 @@ export default {
                     { title: 'Менеджеры', icon: 'question_answer', src: 'managers'},
                     { title: 'Модераторы', icon: 'question_answer', src: 'moderators'},
                     { title: 'Администраторы', icon: 'question_answer', src: 'users'},
-                    { title: 'Монтажники', icon: 'question_answer',src: 'installers'},
-                    { title: 'Роли', icon: 'question_answer', src: 'roles'},
+                    { title: 'Монтажники', icon: 'question_answer',src: 'installers'}
                 ] 
             },
             { title: 'Справочники', icon: 'home', wrapLink:

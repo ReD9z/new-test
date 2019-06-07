@@ -16,8 +16,11 @@ export default {
                     text: 'Город',
                     align: 'left',
                     sortable: true,
-                    input: "text",
-                    value: 'city'
+                    value: 'city_id',
+                    selectText: 'name',
+                    TableGetIdName: 'city',
+                    selectApi: 'api/cities_to_works',
+                    input: "select",
                 },
                 { 
                     text: 'Район', 
@@ -38,6 +41,11 @@ export default {
                     text: 'Количество подъездов', 
                     input: "text",
                     value: 'number_entrances' 
+                },
+                { 
+                    text: 'Управляющая компания', 
+                    input: "text",
+                    value: 'management_company' 
                 },
                 { 
                     text: 'Параметры',

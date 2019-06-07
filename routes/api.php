@@ -23,12 +23,11 @@ Route::group(['middleware' => ['json.response']], function () {
     Route::post('files/remove', 'Api\FilesUploadController@remove');
     
     Route::post('users', 'Api\UsersController@store'); // Add one item
-    Route::get('address/allAddress', 'Api\AddressController@allAddress'); // Show all list
+    Route::post('register', 'Api\AuthController@register');
    
     /******* Private routes *******/
     Route::middleware('auth:api')->group(function () {
         Route::get('logout', 'Api\AuthController@logout');
-        Route::post('register', 'Api\AuthController@register');
     
         // Article
         Route::post('article', 'Api\ArticleController@store'); // Add one item

@@ -11,6 +11,6 @@ class AddressToOrders extends Model
     }
 
     public function orders() {
-        return $this->belongsTo('App\Models\Orders', 'orders_id');
+        return $this->belongsTo('App\Models\Orders', 'order_id');
     }
 }

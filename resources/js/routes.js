@@ -63,11 +63,6 @@ let routers =  [
         component: require('./views/Orders.vue').default
     },
     {
-        path: '/roles',
-        name: 'roles',
-        component: require('./views/Roles.vue').default
-    },
-    {
         path: '/tasks',
         name: 'tasks',
         component: require('./views/Tasks.vue').default

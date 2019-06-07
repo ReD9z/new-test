@@ -16,12 +16,7 @@ class TasksController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->search) {
-            $tasks = Tasks::with('orders', 'installers', 'types')->where('comment', 'like', '%' . $request->search . '%')->paginate(6); 
-            //TODO сделать метод в модели с несколькими параметрами find('title', 'text' ..).paginate(4)
-        } else {
-            $tasks = Tasks::with('orders', 'installers', 'types')->orderBy($request->sortTable, $request->sort)->paginate(6);
-        }
+        $tasks = Tasks::with('orders.clients', 'installers.users', 'types')->get(); 
         
         return TasksResource::collection($tasks);
     }
