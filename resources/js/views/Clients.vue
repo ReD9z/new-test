@@ -11,6 +11,37 @@ export default {
         params: {
             baseUrl: 'api/clients',
             headers: [
+                { 
+                    text: 'Имя', 
+                    input: "text",
+                    sortable: true,
+                    value: 'name' 
+                },
+                { 
+                    text: 'Email', 
+                    input: "text",
+                    sortable: true,
+                    value: 'email' 
+                },
+                { 
+                    text: 'Телефон', 
+                    input: "text",
+                    sortable: true,
+                    value: 'phone' 
+                },
+                { 
+                    text: 'Логин', 
+                    input: "text",
+                    sortable: true,
+                    value: 'login' 
+                },
+                {
+                    text: "Пароль",
+                    input: "password",
+                    sortable: false,
+                    value: 'password',
+                    visibility: 'd-none',
+                },
                 {
                     text: 'Город',
                     align: 'left',

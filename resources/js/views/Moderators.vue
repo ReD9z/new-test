@@ -10,22 +10,52 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/moderators',
-            fields: [
-                {   
-                    key: "name", 
-                    label: "Имя",
-                    sort: true, 
-                    edit: true,
-                    type: "text",
-                    input: "input"
+           headers: [
+                { 
+                    text: 'Имя', 
+                    input: "text",
+                    sortable: true,
+                    value: 'name' 
                 },
-                {   
-                    key: "email", 
-                    label: "Email",
-                    sort: true, 
+                { 
+                    text: 'Email', 
+                    input: "text",
+                    sortable: true,
+                    value: 'email' 
+                },
+                { 
+                    text: 'Телефон', 
+                    input: "text",
+                    sortable: true,
+                    value: 'phone' 
+                },
+                { 
+                    text: 'Логин', 
+                    input: "text",
+                    sortable: true,
+                    value: 'login' 
+                },
+                {
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city_id',
+                    selectText: 'name',
+                    TableGetIdName: 'city',
+                    selectApi: 'api/cities_to_works',
+                    input: "select",
+                },
+                {
+                    text: "Пароль",
+                    input: "password",
+                    sortable: false,
+                    value: 'password',
+                    visibility: 'd-none',
+                },
+                { 
+                    text: 'Параметры',
+                    sortable: false,
                     edit: true,
-                    type: "text",
-                    input: "input"
                 }
             ],
             search: true,

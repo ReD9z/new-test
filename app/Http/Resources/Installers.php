@@ -16,12 +16,15 @@ class Installers extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user_id' => $this->user_id,
+            'users_id' => $this->users_id,
             'name' => $this->users->name,
             'email' => $this->users->email,
-            'password' => $this->users->password,
+            'phone' => $this->users->login,
+            'login' => $this->users->phone,
             'city_id' => $this->city_id,
-            'city' => $this->address->city
+            'city' => $this->cities->name,
+            'moderator_id' => $this->moderator_id,
+            'moderator' => $this->moderator->users->name
         ];
     }
 }

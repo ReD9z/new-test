@@ -17,7 +17,7 @@ class InstallersController extends Controller
      */
     public function index(Request $request)
     {
-        $installers = Installers::with('users', 'address')->get(); 
+        $installers = Installers::with('users', 'cities', 'moderator.users')->get(); 
         
         return InstallersResource::collection($installers);
     }
@@ -36,6 +36,9 @@ class InstallersController extends Controller
         $users->id = $request->input('id');
         $users->name = $request->input('name');
         $users->email = $request->input('email');
+        $users->phone = $request->input('phone');
+        $users->login = $request->input('login');
+        $users->role = 'installer';
         
         if ($request->isMethod('post')) {
             $users->password = bcrypt($request->input('password'));
@@ -45,15 +48,18 @@ class InstallersController extends Controller
         if($users->save()) { 
             $installers = $request->isMethod('put') ? Installers::findOrFail($request->id) : new Installers;
             $installers->id = $request->input('id');
-            $installers->user_id = $users->id;
+            $installers->users_id = $users->id;
             $installers->city_id = $request->input('city_id');
             $installers->moderator_id = $request->input('moderator_id');
 
             if($installers->save()) {
-                return new InstallersResource($installers);
+                return new ManagersResource($installers);
             }
         }
- 
+     
+        if($managers->save()) {
+            return new ManagersResource($managers);
+        }
     }
 
     /**

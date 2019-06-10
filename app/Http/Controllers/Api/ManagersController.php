@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Managers;
+use App\User;
 use App\Http\Resources\Managers as ManagersResource;
 
 class ManagersController extends Controller
@@ -16,7 +17,7 @@ class ManagersController extends Controller
      */
     public function index(Request $request)
     {
-        $managers = Managers::get(); 
+        $managers = Managers::with('users', 'cities', 'moderator.users')->get(); 
         
         return ManagersResource::collection($managers);
     }
@@ -29,11 +30,32 @@ class ManagersController extends Controller
      */
     public function store(Request $request)
     {
-        $managers = $request->isMethod('put') ? Managers::findOrFail($request->id) : new Managers;
+        $users = $request->isMethod('put') ? User::findOrFail($request->id) : new User;
 
-        $managers->id = $request->input('id');
-        $managers->title = $request->input('title');
+        $users->id = $request->input('id');
+        $users->name = $request->input('name');
+        $users->email = $request->input('email');
+        $users->phone = $request->input('phone');
+        $users->login = $request->input('login');
+        $users->role = 'manager';
+        
+        if ($request->isMethod('post')) {
+            $users->password = bcrypt($request->input('password'));
+            $token = $users->createToken('Laravel Password Grant Client')->accessToken;
+        }
     
+        if($users->save()) { 
+            $managers = $request->isMethod('put') ? Managers::findOrFail($request->id) : new Managers;
+            $managers->id = $request->input('id');
+            $managers->users_id = $users->id;
+            $managers->city_id = $request->input('city_id');
+            $managers->moderator_id = $request->input('moderator_id');
+
+            if($managers->save()) {
+                return new ManagersResource($managers);
+            }
+        }
+     
         if($managers->save()) {
             return new ManagersResource($managers);
         }

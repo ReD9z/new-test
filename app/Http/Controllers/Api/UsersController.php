@@ -33,9 +33,11 @@ class UsersController extends Controller
         $users->id = $request->input('id');
         $users->name = $request->input('name');
         $users->email = $request->input('email');
+        $users->phone = $request->input('phone');
+        $users->login = $request->input('login');
+        $users->role = 'admin';
         if ($request->isMethod('post')) {
             $users->password = bcrypt($request->input('password'));
-
             $token = $users->createToken('Laravel Password Grant Client')->accessToken;
         }
     

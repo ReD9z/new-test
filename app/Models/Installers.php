@@ -6,11 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Installers extends Model
 {
-    public function address() {
-        return $this->belongsTo('App\Models\Address', 'city_id');
+    public function cities() {
+        return $this->belongsTo('App\Models\CitiesToWorks', 'city_id');
     }
 
     public function users() {
-        return $this->belongsTo('App\User', 'user_id');
+        return $this->belongsTo('App\User', 'users_id');
+    }
+
+    public function moderator() {
+        return $this->belongsTo('App\Models\Moderators', 'moderator_id');
     }
 }

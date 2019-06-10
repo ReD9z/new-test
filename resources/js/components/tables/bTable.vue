@@ -78,6 +78,9 @@
                             <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
+                    <div v-if="param.input == 'password'">
+                        <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
+                    </div>
                 </v-flex>
             </v-card-text>
             <div class="text-xs-center">
@@ -219,6 +222,9 @@ export default {
         chips: [],
         chipsItem: ['Фильтер1', 'Фильтер2'],
         picker: new Date().toISOString().substr(0, 10),
+        pagination: {
+            sortBy: 'id'
+        },
     }),
     props: {
         params: Object
@@ -451,8 +457,7 @@ export default {
                 }
             ).catch(error => {
                 console.log(error);
-            })
-            
+            })  
         },
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)

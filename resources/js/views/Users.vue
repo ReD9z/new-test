@@ -35,19 +35,12 @@ export default {
                     sortable: true,
                     value: 'login' 
                 },
-                { 
-                    text: 'Роль', 
-                    input: "text",
-                    sortable: true,
-                    value: 'role' 
-                },
-                // Сброс пароля
-                // Роль пользователя
                 {
-                    text: 'Пароль', 
-                    input: "text",
-                    sortable: true,
-                    value: 'password' 
+                    text: "Пароль",
+                    input: "password",
+                    sortable: false,
+                    value: 'password',
+                    visibility: 'd-none',
                 },
                 { 
                     text: 'Параметры',

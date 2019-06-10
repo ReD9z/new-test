@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Moderators;
 use App\Http\Resources\Moderators as ModeratorsResource;
+use App\User;
 
 class ModeratorsController extends Controller
 {
@@ -17,7 +18,7 @@ class ModeratorsController extends Controller
     public function index(Request $request)
     {
  
-        $moderators = Moderators::with('users')->get();
+        $moderators = Moderators::with('users', 'cities')->get();
     
         return ModeratorsResource::collection($moderators);
     }
@@ -30,15 +31,34 @@ class ModeratorsController extends Controller
      */
     public function store(Request $request)
     {
-        $moderators = $request->isMethod('put') ? Moderators::findOrFail($request->id) : new Moderators;
+        $users = $request->isMethod('put') ? User::findOrFail($request->id) : new User;
 
-        // $moderators->id = $request->input('id');
-        // $moderators->name = $request->input('name');
+        $users->id = $request->input('id');
+        $users->name = $request->input('name');
+        $users->email = $request->input('email');
+        $users->phone = $request->input('phone');
+        $users->login = $request->input('login');
+        $users->role = 'moderator';
         
-        if($moderators->save()) { 
-            return new ModeratorsResource($moderators);
+        if ($request->isMethod('post')) {
+            $users->password = bcrypt($request->input('password'));
+            $token = $users->createToken('Laravel Password Grant Client')->accessToken;
         }
-        
+    
+        if($users->save()) { 
+            $moderators = $request->isMethod('put') ? Moderators::findOrFail($request->id) : new Moderators;
+            $moderators->id = $request->input('id');
+            $moderators->users_id = $users->id;
+            $moderators->city_id = $request->input('city_id');
+
+            if($moderators->save()) {
+                return new ModeratorsResource($moderators);
+            }
+        }
+     
+        if($moderators->save()) {
+            return new ManagersResource($moderators);
+        }        
     }
 
     /**
