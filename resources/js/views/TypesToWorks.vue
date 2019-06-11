@@ -16,7 +16,10 @@ export default {
                     align: 'left',
                     sortable: true,
                     input: "text",
-                    value: 'title'
+                    value: 'title',
+                    validate: [
+                        v => !!v || 'Поле "Название" обязательно',
+                    ],
                 },
                 { 
                     text: 'Параметры',

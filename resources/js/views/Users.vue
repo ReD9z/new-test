@@ -9,31 +9,43 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/users',
+            baseUrl: 'api/admins',
             headers: [
                 { 
                     text: 'Имя', 
                     input: "text",
                     sortable: true,
-                    value: 'name' 
+                    value: 'name',
+                    validate: [
+                        v => !!v || 'Поле "Имя" обязательно',
+                    ],
                 },
                 { 
                     text: 'Email', 
                     input: "text",
                     sortable: true,
-                    value: 'email' 
+                    value: 'email',
+                    validate: [
+                        v => !!v || 'Поле "Email" обязательно',
+                    ],
                 },
                 { 
                     text: 'Телефон', 
                     input: "text",
                     sortable: true,
-                    value: 'phone' 
+                    value: 'phone',
+                    validate: [
+                        v => !!v || 'Поле "Телефон" обязательно',
+                    ],
                 },
                 { 
                     text: 'Логин', 
                     input: "text",
                     sortable: true,
-                    value: 'login' 
+                    value: 'login',
+                    validate: [
+                        v => !!v || 'Поле "Логин" обязательно',
+                    ],
                 },
                 {
                     text: "Пароль",

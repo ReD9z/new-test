@@ -50,10 +50,6 @@ class ModeratorsController extends Controller
             $moderators->id = $request->input('id');
             $moderators->users_id = $users->id;
             $moderators->city_id = $request->input('city_id');
-
-            if($moderators->save()) {
-                return new ModeratorsResource($moderators);
-            }
         }
      
         if($moderators->save()) {

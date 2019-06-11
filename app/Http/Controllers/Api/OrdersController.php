@@ -32,7 +32,7 @@ class OrdersController extends Controller
         $orders = $request->isMethod('put') ? Orders::findOrFail($request->id) : new Orders;
 
         $orders->id = $request->input('id');
-        $orders->client_id = $request->input('client_id');
+        $orders->clients_id = $request->input('clients_id');
         $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request->input('order_start_date')));
         $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request->input('order_end_date')));
 

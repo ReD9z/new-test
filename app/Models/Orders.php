@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Orders extends Model
 {
     public function clients() {
-        return $this->belongsTo('App\Models\Clients', 'client_id');
+        return $this->belongsTo('App\Models\Clients', 'clients_id');
     }
 }

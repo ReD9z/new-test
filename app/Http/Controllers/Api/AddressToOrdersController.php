@@ -17,7 +17,7 @@ class AddressToOrdersController extends Controller
 
     public function index(Request $request)
     {
-        $torders = AddressToOrders::with('address', 'orders.clients')->get();
+        $torders = AddressToOrders::with('address.cities', 'orders.clients', 'files')->get();
             
         return AddressToOrdersResource::collection($torders);
     }
@@ -37,9 +37,18 @@ class AddressToOrdersController extends Controller
         $torders->address_id = $request->input('address_id');
         $torders->status = $request->input('status');
     
-        if($torders->save()) {
-            return new AddressToOrdersResource($torders);
+        if($request->isMethod('delete') && $request->images) {
+            $torders::removeTableFiles($request->images);
+        } else {
+            if($torders->save()) {
+                if ($request->isMethod('post') && is_array($request->images) || $request->isMethod('put') && is_array($request->images)) {
+                    foreach ($request->images as $key => $item) {
+                        $torders::saveTableFiles(json_decode($request->images[$key])->id, $torders->id);    
+                    }
+                }
+            }
         }
+        return new AddressToOrdersResource($torders);
     }
 
     /**

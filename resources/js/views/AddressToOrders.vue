@@ -18,7 +18,7 @@ export default {
                     value: 'order_id',
                     selectText: 'actual_title',
                     TableGetIdName: 'orders',
-                    selectApi: 'api/clients',
+                    selectApi: 'api/orders',
                     input: "select",
                 },
                 {
@@ -32,15 +32,15 @@ export default {
                     input: "select",
                 },
                 { 
-                    value: 'files', 
-                    sortable: false,
-                    input: "images"
-                },
-                { 
                     text: 'Статус', 
                     input: "text",
                     sortable: true,
                     value: 'status' 
+                },
+                { 
+                    value: 'files', 
+                    sortable: false,
+                    input: "images"
                 },
                 { 
                     text: 'Параметры',
@@ -48,9 +48,7 @@ export default {
                     edit: true,
                 }
             ],
-            filters: [
-
-            ],
+            filters: [],
             search: true,
             pagination: true,
             excel: false

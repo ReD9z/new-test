@@ -13,16 +13,17 @@ export default {
                     sortable: true,
                     value: 'title',
                     input: "text",
+                    validate: [
+                        v => !!v || 'Поле "Имя" обязательно',
+                    ],
                 },
                 { 
                     text: 'Текст', 
                     value: 'text',
                     input: "text",
-                },
-                { 
-                    value: 'files', 
-                    sortable: false,
-                    input: "images"
+                    validate: [
+                        v => !!v || 'Поле "Текст" обязательно',
+                    ],
                 },
                 { 
                     text: 'Параметры',

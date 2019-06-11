@@ -16,10 +16,7 @@ class AreasController extends Controller
      */
     public function index(Request $request)
     {
-       
         $areas = Areas::get();
-        
-        
         return AreasResource::collection($areas);
     }
 

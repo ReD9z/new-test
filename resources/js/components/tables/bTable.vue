@@ -34,65 +34,67 @@
                 </v-btn>
             </v-toolbar>
             <v-card-text>
-                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                    <div v-if="param.input == 'text'">
-                        <v-text-field v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
-                    </div>
-                    <div v-if="param.input == 'select'">
-                        <div v-for="item in select" :key="item[0]">
-                            <div v-if="item.url == param.selectApi">
-                               <v-autocomplete
-                                    :items="item.data"
-                                    v-model="editedItem[param.value]"
-                                    :item-text="param.selectText"
-                                    item-value="id"
-                                    :label="param.text"
-                                    >
-                                </v-autocomplete>
+                <v-form ref="forms" v-model="valid" lazy-validation>
+                    <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
+                        <div v-if="param.input == 'text'">
+                            <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                        </div>
+                        <div v-if="param.input == 'select'">
+                            <div v-for="item in select" :key="item[0]">
+                                <div v-if="item.url == param.selectApi">
+                                <v-autocomplete
+                                        :items="item.data"
+                                        v-model="editedItem[param.value]"
+                                        :item-text="param.selectText"
+                                        item-value="id"
+                                        :label="param.text"
+                                        >
+                                    </v-autocomplete>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div v-if="param.input == 'date'">
-                         <v-menu
-                            v-model="param.close"
-                            :close-on-content-click="false"
-                            :nudge-right="40"
-                            lazy
-                            transition="scale-transition"
-                            offset-y
-                            full-width
-                            max-width="290px"
-                            min-width="290px"
-                            >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    v-model="editedItem[param.value]"
-                                    hint="DD-MM-YYYY формат"
-                                    persistent-hint
-                                    @blur="editedItem[param.value] = parseDate(picker)"
-                                    prepend-icon="event"
-                                    :label="param.text"
-                                    v-on="on"
-                                ></v-text-field>
+                        <div v-if="param.input == 'date'">
+                            <v-menu
+                                v-model="param.close"
+                                :close-on-content-click="false"
+                                :nudge-right="40"
+                                lazy
+                                transition="scale-transition"
+                                offset-y
+                                full-width
+                                max-width="290px"
+                                min-width="290px"
+                                >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        v-model="editedItem[param.value]"
+                                        hint="DD-MM-YYYY формат"
+                                        persistent-hint
+                                        @blur="editedItem[param.value] = parseDate(picker)"
+                                        prepend-icon="event"
+                                        :label="param.text"
+                                        v-on="on"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                            </v-menu>
+                        </div>
+                        <div v-if="param.input == 'password'">
+                            <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
+                        </div>
+                    </v-flex>
+                    <div class="text-xs-center">
+                        <v-btn color="info" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
+                            Сохранить
+                            <template v-slot:loaderSaveBtn>
+                                <span class="custom-loader">
+                                <v-icon light>cached</v-icon>
+                                </span>
                             </template>
-                            <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
-                        </v-menu>
+                        </v-btn>
                     </div>
-                    <div v-if="param.input == 'password'">
-                        <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
-                    </div>
-                </v-flex>
+                </v-form>
             </v-card-text>
-            <div class="text-xs-center">
-                <v-btn color="info" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
-                    Сохранить
-                    <template v-slot:loaderSaveBtn>
-                        <span class="custom-loader">
-                        <v-icon light>cached</v-icon>
-                        </span>
-                    </template>
-                </v-btn>
-             </div>
         </v-card>
     </v-navigation-drawer>
     <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
@@ -112,22 +114,22 @@
                     <v-flex xs12 v-if="param.input == 'images'">
                         <v-layout row wrap>
                             <v-flex v-for="(file, key) in editedItem.files" :key="key" xs4 d-flex>
-                            <v-card flat tile class="d-flex pr-1 pb-1">
-                                <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
-                                    <template v-slot:placeholder>
-                                        <v-layout fill-height align-center justify-center ma-0 >
-                                            <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
-                                        </v-layout>
-                                    </template>
-                                    <template>
-                                        <v-layout fill-height right top ma-0 >
-                                            <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
-                                                <v-icon>close</v-icon>
-                                            </v-btn>
-                                        </v-layout>
-                                    </template>
-                                </v-img>
-                            </v-card>
+                                <v-card flat tile class="d-flex pr-1 pb-1">
+                                    <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
+                                        <template v-slot:placeholder>
+                                            <v-layout fill-height align-center justify-center ma-0 >
+                                                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                            </v-layout>
+                                        </template>
+                                        <template>
+                                            <v-layout fill-height right top ma-0 >
+                                                <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
+                                                    <v-icon>close</v-icon>
+                                                </v-btn>
+                                            </v-layout>
+                                        </template>
+                                    </v-img>
+                                </v-card>
                             </v-flex>
                         </v-layout>
                     </v-flex>
@@ -168,12 +170,8 @@
         <template v-slot:items="props">
             <td v-for="(param, key) in params.headers" :key="key">
                 <v-flex v-if="param.input !== 'images'">
-                    <div v-if="param.selectText">
-                        {{props.item[param.TableGetIdName]}}
-                    </div>
-                    <div v-else>
-                        {{props.item[param.value]}}
-                    </div>
+                    <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
+                    <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
                 <v-flex v-if="param.edit">
                     <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
@@ -225,6 +223,7 @@ export default {
         pagination: {
             sortBy: 'id'
         },
+        valid: true
     }),
     props: {
         params: Object
@@ -266,7 +265,6 @@ export default {
         },
         parseDate (date) {
             if (!date) return null
-
             const [year, month, day] = date.split('-')
             return `${month}-${day}-${year}`
         },
@@ -365,22 +363,8 @@ export default {
             axios.post('api/files/remove', data)
             .then(
                 res => {
-                    axios({
-                        method: 'delete',
-                        url: this.params.baseUrl,
-                        data: res,
-                        params: { 
-                            images: data.id
-                        }
-                    })
-                    .then(
-                        response => {
-                            this.editedItem.files.splice(this.editedItem.files.indexOf(data.id), 1);
-                            this.loadImages = false;
-                        }
-                    ).catch(error => {
-                        console.log(error);
-                    })
+                    this.editedItem.files.splice(this.editedItem.files.indexOf(data.id), 1);
+                    this.loadImages = false;
                 }
             ).catch(
                 error => {
@@ -403,7 +387,7 @@ export default {
         },
         deleteItem (item) {
             const index = this.desserts.indexOf(item);
-            if (confirm('Are you sure you want to delete this item?')) {
+            if (confirm('Вы уверены, что хотите удалить этот элемент?')) {
                 axios({
                     method: 'delete',
                     url: this.params.baseUrl+'/'+item.id,
@@ -431,33 +415,39 @@ export default {
             this.formData.delete('file[]');
         },
         save () {
-            this.loaderSaveBtn = true;
-            this.loadingSaveBtn = true;
-            let method = null;
-            if (this.editedIndex > -1) {
-                method = 'put'
-            } else {
-                method = 'post'
-            }
-            axios({
-                method: method,
-                url: this.params.baseUrl,
-                data: this.editedItem
-            })
-            .then(
-                response => {
-                    if (this.editedIndex > -1) {
-                        Object.assign(this.desserts[this.editedIndex], this.editedItem);
-                    } else {
-                        this.desserts.push(response.data);
-                    }
-                    this.loaderSaveBtn = null;
-                    this.loadingSaveBtn = false;
-                    this.close();
+            if (this.$refs.forms.validate() == false) {
+                this.snackbar = true
+            } 
+            else {
+                this.loaderSaveBtn = true;
+                this.loadingSaveBtn = true;
+                let method = null;
+                if (this.editedIndex > -1) {
+                    method = 'put'
+                } else {
+                    method = 'post'
                 }
-            ).catch(error => {
-                console.log(error);
-            })  
+                axios({
+                    method: method,
+                    url: this.params.baseUrl,
+                    data: this.editedItem
+                })
+                .then(
+                    response => {
+                        if (this.editedIndex > -1) {
+                            Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                        } else {
+                            this.desserts.push(response.data);
+                        }
+                        this.loaderSaveBtn = null;
+                        this.loadingSaveBtn = false;
+                        this.close();
+                        this.$refs.forms.reset();
+                    }
+                ).catch(error => {
+                    console.log(error);
+                })  
+            }
         },
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)

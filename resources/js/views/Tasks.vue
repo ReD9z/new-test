@@ -52,7 +52,7 @@ export default {
                     text: 'Комментарий', 
                     input: "text",
                     sortable: true,
-                    value: 'comment' 
+                    value: 'comment',
                 },
                 { 
                     text: 'Параметры',

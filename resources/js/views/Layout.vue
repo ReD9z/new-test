@@ -5,7 +5,7 @@
                 <v-list class="pa-0">
                     <v-list-tile avatar>
                         <v-list-tile-avatar>
-                            <img src="https://randomuser.me/api/portraits/men/85.jpg">
+                           <v-icon size="38px">account_circle</v-icon>
                         </v-list-tile-avatar>
                         <v-list-tile-content>
                             <v-list-tile-title>{{isLoggedUser.name}}</v-list-tile-title>
@@ -44,7 +44,7 @@
                     </v-list-group>
                 </div>
                 <v-list-tile @click="exit()">
-                    <v-list-tile-action><v-icon>home</v-icon></v-list-tile-action>
+                    <v-list-tile-action><v-icon>exit_to_app</v-icon></v-list-tile-action>
                     <v-list-tile-content>
                         <v-list-tile-title>Выход</v-list-tile-title>
                     </v-list-tile-content>

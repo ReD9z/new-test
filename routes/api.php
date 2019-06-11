@@ -53,6 +53,13 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('users', 'Api\UsersController@store');  // Edit one item
         Route::delete('users/{id}', 'Api\UsersController@destroy'); // Delete one item
 
+        // Admin
+        Route::post('admins', 'Api\AdminsController@store'); // Add one item
+        Route::get('admins', 'Api\AdminsController@index'); // Show list
+        Route::get('admins/{id}', 'Api\AdminsController@show'); // Show one item
+        Route::put('admins', 'Api\AdminsController@store');  // Edit one item
+        Route::delete('admins/{id}', 'Api\AdminsController@destroy'); // Delete one item
+
         // Moderators
         Route::post('moderators', 'Api\ModeratorsController@store'); // Add one item
         Route::get('moderators', 'Api\ModeratorsController@show'); // Show one item

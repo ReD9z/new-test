@@ -16,9 +16,7 @@ class CitiesToWorksController extends Controller
      */
     public function index(Request $request)
     {
-      
         $toWorks = CitiesToWorks::get();
-        
         return CitiesToWorksResource::collection($toWorks);
     }
 
