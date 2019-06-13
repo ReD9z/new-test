@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
+use App\Models\CitiesToWorks;
 use App\Http\Resources\Address as AddressResource;
 
 class AddressController extends Controller
@@ -49,17 +50,74 @@ class AddressController extends Controller
         //TODO создать метод в модели и вызвать
         $data = [];
         foreach ($request->input() as $key => $value) {
+            $citywork = CitiesToWorks::where('name', array_values($request[$key])[0])->first();
+            $cityId = 0;
             $address = new Address;
-            $address->city = array_values($request[$key])[0] == null ? '' : array_values($request[$key])[0];
+            if (!empty($citywork)) {
+                $cityId = $citywork->id;
+                // $address->city_id = $citywork->id;
+                // $address->area = array_values($request[$key])[1] == null ? '' : array_values($request[$key])[1];
+                // // $address->street = array_values($request[$key])[2] == null ? '' : array_values($request[$key])[2];
+                // // $address->house_number = array_values($request[$key])[3] == null ? '' : array_values($request[$key])[3];
+                // // $address->number_entrances = array_values($request[$key])[4] == null ? '' : array_values($request[$key])[4];
+                // // $address->management_company = array_values($request[$key])[5] == null ? '' : array_values($request[$key])[5];
+                // $address->save();
+                // $data[$key] = new AddressResource($address);
+            }
+            if (empty($citywork)) {
+                $toWorks = new CitiesToWorks;
+                $toWorks->name = array_values($request[$key])[0] == null ? '' : array_values($request[$key])[0];
+                $toWorks->save();
+                $cityId = $toWorks->id;
+            }
+            $address->city_id = $cityId;
             $address->area = array_values($request[$key])[1] == null ? '' : array_values($request[$key])[1];
-            $address->street = array_values($request[$key])[2] == null ? '' : array_values($request[$key])[2];
-            $address->house_number = array_values($request[$key])[3] == null ? '' : array_values($request[$key])[3];
-            $address->number_entrances = array_values($request[$key])[4] == null ? '' : array_values($request[$key])[4];
             $address->save();
+            // if (empty($citywork)) { 
+            //     $toWorks = new CitiesToWorks;
+            //     $toWorks->name = array_values($request[$key])[0];
+            //     $toWorks->save();
+            //     $address = new Address;
+            //     $toWorks->id = $toWorks->id;
+            //     $address->area = array_values($request[$key])[1] == null ? '' : array_values($request[$key])[1];
+            //     // $address->street = array_values($request[$key])[2] == null ? '' : array_values($request[$key])[2];
+            //     // $address->house_number = array_values($request[$key])[3] == null ? '' : array_values($request[$key])[3];
+            //     // $address->number_entrances = array_values($request[$key])[4] == null ? '' : array_values($request[$key])[4];
+            //     // $address->management_company = array_values($request[$key])[5] == null ? '' : array_values($request[$key])[5];
+            //     $address->save();
+            //     $data[$key] = new AddressResource($address);
+            // }
+            // else {
+            //     $toWorks = new CitiesToWorks;
+            //     $toWorks->id = $request->input('id');
+            //     $toWorks->name = array_values($request[$key])[0];
+            //     $toWorks->save();
+            //     $address = new Address;
+            //     $toWorks->id = $toWorks->id;
+            //     $address->area = array_values($request[$key])[1] == null ? '' : array_values($request[$key])[1];
+            //     $address->street = array_values($request[$key])[2] == null ? '' : array_values($request[$key])[2];
+            //     $address->house_number = array_values($request[$key])[3] == null ? '' : array_values($request[$key])[3];
+            //     $address->number_entrances = array_values($request[$key])[4] == null ? '' : array_values($request[$key])[4];
+            //     $address->management_company = array_values($request[$key])[5] == null ? '' : array_values($request[$key])[5];
+            //     $address->save();
+            //     $data[$key] = new AddressResource($address);
+            // }
+            
+            // $address = new Address;
+            // $citywork = CitiesToWorks::where('name', 'like', '%'.array_values($request[$key])[0] == null ? '' : array_values($request[$key])[0].'%')->get();
+    
+            // $address->city_id = CitiesToWorks::Test(array_values($request[$key])[0]);
+            // $address->area = array_values($request[$key])[1] == null ? '' : array_values($request[$key])[1];
+            // $address->street = array_values($request[$key])[2] == null ? '' : array_values($request[$key])[2];
+            // $address->house_number = array_values($request[$key])[3] == null ? '' : array_values($request[$key])[3];
+            // $address->number_entrances = array_values($request[$key])[4] == null ? '' : array_values($request[$key])[4];
+            // $address->management_company = array_values($request[$key])[5] == null ? '' : array_values($request[$key])[5];
+            // $address->save();
             $data[$key] = new AddressResource($address);
         }
-
         return response()->json(['errors' => [], 'data' => $data, 'status' => 200], 200);
+        
+     
     }
 
     /**

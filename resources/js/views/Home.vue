@@ -38,6 +38,7 @@ export default {
             pagination: true,
             excel: true
         }
+        
     })
 }
 </script>

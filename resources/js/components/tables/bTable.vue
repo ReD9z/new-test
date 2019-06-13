@@ -1,7 +1,7 @@
 <template>
 <div>
     <v-toolbar color="#fff" fixed app clipped-righ>
-        <v-toolbar-title>Атом</v-toolbar-title>
+        <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn
             color="blue-grey"
@@ -349,7 +349,7 @@ export default {
                         array.forEach(element => {
                             vm.desserts.push(element);
                         });
-                        setTimeout(() => ( vm.loadingExcel = false), 1000);
+                        setTimeout(() => (vm.loadingExcel = false), 1000);
                     }
                 ).catch(error => {
                     console.log(error);

@@ -12,7 +12,7 @@
                         </v-list-tile-content>
                         <v-list-tile-action>
                             <v-btn icon @click.stop="mini = !mini" >
-                            <v-icon>chevron_left</v-icon>
+                                <v-icon>chevron_left</v-icon>
                             </v-btn>
                         </v-list-tile-action>
                     </v-list-tile>
@@ -27,7 +27,7 @@
                             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>   
-                    <v-list-group prepend-icon="account_circle" :value="hide" v-else>
+                    <v-list-group :prepend-icon="item.icon" :value="hide" v-else>
                         <template v-slot:activator>
                             <v-list-tile>
                                 <v-list-tile-title>{{item.title}}</v-list-tile-title>
@@ -36,7 +36,7 @@
                         <div v-for="(wrapLink, key) in item.wrapLink" :key="key">
                             <v-list-tile active-class="active" :to="{ name: wrapLink.src }" >
                                 <v-list-tile-action>
-                                    <v-icon>{{ item.icon }}</v-icon>
+                                    <v-icon>{{ wrapLink.icon }}</v-icon>
                                 </v-list-tile-action>
                                 <v-list-tile-title>{{wrapLink.title}}</v-list-tile-title>
                             </v-list-tile>
@@ -68,22 +68,22 @@ export default {
         drawer: true,
         hide: "",
         items: [
-            { title: 'Главная', icon: 'dashboard', src: 'home'},
-            { title: 'Адреса', icon: 'question_answer', src: 'address'},
-            { title: 'Заказы', icon: 'question_answer', src: 'orders'},
-            { title: 'Клиенты', icon: 'question_answer', src: 'clients'},
-            { title: 'Адреса заказов', icon: 'question_answer', src: 'addresstoorders'},
-            { title: 'Задачи', icon: 'question_answer', src: 'tasks'},
-            { title: 'Пользователи', icon: 'home', wrapLink:
+            { title: 'Рабочий стол', icon: 'dashboard', src: 'home'},
+            { title: 'Менеджеры', icon: 'people', src: 'managers'},
+            { title: 'Монтажники', icon: 'build', src: 'installers'},
+            { title: 'Продажи', icon: 'account_balance_wallet', wrapLink:
                 [
-                    { title: 'Менеджеры', icon: 'question_answer', src: 'managers'},
-                    { title: 'Модераторы', icon: 'question_answer', src: 'moderators'},
-                    { title: 'Администраторы', icon: 'question_answer', src: 'users'},
-                    { title: 'Монтажники', icon: 'question_answer',src: 'installers'}
+                    { title: 'Заказы', icon: 'question_answer', src: 'orders'},
+                    { title: 'Клиенты', icon: 'question_answer', src: 'clients'},
+                    { title: 'Задачи', icon: 'question_answer', src: 'tasks'},
+                    { title: 'Адреса', icon: 'question_answer', src: 'address'},
+                    { title: 'Адреса заказов', icon: 'question_answer', src: 'addresstoorders'},
                 ] 
             },
-            { title: 'Справочники', icon: 'home', wrapLink:
+            { title: 'Настройки', icon: 'settings', wrapLink:
                 [
+                    { title: 'Модераторы', icon: 'question_answer', src: 'moderators'},
+                    { title: 'Администраторы', icon: 'question_answer', src: 'users'},
                     { title: 'Типы работы', icon: 'question_answer', src: 'typestoworks'},
                     { title: 'Районы', icon: 'question_answer', src: 'areas'},
                     { title: 'Города работы', icon: 'question_answer', src: 'citiestoworks'}
