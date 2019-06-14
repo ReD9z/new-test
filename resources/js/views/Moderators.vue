@@ -10,7 +10,7 @@ export default {
     data: () => ({
         params: {
             baseUrl: 'api/moderators',
-           headers: [
+            headers: [
                 { 
                     text: 'Имя', 
                     input: "text",
@@ -51,11 +51,6 @@ export default {
                     sortable: false,
                     value: 'password',
                     visibility: 'd-none',
-                },
-                { 
-                    text: 'Параметры',
-                    sortable: false,
-                    edit: true,
                 }
             ],
             search: true,

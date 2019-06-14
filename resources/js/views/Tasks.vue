@@ -53,11 +53,6 @@ export default {
                     input: "text",
                     sortable: true,
                     value: 'comment',
-                },
-                { 
-                    text: 'Параметры',
-                    sortable: false,
-                    edit: true,
                 }
             ],
             search: true,

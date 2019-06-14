@@ -40,12 +40,8 @@ export default {
                 { 
                     value: 'files', 
                     sortable: false,
-                    input: "images"
-                },
-                { 
-                    text: 'Параметры',
-                    sortable: false,
-                    edit: true,
+                    input: "images",
+                    visibility: 'd-none',
                 }
             ],
             filters: [],

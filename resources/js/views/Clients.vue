@@ -99,11 +99,6 @@ export default {
                     input: "text",
                     sortable: true,
                     value: 'settlement_account' 
-                },
-                { 
-                    text: 'Параметры',
-                    sortable: false,
-                    edit: true,
                 }
             ],
             filters: [

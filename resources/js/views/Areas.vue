@@ -17,11 +17,6 @@ export default {
                     sortable: true,
                     value: 'name',
                     input: "text"
-                },
-                { 
-                    text: 'Параметры', 
-                    sortable: false,
-                    edit: true,
                 }
             ],
             search: true,

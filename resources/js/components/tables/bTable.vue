@@ -165,15 +165,34 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table v-model="selected" :pagination.sync="pagination" select-all item-key="name" :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
+        <template v-slot:headers="props">
+            <th>
+                <v-checkbox :input-value="props.all" :indeterminate="props.indeterminate" primary hide-details @click.stop="toggleAll"></v-checkbox>
+            </th>
+            <th
+                v-for="header in props.headers"
+                :key="header.text"
+                :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
+                @click="changeSort(header.value)"
+            >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
+            <th class="text-xs-left">
+                Парамеры  
+            </th>
+        </template>
         <template v-slot:items="props">
-            <td v-for="(param, key) in params.headers" :key="key">
+            <td>
+                <v-checkbox :input-value="props.selected" primary hide-details ></v-checkbox>
+            </td>
+            <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
                 <v-flex v-if="param.input !== 'images'">
                     <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
-                <v-flex v-if="param.edit">
+            </td>
+            <td>
+                <v-flex>
                     <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
                         image
                     </v-icon>
@@ -220,10 +239,11 @@ export default {
         chips: [],
         chipsItem: ['Фильтер1', 'Фильтер2'],
         picker: new Date().toISOString().substr(0, 10),
+        valid: true,
         pagination: {
             sortBy: 'id'
         },
-        valid: true
+        selected: [],
     }),
     props: {
         params: Object
@@ -246,6 +266,18 @@ export default {
         this.selectStatus();
     },
     methods: {
+        toggleAll () {
+            if (this.selected.length) this.selected = []
+            else this.selected = this.desserts.slice()
+        },
+        changeSort (column) {
+            if (this.pagination.sortBy === column) {
+                this.pagination.descending = !this.pagination.descending
+            } else {
+                this.pagination.sortBy = column
+                this.pagination.descending = false
+            }
+        },
         initialize () {
             axios({
                 method: 'get',
@@ -326,6 +358,29 @@ export default {
                 }
             );
         },
+        async loadExecel(file) {
+            let vm = this;
+            await file.forEach(function (item) {
+                axios({
+                    method: 'post',
+                    url: vm.params.baseUrl +'/excel',
+                    data: item
+                })
+                .then(
+                    response => {
+                        // Обновлять при сохранении select с адресами
+                        let array = response.data.data;
+                        if(array != undefined) {
+                            vm.desserts.push(array);
+                        }
+                        setTimeout(() => (vm.loadingExcel = false), 1000);
+                        vm.$refs.excel.value = '';
+                    }
+                ).catch(error => {
+                    console.log(error);
+                });
+            })
+        },
         elementLoadToFile() {
             this.loadingExcel = true;
             let file = this.$refs.excel.files[0];
@@ -338,23 +393,9 @@ export default {
                 });
                 let firstSheet = workbook.SheetNames[0];
                 let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-                axios({
-                    method: 'post',
-                    url: vm.params.baseUrl +'/excel',
-                    data: excelRows
-                })
-                .then(
-                    response => {
-                        let array = Array.from(response.data.data);
-                        array.forEach(element => {
-                            vm.desserts.push(element);
-                        });
-                        setTimeout(() => (vm.loadingExcel = false), 1000);
-                    }
-                ).catch(error => {
-                    console.log(error);
-                });
-               
+
+                vm.loadExecel(excelRows);
+                
                 file.value = '';
             };
         },

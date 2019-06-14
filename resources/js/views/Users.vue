@@ -53,11 +53,6 @@ export default {
                     sortable: false,
                     value: 'password',
                     visibility: 'd-none',
-                },
-                { 
-                    text: 'Параметры',
-                    sortable: false,
-                    edit: true,
                 }
             ]
         }

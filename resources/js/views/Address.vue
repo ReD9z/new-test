@@ -46,11 +46,6 @@ export default {
                     text: 'Управляющая компания', 
                     input: "text",
                     value: 'management_company' 
-                },
-                { 
-                    text: 'Параметры',
-                    sortable: false,
-                    edit: true,
                 }
             ],
             search: true,

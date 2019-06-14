@@ -20,11 +20,6 @@ export default {
                     validate: [
                         v => !!v || 'Поле "Название" обязательно',
                     ],
-                },
-                { 
-                    text: 'Параметры',
-                    sortable: false,
-                    edit: true,
                 }
             ],
             search: true,

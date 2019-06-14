@@ -24,11 +24,6 @@ export default {
                     validate: [
                         v => !!v || 'Поле "Текст" обязательно',
                     ],
-                },
-                { 
-                    text: 'Параметры',
-                    sortable: false,
-                    edit: true,
                 }
             ],
             filters: [

@@ -34,11 +34,6 @@ export default {
                     sortable: true,
                     close: false,
                     value: 'order_end_date' 
-                },
-                { 
-                    text: 'Параметры',
-                    sortable: false,
-                    edit: true,
                 }
             ],
             filters: [
