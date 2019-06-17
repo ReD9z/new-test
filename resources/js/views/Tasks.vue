@@ -15,7 +15,7 @@ export default {
                     text: 'Заказ',
                     align: 'left',
                     sortable: true,
-                    value: 'order_id',
+                    value: 'orders_id',
                     selectText: 'actual_title',
                     TableGetIdName: 'orders',
                     selectApi: 'api/orders',

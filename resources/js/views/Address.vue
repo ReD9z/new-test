@@ -22,10 +22,15 @@ export default {
                     selectApi: 'api/cities_to_works',
                     input: "select",
                 },
-                { 
-                    text: 'Район', 
-                    input: "text",
-                    value: 'area' 
+                {
+                    text: 'Район',
+                    align: 'left',
+                    sortable: true,
+                    value: 'area_id',
+                    selectText: 'name',
+                    TableGetIdName: 'area',
+                    selectApi: 'api/areas',
+                    input: "select",
                 },
                 { 
                     text: 'Улица', 

@@ -35,7 +35,7 @@ class TasksController extends Controller
         $tasks->orders_id = $request->input('orders_id');
         $tasks->installer_id = $request->input('installer_id');
         $tasks->types_to_works_id = $request->input('types_to_works_id');
-        $tasks->task_date_completion = $request->input('task_date_completion');
+        $tasks->task_date_completion = date("Y-m-d 00:00:00", strtotime($request->input('task_date_completion')));
         $tasks->comment = $request->input('comment');
 
         if($tasks->save()) {

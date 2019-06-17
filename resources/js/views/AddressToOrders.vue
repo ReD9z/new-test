@@ -31,11 +31,12 @@ export default {
                     selectApi: 'api/address',
                     input: "select",
                 },
-                { 
+                {
                     text: 'Статус', 
-                    input: "text",
+                    input: "status",
                     sortable: true,
-                    value: 'status' 
+                    value: 'status', 
+                    status: ['Свободно', 'Занято']
                 },
                 { 
                     value: 'files', 

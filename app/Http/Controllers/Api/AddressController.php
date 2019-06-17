@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
+use App\Models\Areas;
 use App\Models\CitiesToWorks;
 use App\Http\Resources\Address as AddressResource;
 
@@ -17,7 +18,7 @@ class AddressController extends Controller
      */
     public function index(Request $request)
     {
-        $address = Address::with('cities')->get();
+        $address = Address::with('cities', 'areas')->get();
         return AddressResource::collection($address);
     }
 
@@ -33,7 +34,7 @@ class AddressController extends Controller
 
         $address->id = $request->input('id');
         $address->city_id = $request->input('city_id');
-        $address->area = $request->input('area');
+        $address->area_id = $request->input('area_id');
         $address->street = $request->input('street');
         $address->house_number = $request->input('house_number');
         $address->number_entrances = $request->input('number_entrances');
@@ -57,19 +58,29 @@ class AddressController extends Controller
         if(count($request->input()) == 6) {
             $data = [];
             $citywork = CitiesToWorks::where('name', mb_ucfirst(array_values($request->input())[0]))->first();
+            $area = Areas::where('name', mb_ucfirst(array_values($request->input())[1]))->first();
             $address = new Address;
             if (!empty($citywork)) {
-                $address = new Address;
                 $address->city_id = $citywork->id;
             }
             if (empty($citywork)) {
-            
                 $toWorks = new CitiesToWorks;
                 $toWorks->name = mb_ucfirst(array_values($request->input())[0]);
                 $toWorks->save();
                 $address->city_id = $toWorks->id;
             }       
-            $address->area = array_values($request->input())[1];
+
+            if (!empty($area)) {
+                $address->area_id = $area->id;
+            }
+
+            if (empty($area)) {
+                $areas = new Areas;
+                $areas->name = mb_ucfirst(array_values($request->input())[1]);
+                $areas->save();
+                $address->area_id = $areas->id;
+            } 
+
             $address->street = array_values($request->input())[2];
             $address->house_number = array_values($request->input())[3];
             $address->number_entrances = array_values($request->input())[4];
@@ -79,9 +90,6 @@ class AddressController extends Controller
             $data = new AddressResource($address);
             return response()->json(['errors' => [], 'data' => $data, 'status' => 200], 200);
         }
-    
-        
-     
     }
 
     /**

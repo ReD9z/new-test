@@ -53,7 +53,7 @@ class ModeratorsController extends Controller
         }
      
         if($moderators->save()) {
-            return new ManagersResource($moderators);
+            return new ModeratorsResource($moderators);
         }        
     }
 

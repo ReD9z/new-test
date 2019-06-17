@@ -2,110 +2,69 @@
 <div>
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn
-            color="#f2994a"
-            class="white--text"
-            large
-            :loading="loadingExcel"
-            :disabled="loadingExcel"
-            @click='pickExcel'
-            v-show="params.excel"
-        >
-            <v-icon left>vertical_align_bottom</v-icon>
-            Добавить Excel
-            <input
-                type="file"
-                style="display: none"
-                ref="excel"
-                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                @change="elementLoadToFile"
-                multiple
-            >
-        </v-btn>
-        <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать</v-btn>
     </v-toolbar>
-    <v-navigation-drawer v-model="dialog" right temporary fixed>
-        <v-card height="100%">
-            <v-toolbar color="pink" dark>
-                <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-btn icon @click="close">
-                    <v-icon>close</v-icon>
-                </v-btn>
-            </v-toolbar>
-            <v-card-text>
-                <v-form ref="forms" v-model="valid" lazy-validation>
-                    <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                        <div v-if="param.input == 'text'">
-                            <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
-                        </div>
-                        <div v-if="param.input == 'select'">
-                            <div v-for="item in select" :key="item[0]">
-                                <div v-if="item.url == param.selectApi">
-                                    <v-autocomplete
-                                        :items="item.data"
-                                        v-model="editedItem[param.value]"
-                                        :item-text="param.selectText"
-                                        item-value="id"
-                                        :label="param.text"
-                                        >
-                                    </v-autocomplete>
-                                </div>
+    <v-card>
+        <v-card-text>
+            <v-form ref="forms" v-model="valid" lazy-validation>
+                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
+                    <div v-if="param.input == 'text'">
+                        <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                    </div>
+                    <div v-if="param.input == 'select'">
+                        <div v-for="item in select" :key="item[0]">
+                            <div v-if="item.url == param.selectApi">
+                                <v-autocomplete
+                                    :items="item.data"
+                                    v-model="editedItem[param.value]"
+                                    :item-text="param.selectText"
+                                    item-value="id"
+                                    :label="param.text"
+                                    >
+                                </v-autocomplete>
                             </div>
                         </div>
-                        <div v-if="param.input == 'date'">
-                            <v-menu
-                                v-model="param.close"
-                                :close-on-content-click="false"
-                                :nudge-right="40"
-                                lazy
-                                transition="scale-transition"
-                                offset-y
-                                full-width
-                                max-width="290px"
-                                min-width="290px"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        v-model="editedItem[param.value]"
-                                        hint="DD-MM-YYYY формат"
-                                        persistent-hint
-                                        @blur="editedItem[param.value] = parseDate(picker)"
-                                        prepend-icon="event"
-                                        :label="param.text"
-                                        v-on="on"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
-                            </v-menu>
-                        </div>
-                        <div v-if="param.input == 'password'">
-                            <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
-                        </div>
-                        <div v-if="param.value == 'status'">
-                            <v-combobox
-                                v-model="editedItem[param.value]"
-                                :items="param.status"
-                                :label="param.text"
-                                >
-                            </v-combobox>
-                        </div>
-                    </v-flex>
-                    <div class="text-xs-center">
-                        <v-btn color="info" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
-                            Сохранить
-                            <template v-slot:loaderSaveBtn>
-                                <span class="custom-loader">
-                                <v-icon light>cached</v-icon>
-                                </span>
-                            </template>
-                        </v-btn>
                     </div>
-                </v-form>
-            </v-card-text>
-        </v-card>
-    </v-navigation-drawer>
+                    <div v-if="param.input == 'date'">
+                        <v-menu
+                            v-model="param.close"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            lazy
+                            transition="scale-transition"
+                            offset-y
+                            full-width
+                            max-width="290px"
+                            min-width="290px"
+                        >
+                            <template v-slot:activator="{ on }">
+                                <v-text-field
+                                    v-model="editedItem[param.value]"
+                                    hint="DD-MM-YYYY формат"
+                                    persistent-hint
+                                    @blur="editedItem[param.value] = parseDate(picker)"
+                                    prepend-icon="event"
+                                    :label="param.text"
+                                    v-on="on"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                        </v-menu>
+                    </div>
+                    <div v-if="param.input == 'password'">
+                        <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
+                    </div>
+                    <div v-if="param.value == 'status'">
+                        <v-combobox
+                            v-model="editedItem[param.value]"
+                            :items="param.status"
+                            :label="param.text"
+                            >
+                        </v-combobox>
+                    </div>
+                </v-flex>
+            </v-form>
+        </v-card-text>
+    </v-card>
     <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
         <v-card height="100%">
             <v-toolbar color="pink" dark>
@@ -205,9 +164,6 @@
                     <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
                         image
                     </v-icon>
-                    <v-icon small class="mr-2" @click="editItem(props.item)">
-                        edit
-                    </v-icon>
                     <v-icon small @click="deleteItem(props.item)">
                         delete
                     </v-icon>
@@ -223,6 +179,16 @@
             </v-alert>
         </template>
     </v-data-table>
+    <div class="text-xs-center">
+        <v-btn color="info" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
+            Сохранить
+            <template v-slot:loaderSaveBtn>
+                <span class="custom-loader">
+                <v-icon light>cached</v-icon>
+                </span>
+            </template>
+        </v-btn>
+    </div>
 </div>
 </template>
 <script>
@@ -230,7 +196,6 @@ import XLSX from 'xlsx';
 export default {
     data: () => ({
         search: '',
-        dialog: false,
         dialogImages: false,
         loading: true,
         loadingExcel: false,

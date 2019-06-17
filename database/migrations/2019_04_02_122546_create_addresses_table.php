@@ -17,7 +17,8 @@ class CreateAddressesTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('city_id')->nullable()->unsigned();
             $table->foreign('city_id')->references('id')->on('cities_to_works');
-            $table->string('area')->nullable();
+            $table->bigInteger('area_id')->nullable()->unsigned();
+            $table->foreign('area_id')->references('id')->on('areas');
             $table->string('street')->nullable();
             $table->string('house_number')->nullable();
             $table->string('number_entrances')->nullable();

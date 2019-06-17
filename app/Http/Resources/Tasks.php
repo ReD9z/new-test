@@ -22,7 +22,7 @@ class Tasks extends JsonResource
             'installers' => $this->installers->users->name,
             'types' => $this->types->title,
             'types_to_works_id' => $this->types_to_works_id,
-            'task_date_completion' =>date("d-m-Y", strtotime( $this->task_date_completion)),
+            'task_date_completion' => date("d-m-Y", strtotime($this->task_date_completion)),
             'comment' => $this->comment,
         ];
     }

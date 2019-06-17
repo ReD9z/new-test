@@ -53,12 +53,12 @@ class InstallersController extends Controller
             $installers->moderator_id = $request->input('moderator_id');
 
             if($installers->save()) {
-                return new ManagersResource($installers);
+                return new InstallersResource($installers);
             }
         }
      
-        if($managers->save()) {
-            return new ManagersResource($managers);
+        if($installers->save()) {
+            return new InstallersResource($installers);
         }
     }
 

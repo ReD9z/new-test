@@ -28,10 +28,15 @@ class AreasController extends Controller
      */
     public function store(Request $request)
     {
+        function mb_ucfirst($word)
+        {
+            return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
+        }
+        
         $areas = $request->isMethod('put') ? Areas::findOrFail($request->id) : new Areas;
 
         $areas->id = $request->input('id');
-        $areas->name = $request->input('name');
+        $areas->name = mb_ucfirst($request->input('name'));
     
         if($areas->save()) {
             return new AreasResource($areas);
