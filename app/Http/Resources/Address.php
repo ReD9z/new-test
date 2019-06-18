@@ -23,7 +23,9 @@ class Address extends JsonResource
             'street' => $this->street,
             'house_number' => $this->house_number,
             'number_entrances' => $this->number_entrances,
-            'management_company' => $this->management_company
+            'management_company' => $this->management_company,
+            'status' => $this->orderAddress,
+            'files' => ($this->orderAddress) ? $this->orderAddress->files : null
         ];
     }
 }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Orders;
+use App\Models\Address;
+use App\Models\AddressToOrders;
 use App\Http\Resources\Orders as OrdersResource;
 
 class OrdersController extends Controller
@@ -29,16 +31,20 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-        $orders = $request->isMethod('put') ? Orders::findOrFail($request->id) : new Orders;
+        // $orders = $request->isMethod('put') ? Orders::findOrFail($request->id) : new Orders;
 
-        $orders->id = $request->input('id');
-        $orders->clients_id = $request->input('clients_id');
-        $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request->input('order_start_date')));
-        $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request->input('order_end_date')));
+        // $orders->id = $request->input('id');
+        // $orders->clients_id = $request->input('clients_id');
+        // $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request->input('order_start_date')));
+        // $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request->input('order_end_date')));
+        
+        // $toOrders = new AddressToOrders;
 
-        if($orders->save()) {
-            return new OrdersResource($orders);
-        }
+        // if($orders->save()) {
+        //     return new OrdersResource($orders);
+        // }
+
+        return response()->json(['errors' => [], 'data' => $request->all(), 'status' => 200], 200);
     }
 
     /**

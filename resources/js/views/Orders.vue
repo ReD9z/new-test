@@ -7,73 +7,11 @@
 </template>
 <script>
 export default {
-    // data: () => ({
-    //     params: {
-    //         baseUrl: 'api/address',
-    //         headers: [
-    //             {
-    //                 text: 'Город',
-    //                 align: 'left',
-    //                 sortable: true,
-    //                 value: 'city_id',
-    //                 selectText: 'name',
-    //                 TableGetIdName: 'city',
-    //                 selectApi: 'api/cities_to_works',
-    //                 input: "select",
-    //             },
-    //             {
-    //                 text: 'Район',
-    //                 align: 'left',
-    //                 sortable: true,
-    //                 value: 'area_id',
-    //                 selectText: 'name',
-    //                 TableGetIdName: 'area',
-    //                 selectApi: 'api/areas',
-    //                 input: "select",
-    //             },
-    //             { 
-    //                 text: 'Улица', 
-    //                 input: "text",
-    //                 value: 'street' 
-    //             },
-    //             { 
-    //                 text: 'Номер дома', 
-    //                 input: "text",
-    //                 value: 'house_number' 
-    //             },
-    //             { 
-    //                 text: 'Количество подъездов', 
-    //                 input: "text",
-    //                 value: 'number_entrances' 
-    //             },
-    //             { 
-    //                 text: 'Управляющая компания', 
-    //                 input: "text",
-    //                 value: 'management_company' 
-    //             },
-    //             {
-    //                 text: 'Статус', 
-    //                 input: "status",
-    //                 sortable: true,
-    //                 value: 'status', 
-    //                 status: ['Свободно', 'Занято']
-    //             },
-    //             { 
-    //                 value: 'files', 
-    //                 sortable: false,
-    //                 input: "images",
-    //                 visibility: 'd-none',
-    //             }
-    //         ],
-    //         search: true,
-    //         pagination: true,
-    //         excel: true
-    //     }
-    // })
     data: () => ({
         params: {
-            baseUrl: 'api/orders',
-            headers: [
+            baseUrl: 'api/address',
+            baseOrders: 'api/orders',
+            headerOrders: [
                 {
                     text: 'Клиент',
                     align: 'left',
@@ -99,9 +37,62 @@ export default {
                     value: 'order_end_date' 
                 }
             ],
+            headers: [
+                {
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city_id',
+                    selectText: 'name',
+                    TableGetIdName: 'city',
+                    selectApi: 'api/cities_to_works',
+                    input: "select",
+                },
+                {
+                    text: 'Район',
+                    align: 'left',
+                    sortable: true,
+                    value: 'area_id',
+                    selectText: 'name',
+                    TableGetIdName: 'area',
+                    selectApi: 'api/areas',
+                    input: "select",
+                },
+                { 
+                    text: 'Улица', 
+                    input: "text",
+                    value: 'street' 
+                },
+                { 
+                    text: 'Номер дома', 
+                    input: "text",
+                    value: 'house_number' 
+                },
+                { 
+                    text: 'Количество подъездов', 
+                    input: "text",
+                    value: 'number_entrances' 
+                },
+                { 
+                    text: 'Управляющая компания', 
+                    input: "text",
+                    value: 'management_company' 
+                },
+                { 
+                    text: 'Статус', 
+                    input: "text",
+                    value: 'status' 
+                },
+                { 
+                    value: 'files', 
+                    sortable: false,
+                    input: "images",
+                    visibility: 'd-none',
+                }
+            ],
             search: true,
             pagination: true,
-            excel: false
+            excel: true
         }
     })
 }

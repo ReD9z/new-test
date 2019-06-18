@@ -31,13 +31,6 @@ export default {
                     selectApi: 'api/address',
                     input: "select",
                 },
-                {
-                    text: 'Статус', 
-                    input: "status",
-                    sortable: true,
-                    value: 'status', 
-                    status: ['Свободно', 'Занято']
-                },
                 { 
                     value: 'files', 
                     sortable: false,

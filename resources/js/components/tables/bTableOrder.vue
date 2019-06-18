@@ -6,7 +6,7 @@
     <v-card>
         <v-card-text>
             <v-form ref="forms" v-model="valid" lazy-validation>
-                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
+                <v-flex v-for="(param, key) in params.headerOrders" :key="key" xs12>
                     <div v-if="param.input == 'text'">
                         <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                     </div>
@@ -49,17 +49,6 @@
                             </template>
                             <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
                         </v-menu>
-                    </div>
-                    <div v-if="param.input == 'password'">
-                        <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
-                    </div>
-                    <div v-if="param.value == 'status'">
-                        <v-combobox
-                            v-model="editedItem[param.value]"
-                            :items="param.status"
-                            :label="param.text"
-                            >
-                        </v-combobox>
                     </div>
                 </v-flex>
             </v-form>
@@ -116,7 +105,7 @@
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
         </div>
         <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
-            <template v-slot:activator="{ on }">
+            <template v-slot:activator="{on}">
                 <v-btn icon v-on="on">
                     <v-icon>more_vert</v-icon>
                 </v-btn>
@@ -133,42 +122,46 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table v-model="selected" :pagination.sync="pagination" select-all item-key="name" :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table v-model="selected" :pagination.sync="pagination" select-all :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
-            <th>
-                <v-checkbox :input-value="props.all" :indeterminate="props.indeterminate" primary hide-details @click.stop="toggleAll"></v-checkbox>
-            </th>
-            <th
-                v-for="header in props.headers"
-                :key="header.text"
-                :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
-                @click="changeSort(header.value)"
-            >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
-            <th class="text-xs-left">
-                Парамеры  
-            </th>
+            <tr>
+                <th>
+                    <v-checkbox :input-value="props.all" :indeterminate="props.indeterminate" primary hide-details @click.stop="toggleAll"></v-checkbox>
+                </th>
+                <th
+                    v-for="header in props.headers"
+                    :key="header.text"
+                    :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
+                    @click="changeSort(header.value)"
+                >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
+                <th class="text-xs-left">
+                    Парамеры  
+                </th>
+            </tr>
         </template>
         <template v-slot:items="props">
-            <td>
-                <v-checkbox :input-value="props.selected" primary hide-details ></v-checkbox>
-            </td>
-            <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
-                <v-flex v-if="param.input !== 'images'">
-                    <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
-                    <v-flex v-else>{{props.item[param.value]}}</v-flex>
-                </v-flex>
-            </td>
-            <td>
-                <v-flex>
-                    <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
-                        image
-                    </v-icon>
-                    <v-icon small @click="deleteItem(props.item)">
-                        delete
-                    </v-icon>
-                </v-flex>
-            </td>
+            <tr :active="props.selected" @click="props.selected = !props.selected">
+                <td>
+                    <v-checkbox :input-value="props.selected" primary hide-details ></v-checkbox>
+                </td>
+                <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
+                    <v-flex v-if="param.input !== 'images'">
+                        <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
+                        <v-flex v-else>{{props.item[param.value]}}</v-flex>
+                    </v-flex>
+                </td>
+                <td>
+                    <v-flex>
+                        <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
+                            image
+                        </v-icon>
+                        <!-- <v-icon small @click="deleteItem(props.item)">
+                            delete
+                        </v-icon> -->
+                    </v-flex>
+                </td>
+            </tr>
         </template>
         <template v-slot:no-data>
             <v-btn color="primary" @click="initialize">Сброс</v-btn>
@@ -198,7 +191,6 @@ export default {
         search: '',
         dialogImages: false,
         loading: true,
-        loadingExcel: false,
         files: [],
         deleteImage: false,
         desserts: [],
@@ -214,6 +206,7 @@ export default {
         chipsItem: ['Фильтер1', 'Фильтер2'],
         picker: new Date().toISOString().substr(0, 10),
         valid: true,
+        order: [],
         pagination: {
             sortBy: 'id'
         },
@@ -238,11 +231,12 @@ export default {
     created () {
         this.initialize();
         this.selectStatus();
+        this.initializeOrder();
     },
     methods: {
         toggleAll () {
             if (this.selected.length) this.selected = []
-            else this.selected = this.desserts.slice()
+            else this.selected = this.desserts.slice();
         },
         changeSort (column) {
             if (this.pagination.sortBy === column) {
@@ -252,7 +246,7 @@ export default {
                 this.pagination.descending = false
             }
         },
-        initialize () {
+        initialize() {
             axios({
                 method: 'get',
                 url: this.params.baseUrl
@@ -260,6 +254,21 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
+                    console.log(this.desserts);
+                    this.loading = false;
+                }
+            ).catch(error => {
+                console.log(error);
+            })
+        },
+        initializeOrder() {
+            axios({
+                method: 'get',
+                url: this.params.baseOrders
+            })
+            .then(
+                response => {
+                    this.order = response.data;
                     this.loading = false;
                 }
             ).catch(error => {
@@ -275,7 +284,7 @@ export default {
             return `${month}-${day}-${year}`
         },
         selectStatus() {
-            this.params.headers.forEach(element => {
+            this.params.headerOrders.forEach(element => {
                 if(element.selectApi != undefined) {
                     axios.get(element.selectApi)
                     .then(
@@ -332,47 +341,6 @@ export default {
                 }
             );
         },
-        async loadExecel(file) {
-            let vm = this;
-            await file.forEach(function (item) {
-                axios({
-                    method: 'post',
-                    url: vm.params.baseUrl +'/excel',
-                    data: item
-                })
-                .then(
-                    response => {
-                        // Обновлять при сохранении select с адресами
-                        let array = response.data.data;
-                        if(array != undefined) {
-                            vm.desserts.push(array);
-                        }
-                        setTimeout(() => (vm.loadingExcel = false), 1000);
-                        vm.$refs.excel.value = '';
-                    }
-                ).catch(error => {
-                    console.log(error);
-                });
-            })
-        },
-        elementLoadToFile() {
-            this.loadingExcel = true;
-            let file = this.$refs.excel.files[0];
-            let reader = new FileReader();
-            let vm = this;
-            reader.readAsBinaryString(file);
-            reader.onload = function (e) {
-                let workbook = XLSX.read(e.target.result, {
-                    type: 'binary'
-                });
-                let firstSheet = workbook.SheetNames[0];
-                let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-
-                vm.loadExecel(excelRows);
-                
-                file.value = '';
-            };
-        },
         removeImg(data) {
             this.loadImages = true;
             axios.post('api/files/remove', data)
@@ -386,9 +354,6 @@ export default {
                     console.log(error);
                 }
             );
-        },
-        pickExcel () {
-            this.$refs.excel.click();
         },
         editItem (item) {
             this.editedIndex = this.desserts.indexOf(item);
@@ -430,39 +395,65 @@ export default {
             this.formData.delete('file[]');
         },
         save () {
-            if (this.$refs.forms.validate() == false) {
-                this.snackbar = true
-            } 
-            else {
-                this.loaderSaveBtn = true;
-                this.loadingSaveBtn = true;
-                let method = null;
-                if (this.editedIndex > -1) {
-                    method = 'put'
-                } else {
-                    method = 'post'
-                }
-                axios({
-                    method: method,
-                    url: this.params.baseUrl,
-                    data: this.editedItem
-                })
-                .then(
-                    response => {
-                        if (this.editedIndex > -1) {
-                            Object.assign(this.desserts[this.editedIndex], this.editedItem);
-                        } else {
-                            this.desserts.push(response.data);
-                        }
-                        this.loaderSaveBtn = null;
-                        this.loadingSaveBtn = false;
-                        this.close();
-                        this.$refs.forms.reset();
-                    }
-                ).catch(error => {
-                    console.log(error);
-                })  
-            }
+            // console.log(this.selected);
+            // console.log(this.editedItem);
+            // axios({
+            //     method: 'post',
+            //     url: this.params.baseOrders,
+            //     data: {
+            //         order: this.editedItem,
+            //         address: this.selected
+            //     }
+            // })
+            // .then(
+            //     response => {
+            //         console.log(response);
+                    // if (this.editedIndex > -1) {
+                    //     Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                    // } else {
+                    //     this.desserts.push(response.data);
+                    // }
+                    // this.loaderSaveBtn = null;
+                    // this.loadingSaveBtn = false;
+                    // this.close();
+                    // this.$refs.forms.reset();
+            //     }
+            // ).catch(error => {
+            //     console.log(error);
+            // });
+        // if (this.$refs.forms.validate() == false) {
+            //     this.snackbar = true
+            // } 
+            // else {
+            //     this.loaderSaveBtn = true;
+            //     this.loadingSaveBtn = true;
+            //     let method = null;
+            //     if (this.editedIndex > -1) {
+            //         method = 'put'
+            //     } else {
+            //         method = 'post'
+            //     }
+            //     axios({
+            //         method: method,
+            //         url: this.params.baseUrl,
+            //         data: this.editedItem
+            //     })
+            //     .then(
+            //         response => {
+            //             if (this.editedIndex > -1) {
+            //                 Object.assign(this.desserts[this.editedIndex], this.editedItem);
+            //             } else {
+            //                 this.desserts.push(response.data);
+            //             }
+            //             this.loaderSaveBtn = null;
+            //             this.loadingSaveBtn = false;
+            //             this.close();
+            //             this.$refs.forms.reset();
+            //         }
+            //     ).catch(error => {
+            //         console.log(error);
+            //     })  
+            // }
         },
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)

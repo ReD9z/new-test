@@ -18,7 +18,7 @@ class AddressController extends Controller
      */
     public function index(Request $request)
     {
-        $address = Address::with('cities', 'areas')->get();
+        $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files')->get();
         return AddressResource::collection($address);
     }
 
