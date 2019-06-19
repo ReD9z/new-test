@@ -31,20 +31,23 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-        // $orders = $request->isMethod('put') ? Orders::findOrFail($request->id) : new Orders;
+        foreach ($request['address'] as $key => $value) {
+            $orders = new Orders;
+            $orders->id = $request->input('id');
+            $orders->clients_id = $request['client']['clients_id'];
+            $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request['dateStart']));
+            $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request['dateEnd']));
+            $orders->save();
 
-        // $orders->id = $request->input('id');
-        // $orders->clients_id = $request->input('clients_id');
-        // $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request->input('order_start_date')));
-        // $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request->input('order_end_date')));
+            $torders = new AddressToOrders;
+            $torders->id = $request->input('id');
+            $torders->order_id = $orders->id;
+            $torders->address_id = $value['id'];
+            $torders->save();
+            
+        }
         
-        // $toOrders = new AddressToOrders;
-
-        // if($orders->save()) {
-        //     return new OrdersResource($orders);
-        // }
-
-        return response()->json(['errors' => [], 'data' => $request->all(), 'status' => 200], 200);
+        return new OrdersResource($orders);
     }
 
     /**

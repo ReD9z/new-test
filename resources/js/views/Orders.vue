@@ -24,14 +24,14 @@ export default {
                 },
                 { 
                     text: 'Дата начала размещения', 
-                    input: "date",
+                    input: "dateStart",
                     sortable: true,
                     close: false,
                     value: 'order_start_date' 
                 },
                 { 
                     text: 'Дата конца размещения', 
-                    input: "date",
+                    input: "dateEnd",
                     sortable: true,
                     close: false,
                     value: 'order_end_date' 
@@ -81,7 +81,7 @@ export default {
                 { 
                     text: 'Статус', 
                     input: "text",
-                    value: 'status' 
+                    value: 'result' 
                 },
                 { 
                     value: 'files', 

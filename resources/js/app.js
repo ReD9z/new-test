@@ -17,7 +17,7 @@ Vue.use(Vuetify, {
 
 
 require('./bootstrap');
-
+Vue.use(require('vue-moment'));
 window.Vue = require('vue');
 Vue.use(VueRouter);
 Vue.use(Vuex);

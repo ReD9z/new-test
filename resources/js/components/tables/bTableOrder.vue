@@ -24,7 +24,7 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="param.input == 'date'">
+                    <div v-if="param.input == 'dateStart'">
                         <v-menu
                             v-model="param.close"
                             :close-on-content-click="false"
@@ -38,16 +38,42 @@
                         >
                             <template v-slot:activator="{ on }">
                                 <v-text-field
-                                    v-model="editedItem[param.value]"
+                                    v-model="dateStart"
                                     hint="DD-MM-YYYY формат"
                                     persistent-hint
-                                    @blur="editedItem[param.value] = parseDate(picker)"
+                                    @blur="dateStart = parseDate(picker)"
                                     prepend-icon="event"
                                     :label="param.text"
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                            <v-date-picker v-model="picker" no-title :value="dateStart" @input="param.close = false"></v-date-picker>
+                        </v-menu>
+                    </div>
+                    <div v-if="param.input == 'dateEnd'">
+                        <v-menu
+                            v-model="param.close"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            lazy
+                            transition="scale-transition"
+                            offset-y
+                            full-width
+                            max-width="290px"
+                            min-width="290px"
+                        >
+                            <template v-slot:activator="{ on }">
+                                <v-text-field
+                                    v-model="dateEnd"
+                                    hint="DD-MM-YYYY формат"
+                                    persistent-hint
+                                    @blur="dateEnd = parseDate(picker)"
+                                    prepend-icon="event"
+                                    :label="param.text"
+                                    v-on="on"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker v-model="picker" no-title :value="dateEnd" @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
                 </v-flex>
@@ -133,8 +159,9 @@
                     v-for="header in props.headers"
                     :key="header.text"
                     :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
-                    @click="changeSort(header.value)"
-                >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
+                    @click="changeSort(header.value)">
+                    {{ header.text }}<v-icon small>arrow_upward</v-icon>
+                </th>
                 <th class="text-xs-left">
                     Парамеры  
                 </th>
@@ -199,6 +226,9 @@ export default {
         editedItem: {},
         defaultItem: {},
         select: [],
+        keywords: '',
+        dateStart: null,
+        dateEnd: null,
         loadingSaveBtn: false,
         loaderSaveBtn: null,
         formData: new FormData(),
@@ -226,6 +256,12 @@ export default {
     watch: {
         dialog (val) {
             val || this.close()
+        },
+        dateStart(after, before) {
+            this.initialize();
+        },
+        dateEnd(after, before) {
+            this.initialize();
         }
     },
     created () {
@@ -254,7 +290,27 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
-                    console.log(this.desserts);
+                    let vm = this;
+
+                    this.desserts.map(function (item) {
+                        if(item.status) {
+                            let itemDateStart = vm.$moment(item.dateStart, 'DD-MM-YYYY').unix() * 1000;
+                            let itemDateEnd = vm.$moment(item.dateEnd, 'DD-MM-YYYY').unix() * 1000;
+                            
+                            let dateStart = vm.$moment(vm.dateStart, 'MM-DD-YYYY').unix() * 1000;
+                            let dateEnd = vm.$moment(vm.dateEnd, 'MM-DD-YYYY').unix() * 1000;
+                        
+                            if(dateStart >= itemDateStart && dateEnd <= itemDateEnd) {
+                                item.result = 'Занято';
+                                let index = vm.desserts.indexOf(item);
+                                Object.assign(vm.desserts[index], item);
+                            } else {
+                                item.result = 'Свободно';
+                                let index = vm.desserts.indexOf(item);
+                                Object.assign(vm.desserts[index], item);
+                            }
+                        }
+                    });
                     this.loading = false;
                 }
             ).catch(error => {
@@ -397,30 +453,32 @@ export default {
         save () {
             // console.log(this.selected);
             // console.log(this.editedItem);
-            // axios({
-            //     method: 'post',
-            //     url: this.params.baseOrders,
-            //     data: {
-            //         order: this.editedItem,
-            //         address: this.selected
-            //     }
-            // })
-            // .then(
-            //     response => {
-            //         console.log(response);
+            axios({
+                method: 'post',
+                url: this.params.baseOrders,
+                data: {
+                    client: this.editedItem,
+                    address: this.selected,
+                    dateStart: this.dateStart,
+                    dateEnd: this.dateEnd
+                }
+            })
+            .then(
+                response => {
+                    this.initialize();
                     // if (this.editedIndex > -1) {
                     //     Object.assign(this.desserts[this.editedIndex], this.editedItem);
                     // } else {
                     //     this.desserts.push(response.data);
                     // }
-                    // this.loaderSaveBtn = null;
-                    // this.loadingSaveBtn = false;
+                    this.loaderSaveBtn = null;
+                    this.loadingSaveBtn = false;
                     // this.close();
-                    // this.$refs.forms.reset();
-            //     }
-            // ).catch(error => {
-            //     console.log(error);
-            // });
+                    this.$refs.forms.reset();
+                }
+            ).catch(error => {
+                console.log(error);
+            });
         // if (this.$refs.forms.validate() == false) {
             //     this.snackbar = true
             // } 

@@ -25,6 +25,9 @@ class Address extends JsonResource
             'number_entrances' => $this->number_entrances,
             'management_company' => $this->management_company,
             'status' => $this->orderAddress,
+            'result' => 'Свободен',
+            'dateStart' => ($this->orderAddress) ? date("d-m-Y", strtotime($this->orderAddress->orders->order_start_date)) : null,
+            'dateEnd' => ($this->orderAddress) ? date("d-m-Y", strtotime($this->orderAddress->orders->order_start_date)) : null,
             'files' => ($this->orderAddress) ? $this->orderAddress->files : null
         ];
     }
