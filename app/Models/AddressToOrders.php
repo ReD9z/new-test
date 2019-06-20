@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class AddressToOrders extends Model
 {
     public function address() {
-        return $this->hasMany('App\Models\Address', 'address_id');
+        return $this->belongsToMany('App\Models\Address', 'address_id');
     }
 
     public function orders() {

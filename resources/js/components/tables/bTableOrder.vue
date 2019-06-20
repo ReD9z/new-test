@@ -39,15 +39,14 @@
                             <template v-slot:activator="{ on }">
                                 <v-text-field
                                     v-model="dateStart"
-                                    hint="DD-MM-YYYY формат"
+                                    hint="YYYY-MM-DD формат"
                                     persistent-hint
-                                    @blur="dateStart = parseDate(picker)"
                                     prepend-icon="event"
                                     :label="param.text"
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="picker" no-title :value="dateStart" @input="param.close = false"></v-date-picker>
+                            <v-date-picker v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
                     <div v-if="param.input == 'dateEnd'">
@@ -65,15 +64,14 @@
                             <template v-slot:activator="{ on }">
                                 <v-text-field
                                     v-model="dateEnd"
-                                    hint="DD-MM-YYYY формат"
+                                    hint="YYYY-MM-DD формат"
                                     persistent-hint
-                                    @blur="dateEnd = parseDate(picker)"
                                     prepend-icon="event"
                                     :label="param.text"
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="picker" no-title :value="dateEnd" @input="param.close = false"></v-date-picker>
+                            <v-date-picker v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
                 </v-flex>
@@ -234,7 +232,6 @@ export default {
         formData: new FormData(),
         chips: [],
         chipsItem: ['Фильтер1', 'Фильтер2'],
-        picker: new Date().toISOString().substr(0, 10),
         valid: true,
         order: [],
         pagination: {
@@ -292,23 +289,31 @@ export default {
                     this.desserts = response.data;
                     let vm = this;
 
+
                     this.desserts.map(function (item) {
                         if(item.status) {
-                            let itemDateStart = vm.$moment(item.dateStart, 'DD-MM-YYYY').unix() * 1000;
-                            let itemDateEnd = vm.$moment(item.dateEnd, 'DD-MM-YYYY').unix() * 1000;
-                            
-                            let dateStart = vm.$moment(vm.dateStart, 'MM-DD-YYYY').unix() * 1000;
-                            let dateEnd = vm.$moment(vm.dateEnd, 'MM-DD-YYYY').unix() * 1000;
-                        
-                            if(dateStart >= itemDateStart && dateEnd <= itemDateEnd) {
-                                item.result = 'Занято';
-                                let index = vm.desserts.indexOf(item);
-                                Object.assign(vm.desserts[index], item);
-                            } else {
-                                item.result = 'Свободно';
-                                let index = vm.desserts.indexOf(item);
-                                Object.assign(vm.desserts[index], item);
-                            }
+                            let test = item.status.map(function (stats) {
+                                // console.log(stats);
+                                // console.log(stats);
+                                let itemDateStart = vm.$moment(stats.orders.order_start_date, 'YYYY-MM-DD').unix() * 1000;
+                                let itemDateEnd = vm.$moment(stats.orders.order_end_date, 'YYYY-MM-DD').unix() * 1000;
+
+                                let dateStart = vm.$moment(vm.dateStart, 'YYYY-MM-DD').unix() * 1000;
+                                let dateEnd = vm.$moment(vm.dateEnd, 'YYYY-MM-DD').unix() * 1000;
+    
+                                if(dateStart >= itemDateStart && dateEnd <= itemDateEnd) {
+                                    item.result = 'Занято';
+                                    let index = vm.desserts.indexOf(item);
+                                    Object.assign(vm.desserts[index], item);
+                                    vm.selected.push(item);
+                                } 
+                                else {
+                                    item.result = 'Свободно';
+                                    let index = vm.desserts.indexOf(item);
+                                    Object.assign(vm.desserts[index], item);
+                                    vm.selected.splice(vm.selected.indexOf(item), 1)
+                                }
+                            });
                         }
                     });
                     this.loading = false;
