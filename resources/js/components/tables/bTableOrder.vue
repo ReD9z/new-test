@@ -146,47 +146,30 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table v-model="selected" :pagination.sync="pagination" select-all :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table v-model="selected" select-all :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
-        <template v-slot:headers="props">
-            <tr>
-                <th>
-                    <v-checkbox :input-value="props.all" :indeterminate="props.indeterminate" primary hide-details @click.stop="toggleAll"></v-checkbox>
-                </th>
-                <th
-                    v-for="header in props.headers"
-                    :key="header.text"
-                    :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
-                    @click="changeSort(header.value)">
-                    {{ header.text }}<v-icon small>arrow_upward</v-icon>
-                </th>
-                <th class="text-xs-left">
-                    Парамеры  
-                </th>
-            </tr>
-        </template>
         <template v-slot:items="props">
-            <tr :active="props.selected" @click="props.selected = !props.selected">
-                <td>
-                    <v-checkbox :input-value="props.selected" primary hide-details ></v-checkbox>
-                </td>
-                <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
-                    <v-flex v-if="param.input !== 'images'">
-                        <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
-                        <v-flex v-else>{{props.item[param.value]}}</v-flex>
-                    </v-flex>
-                </td>
-                <td>
-                    <v-flex>
-                        <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
-                            image
-                        </v-icon>
-                        <!-- <v-icon small @click="deleteItem(props.item)">
-                            delete
-                        </v-icon> -->
-                    </v-flex>
-                </td>
-            </tr>
+            <td>
+                <v-checkbox
+                v-model="props.selected"
+                primary
+                hide-details
+                ></v-checkbox>
+            </td>
+            <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
+                <v-flex v-if="param.input !== 'images' && param.value !== 'params'">
+                    <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
+                    <v-flex v-else>{{props.item[param.value]}}</v-flex>
+                </v-flex>
+                <v-flex v-if="param.value === 'params'">
+                    <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
+                        image
+                    </v-icon>
+                    <v-icon v-if="props.item.data" small @click="deleteItem(props.item)">
+                        delete
+                    </v-icon>
+                </v-flex>
+            </td>
         </template>
         <template v-slot:no-data>
             <v-btn color="primary" @click="initialize">Сброс</v-btn>
@@ -288,13 +271,9 @@ export default {
                 response => {
                     this.desserts = response.data;
                     let vm = this;
-
-
                     this.desserts.map(function (item) {
                         if(item.status) {
                             let test = item.status.map(function (stats) {
-                                // console.log(stats);
-                                // console.log(stats);
                                 let itemDateStart = vm.$moment(stats.orders.order_start_date, 'YYYY-MM-DD').unix() * 1000;
                                 let itemDateEnd = vm.$moment(stats.orders.order_end_date, 'YYYY-MM-DD').unix() * 1000;
 
@@ -303,17 +282,19 @@ export default {
     
                                 if(dateStart >= itemDateStart && dateEnd <= itemDateEnd) {
                                     item.result = 'Занято';
+                                    item.data = stats;
+                                    // console.log(item.data);
                                     let index = vm.desserts.indexOf(item);
                                     Object.assign(vm.desserts[index], item);
-                                    vm.selected.push(item);
+                                    item.files = stats.files;
                                 } 
-                                else {
-                                    item.result = 'Свободно';
-                                    let index = vm.desserts.indexOf(item);
-                                    Object.assign(vm.desserts[index], item);
-                                    vm.selected.splice(vm.selected.indexOf(item), 1)
-                                }
                             });
+                        } else {
+                            item.result = 'Свободно';
+                            item.files = null;
+                            item.data = null;
+                            let index = vm.desserts.indexOf(item);
+                            Object.assign(vm.desserts[index], item);
                         }
                     });
                     this.loading = false;
@@ -381,14 +362,14 @@ export default {
                     axios({
                         method: 'put',
                         url: this.params.baseUrl,
-                        data: this.editedItem,
+                        data: this.editedItem.data,
                         params: {
                             images: res.data.files
                         }
                     })
                     .then(
                         response => {
-                            Object.assign(this.editedItem, response.data);
+                            // Object.assign(this.editedItem.data, response.data);
                             this.loadImages = false;
                             this.resetFilesLoad();
                         }
@@ -403,18 +384,18 @@ export default {
             );
         },
         removeImg(data) {
-            this.loadImages = true;
-            axios.post('api/files/remove', data)
-            .then(
-                res => {
-                    this.editedItem.files.splice(this.editedItem.files.indexOf(data.id), 1);
-                    this.loadImages = false;
-                }
-            ).catch(
-                error => {
-                    console.log(error);
-                }
-            );
+            // this.loadImages = true;
+            // axios.post('api/files/remove', data)
+            // .then(
+            //     res => {
+            //         this.editedItem.files.splice(this.editedItem.files.indexOf(data.id), 1);
+            //         this.loadImages = false;
+            //     }
+            // ).catch(
+            //     error => {
+            //         console.log(error);
+            //     }
+            // );
         },
         editItem (item) {
             this.editedIndex = this.desserts.indexOf(item);
@@ -427,15 +408,14 @@ export default {
             this.dialogImages = true;
         },
         deleteItem (item) {
-            const index = this.desserts.indexOf(item);
             if (confirm('Вы уверены, что хотите удалить этот элемент?')) {
                 axios({
                     method: 'delete',
-                    url: this.params.baseUrl+'/'+item.id,
+                    url: this.params.baseOrders+'/'+item.data.orders.id,
                 })
                 .then(
                     response => {
-                        this.desserts.splice(index, 1);
+                        this.initialize();
                     }
                 ).catch(error => {
                     console.log(error);

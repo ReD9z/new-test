@@ -84,10 +84,9 @@ export default {
                     value: 'result' 
                 },
                 { 
-                    value: 'files', 
-                    sortable: false,
-                    input: "images",
-                    visibility: 'd-none',
+                    text: 'Параметры', 
+                    value: 'params', 
+                    sortable: false 
                 }
             ],
             search: true,

@@ -33,10 +33,7 @@ class AddressToOrdersController extends Controller
         $torders = $request->isMethod('put') ? AddressToOrders::findOrFail($request->id) : new AddressToOrders;
 
         $torders->id = $request->input('id');
-        $torders->order_id = $request->input('order_id');
-        $torders->address_id = $request->input('address_id');
-        $torders->status = $request->input('status');
-    
+       
         if($request->isMethod('delete') && $request->images) {
             $torders::removeTableFiles($request->images);
         } else {
