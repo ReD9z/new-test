@@ -17,7 +17,7 @@ class AddressToOrdersController extends Controller
 
     public function index(Request $request)
     {
-        $torders = AddressToOrders::with('address', 'files')->get();
+        $torders = AddressToOrders::with('address', 'orders', 'files')->get();
             
         return AddressToOrdersResource::collection($torders);
     }

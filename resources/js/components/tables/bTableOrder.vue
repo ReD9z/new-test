@@ -3,26 +3,6 @@
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn
-            color="#f2994a"
-            class="white--text"
-            large
-            :loading="loadingExcel"
-            :disabled="loadingExcel"
-            @click='pickExcel'
-            v-show="params.excel"
-        >
-            <v-icon left>vertical_align_bottom</v-icon>
-            Добавить Excel
-            <input
-                type="file"
-                style="display: none"
-                ref="excel"
-                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                @change="elementLoadToFile"
-                multiple
-            >
-        </v-btn>
         <v-btn color="green" large class="mb-2 white--text" to="orders-create"><v-icon left>add</v-icon>Создать заказ</v-btn>
     </v-toolbar>
     <v-navigation-drawer v-model="dialog" right temporary fixed>

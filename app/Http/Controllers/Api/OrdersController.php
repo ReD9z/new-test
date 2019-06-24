@@ -31,20 +31,20 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
+        $orders = new Orders;
+        
+        $orders->id = $request->input('id');
+        $orders->clients_id = $request['client']['clients_id'];
+        $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request['dateStart']));
+        $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request['dateEnd']));
+        $orders->save();
+        
         foreach ($request['address'] as $key => $value) {
-            $orders = new Orders;
-            $orders->id = $request->input('id');
-            $orders->clients_id = $request['client']['clients_id'];
-            $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request['dateStart']));
-            $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request['dateEnd']));
-            $orders->save();
-
             $torders = new AddressToOrders;
             $torders->id = $request->input('id');
             $torders->order_id = $orders->id;
             $torders->address_id = $value['id'];
             $torders->save();
-            
         }
         
         return new OrdersResource($orders);
