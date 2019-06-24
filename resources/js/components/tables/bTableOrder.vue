@@ -2,82 +2,110 @@
 <div>
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn
+            color="#f2994a"
+            class="white--text"
+            large
+            :loading="loadingExcel"
+            :disabled="loadingExcel"
+            @click='pickExcel'
+            v-show="params.excel"
+        >
+            <v-icon left>vertical_align_bottom</v-icon>
+            Добавить Excel
+            <input
+                type="file"
+                style="display: none"
+                ref="excel"
+                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                @change="elementLoadToFile"
+                multiple
+            >
+        </v-btn>
+        <v-btn color="green" large class="mb-2 white--text" to="orders-create"><v-icon left>add</v-icon>Создать заказ</v-btn>
     </v-toolbar>
-    <v-card>
-        <v-card-text>
-            <v-form ref="forms" v-model="valid" lazy-validation>
-                <v-flex v-for="(param, key) in params.headerOrders" :key="key" xs12>
-                    <div v-if="param.input == 'text'">
-                        <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
-                    </div>
-                    <div v-if="param.input == 'select'">
-                        <div v-for="item in select" :key="item[0]">
-                            <div v-if="item.url == param.selectApi">
-                                <v-autocomplete
-                                    :items="item.data"
-                                    v-model="editedItem[param.value]"
-                                    :item-text="param.selectText"
-                                    item-value="id"
-                                    :label="param.text"
-                                    >
-                                </v-autocomplete>
+    <v-navigation-drawer v-model="dialog" right temporary fixed>
+        <v-card height="100%">
+            <v-toolbar color="pink" dark>
+                <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon @click="close">
+                    <v-icon>close</v-icon>
+                </v-btn>
+            </v-toolbar>
+            <v-card-text>
+                <v-form ref="forms" v-model="valid" lazy-validation>
+                    <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
+                        <div v-if="param.input == 'text'">
+                            <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                        </div>
+                        <div v-if="param.input == 'select'">
+                            <div v-for="item in select" :key="item[0]">
+                                <div v-if="item.url == param.selectApi">
+                                    <v-autocomplete
+                                        :items="item.data"
+                                        v-model="editedItem[param.value]"
+                                        :item-text="param.selectText"
+                                        item-value="id"
+                                        :label="param.text"
+                                        >
+                                    </v-autocomplete>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div v-if="param.input == 'dateStart'">
-                        <v-menu
-                            v-model="param.close"
-                            :close-on-content-click="false"
-                            :nudge-right="40"
-                            lazy
-                            transition="scale-transition"
-                            offset-y
-                            full-width
-                            max-width="290px"
-                            min-width="290px"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    v-model="dateStart"
-                                    hint="YYYY-MM-DD формат"
-                                    persistent-hint
-                                    prepend-icon="event"
-                                    :label="param.text"
-                                    v-on="on"
-                                ></v-text-field>
+                        <div v-if="param.input == 'date'">
+                            <v-menu
+                                v-model="param.close"
+                                :close-on-content-click="false"
+                                :nudge-right="40"
+                                lazy
+                                transition="scale-transition"
+                                offset-y
+                                full-width
+                                max-width="290px"
+                                min-width="290px"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        v-model="editedItem[param.value]"
+                                        hint="DD-MM-YYYY формат"
+                                        persistent-hint
+                                        @blur="editedItem[param.value] = parseDate(picker)"
+                                        prepend-icon="event"
+                                        :label="param.text"
+                                        v-on="on"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                            </v-menu>
+                        </div>
+                        <div v-if="param.input == 'password'">
+                            <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
+                        </div>
+                        <div v-if="param.value == 'status'">
+                            <v-combobox
+                                v-model="editedItem[param.value]"
+                                :items="param.status"
+                                :label="param.text"
+                                >
+                            </v-combobox>
+                        </div>
+                    </v-flex>
+                    <div class="text-xs-center">
+                        <v-btn color="info" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
+                            Сохранить
+                            <template v-slot:loaderSaveBtn>
+                                <span class="custom-loader">
+                                <v-icon light>cached</v-icon>
+                                </span>
                             </template>
-                            <v-date-picker v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
-                        </v-menu>
+                        </v-btn>
                     </div>
-                    <div v-if="param.input == 'dateEnd'">
-                        <v-menu
-                            v-model="param.close"
-                            :close-on-content-click="false"
-                            :nudge-right="40"
-                            lazy
-                            transition="scale-transition"
-                            offset-y
-                            full-width
-                            max-width="290px"
-                            min-width="290px"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    v-model="dateEnd"
-                                    hint="YYYY-MM-DD формат"
-                                    persistent-hint
-                                    prepend-icon="event"
-                                    :label="param.text"
-                                    v-on="on"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
-                        </v-menu>
-                    </div>
-                </v-flex>
-            </v-form>
-        </v-card-text>
-    </v-card>
+                </v-form>
+            </v-card-text>
+        </v-card>
+    </v-navigation-drawer>
     <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
         <v-card height="100%">
             <v-toolbar color="pink" dark>
@@ -129,7 +157,7 @@
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
         </div>
         <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
-            <template v-slot:activator="{on}">
+            <template v-slot:activator="{ on }">
                 <v-btn icon v-on="on">
                     <v-icon>more_vert</v-icon>
                 </v-btn>
@@ -146,26 +174,41 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table v-model="selected" select-all :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table v-model="selected" :pagination.sync="pagination" select-all item-key="name" :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
+        <template v-slot:headers="props">
+            <th>
+                <v-checkbox :input-value="props.all" :indeterminate="props.indeterminate" primary hide-details @click.stop="toggleAll"></v-checkbox>
+            </th>
+            <th
+                v-for="header in props.headers"
+                :key="header.text"
+                :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
+                @click="changeSort(header.value)"
+            >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
+            <th class="text-xs-left">
+                Парамеры  
+            </th>
+        </template>
         <template v-slot:items="props">
             <td>
-                <v-checkbox
-                v-model="props.selected"
-                primary
-                hide-details
-                ></v-checkbox>
+                <v-checkbox :input-value="props.selected" primary hide-details ></v-checkbox>
             </td>
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
-                <v-flex v-if="param.input !== 'images' && param.value !== 'params'">
+                <v-flex v-if="param.input !== 'images'">
                     <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
-                <v-flex v-if="param.value === 'params'">
+            </td>
+            <td>
+                <v-flex>
                     <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
                         image
                     </v-icon>
-                    <v-icon v-if="props.item.data" small @click="deleteItem(props.item)">
+                    <v-icon small class="mr-2" @click="editItem(props.item)">
+                        edit
+                    </v-icon>
+                    <v-icon small @click="deleteItem(props.item)">
                         delete
                     </v-icon>
                 </v-flex>
@@ -180,16 +223,6 @@
             </v-alert>
         </template>
     </v-data-table>
-    <div class="text-xs-center">
-        <v-btn color="info" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
-            Сохранить
-            <template v-slot:loaderSaveBtn>
-                <span class="custom-loader">
-                <v-icon light>cached</v-icon>
-                </span>
-            </template>
-        </v-btn>
-    </div>
 </div>
 </template>
 <script>
@@ -197,8 +230,10 @@ import XLSX from 'xlsx';
 export default {
     data: () => ({
         search: '',
+        dialog: false,
         dialogImages: false,
         loading: true,
+        loadingExcel: false,
         files: [],
         deleteImage: false,
         desserts: [],
@@ -207,16 +242,13 @@ export default {
         editedItem: {},
         defaultItem: {},
         select: [],
-        keywords: '',
-        dateStart: null,
-        dateEnd: null,
         loadingSaveBtn: false,
         loaderSaveBtn: null,
         formData: new FormData(),
         chips: [],
         chipsItem: ['Фильтер1', 'Фильтер2'],
+        picker: new Date().toISOString().substr(0, 10),
         valid: true,
-        order: [],
         pagination: {
             sortBy: 'id'
         },
@@ -236,23 +268,16 @@ export default {
     watch: {
         dialog (val) {
             val || this.close()
-        },
-        dateStart(after, before) {
-            this.initialize();
-        },
-        dateEnd(after, before) {
-            this.initialize();
         }
     },
     created () {
         this.initialize();
         this.selectStatus();
-        this.initializeOrder();
     },
     methods: {
         toggleAll () {
             if (this.selected.length) this.selected = []
-            else this.selected = this.desserts.slice();
+            else this.selected = this.desserts.slice()
         },
         changeSort (column) {
             if (this.pagination.sortBy === column) {
@@ -262,7 +287,7 @@ export default {
                 this.pagination.descending = false
             }
         },
-        initialize() {
+        initialize () {
             axios({
                 method: 'get',
                 url: this.params.baseUrl
@@ -270,47 +295,6 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
-                    let vm = this;
-                    this.desserts.map(function (item) {
-                        if(item.status) {
-                            let test = item.status.map(function (stats) {
-                                let itemDateStart = vm.$moment(stats.orders.order_start_date, 'YYYY-MM-DD').unix() * 1000;
-                                let itemDateEnd = vm.$moment(stats.orders.order_end_date, 'YYYY-MM-DD').unix() * 1000;
-
-                                let dateStart = vm.$moment(vm.dateStart, 'YYYY-MM-DD').unix() * 1000;
-                                let dateEnd = vm.$moment(vm.dateEnd, 'YYYY-MM-DD').unix() * 1000;
-    
-                                if(dateStart >= itemDateStart && dateEnd <= itemDateEnd) {
-                                    item.result = 'Занято';
-                                    item.data = stats;
-                                    // console.log(item.data);
-                                    let index = vm.desserts.indexOf(item);
-                                    Object.assign(vm.desserts[index], item);
-                                    item.files = stats.files;
-                                } 
-                            });
-                        } else {
-                            item.result = 'Свободно';
-                            item.files = null;
-                            item.data = null;
-                            let index = vm.desserts.indexOf(item);
-                            Object.assign(vm.desserts[index], item);
-                        }
-                    });
-                    this.loading = false;
-                }
-            ).catch(error => {
-                console.log(error);
-            })
-        },
-        initializeOrder() {
-            axios({
-                method: 'get',
-                url: this.params.baseOrders
-            })
-            .then(
-                response => {
-                    this.order = response.data;
                     this.loading = false;
                 }
             ).catch(error => {
@@ -326,7 +310,7 @@ export default {
             return `${month}-${day}-${year}`
         },
         selectStatus() {
-            this.params.headerOrders.forEach(element => {
+            this.params.headers.forEach(element => {
                 if(element.selectApi != undefined) {
                     axios.get(element.selectApi)
                     .then(
@@ -362,14 +346,14 @@ export default {
                     axios({
                         method: 'put',
                         url: this.params.baseUrl,
-                        data: this.editedItem.data,
+                        data: this.editedItem,
                         params: {
                             images: res.data.files
                         }
                     })
                     .then(
                         response => {
-                            // Object.assign(this.editedItem.data, response.data);
+                            Object.assign(this.editedItem, response.data);
                             this.loadImages = false;
                             this.resetFilesLoad();
                         }
@@ -383,19 +367,63 @@ export default {
                 }
             );
         },
+        async loadExecel(file) {
+            let vm = this;
+            await file.forEach(function (item) {
+                axios({
+                    method: 'post',
+                    url: vm.params.baseUrl +'/excel',
+                    data: item
+                })
+                .then(
+                    response => {
+                        // Обновлять при сохранении select с адресами
+                        let array = response.data.data;
+                        if(array != undefined) {
+                            vm.desserts.push(array);
+                        }
+                        setTimeout(() => (vm.loadingExcel = false), 1000);
+                        vm.$refs.excel.value = '';
+                    }
+                ).catch(error => {
+                    console.log(error);
+                });
+            })
+        },
+        elementLoadToFile() {
+            this.loadingExcel = true;
+            let file = this.$refs.excel.files[0];
+            let reader = new FileReader();
+            let vm = this;
+            reader.readAsBinaryString(file);
+            reader.onload = function (e) {
+                let workbook = XLSX.read(e.target.result, {
+                    type: 'binary'
+                });
+                let firstSheet = workbook.SheetNames[0];
+                let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+
+                vm.loadExecel(excelRows);
+                
+                file.value = '';
+            };
+        },
         removeImg(data) {
-            // this.loadImages = true;
-            // axios.post('api/files/remove', data)
-            // .then(
-            //     res => {
-            //         this.editedItem.files.splice(this.editedItem.files.indexOf(data.id), 1);
-            //         this.loadImages = false;
-            //     }
-            // ).catch(
-            //     error => {
-            //         console.log(error);
-            //     }
-            // );
+            this.loadImages = true;
+            axios.post('api/files/remove', data)
+            .then(
+                res => {
+                    this.editedItem.files.splice(this.editedItem.files.indexOf(data.id), 1);
+                    this.loadImages = false;
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            );
+        },
+        pickExcel () {
+            this.$refs.excel.click();
         },
         editItem (item) {
             this.editedIndex = this.desserts.indexOf(item);
@@ -408,14 +436,15 @@ export default {
             this.dialogImages = true;
         },
         deleteItem (item) {
+            const index = this.desserts.indexOf(item);
             if (confirm('Вы уверены, что хотите удалить этот элемент?')) {
                 axios({
                     method: 'delete',
-                    url: this.params.baseOrders+'/'+item.data.orders.id,
+                    url: this.params.baseUrl+'/'+item.id,
                 })
                 .then(
                     response => {
-                        this.initialize();
+                        this.desserts.splice(index, 1);
                     }
                 ).catch(error => {
                     console.log(error);
@@ -436,67 +465,39 @@ export default {
             this.formData.delete('file[]');
         },
         save () {
-            // console.log(this.selected);
-            // console.log(this.editedItem);
-            axios({
-                method: 'post',
-                url: this.params.baseOrders,
-                data: {
-                    client: this.editedItem,
-                    address: this.selected,
-                    dateStart: this.dateStart,
-                    dateEnd: this.dateEnd
+            if (this.$refs.forms.validate() == false) {
+                this.snackbar = true
+            } 
+            else {
+                this.loaderSaveBtn = true;
+                this.loadingSaveBtn = true;
+                let method = null;
+                if (this.editedIndex > -1) {
+                    method = 'put'
+                } else {
+                    method = 'post'
                 }
-            })
-            .then(
-                response => {
-                    this.initialize();
-                    // if (this.editedIndex > -1) {
-                    //     Object.assign(this.desserts[this.editedIndex], this.editedItem);
-                    // } else {
-                    //     this.desserts.push(response.data);
-                    // }
-                    this.loaderSaveBtn = null;
-                    this.loadingSaveBtn = false;
-                    // this.close();
-                    this.$refs.forms.reset();
-                }
-            ).catch(error => {
-                console.log(error);
-            });
-        // if (this.$refs.forms.validate() == false) {
-            //     this.snackbar = true
-            // } 
-            // else {
-            //     this.loaderSaveBtn = true;
-            //     this.loadingSaveBtn = true;
-            //     let method = null;
-            //     if (this.editedIndex > -1) {
-            //         method = 'put'
-            //     } else {
-            //         method = 'post'
-            //     }
-            //     axios({
-            //         method: method,
-            //         url: this.params.baseUrl,
-            //         data: this.editedItem
-            //     })
-            //     .then(
-            //         response => {
-            //             if (this.editedIndex > -1) {
-            //                 Object.assign(this.desserts[this.editedIndex], this.editedItem);
-            //             } else {
-            //                 this.desserts.push(response.data);
-            //             }
-            //             this.loaderSaveBtn = null;
-            //             this.loadingSaveBtn = false;
-            //             this.close();
-            //             this.$refs.forms.reset();
-            //         }
-            //     ).catch(error => {
-            //         console.log(error);
-            //     })  
-            // }
+                axios({
+                    method: method,
+                    url: this.params.baseUrl,
+                    data: this.editedItem
+                })
+                .then(
+                    response => {
+                        if (this.editedIndex > -1) {
+                            Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                        } else {
+                            this.desserts.push(response.data);
+                        }
+                        this.loaderSaveBtn = null;
+                        this.loadingSaveBtn = false;
+                        this.close();
+                        this.$refs.forms.reset();
+                    }
+                ).catch(error => {
+                    console.log(error);
+                })  
+            }
         },
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)

@@ -37,6 +37,7 @@ Vue.component('home-layout', require('./views/Layout.vue').default);
 Vue.component('home-address', require('./views/Address.vue').default);
 Vue.component('b-table', require('./components/tables/bTable.vue').default);
 Vue.component('b-table-order', require('./components/tables/bTableOrder.vue').default);
+Vue.component('b-table-order-create', require('./components/tables/bTableOrderCreate.vue').default);
 
 /**
  * VueRouter components

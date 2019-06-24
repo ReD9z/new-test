@@ -38,7 +38,6 @@ export default {
                     visibility: 'd-none',
                 }
             ],
-            filters: [],
             search: true,
             pagination: true,
             excel: false

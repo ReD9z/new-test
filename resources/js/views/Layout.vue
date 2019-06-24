@@ -34,7 +34,7 @@
                             </v-list-tile>
                         </template>
                         <div v-for="(wrapLink, key) in item.wrapLink" :key="key">
-                            <v-list-tile active-class="active" :to="{ name: wrapLink.src }" >
+                            <v-list-tile active-class="active" :to="{ name: wrapLink.src }">
                                 <v-list-tile-action>
                                     <v-icon>{{ wrapLink.icon }}</v-icon>
                                 </v-list-tile-action>
@@ -68,7 +68,6 @@ export default {
         drawer: true,
         hide: "",
         items: [
-            { title: 'Рабочий стол', icon: 'dashboard', src: 'home'},
             { title: 'Менеджеры', icon: 'people', src: 'managers'},
             { title: 'Монтажники', icon: 'build', src: 'installers'},
             { title: 'Продажи', icon: 'account_balance_wallet', wrapLink:
@@ -76,8 +75,7 @@ export default {
                     { title: 'Заказы', icon: 'question_answer', src: 'orders'},
                     { title: 'Клиенты', icon: 'question_answer', src: 'clients'},
                     { title: 'Задачи', icon: 'question_answer', src: 'tasks'},
-                    { title: 'Адреса', icon: 'question_answer', src: 'address'},
-                    { title: 'Адреса заказов', icon: 'question_answer', src: 'addresstoorders'},
+                    { title: 'Адреса', icon: 'question_answer', src: 'address'}
                 ] 
             },
             { title: 'Настройки', icon: 'settings', wrapLink:

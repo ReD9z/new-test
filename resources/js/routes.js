@@ -46,14 +46,6 @@ let routers =  [
         component: require('./views/CitiesToWorks.vue').default
     },
     {
-        path: '/addresstoorders',
-        name: 'addresstoorders',
-        meta: {
-            title: 'Адреса заказов',
-        },
-        component: require('./views/AddressToOrders.vue').default
-    },
-    {
         path: '/areas',
         name: 'areas',
         meta: {
@@ -92,6 +84,14 @@ let routers =  [
             title: 'Заказы',
         },
         component: require('./views/Orders.vue').default
+    },
+    {
+        path: '/orders-create',
+        name: 'orders-create',
+        meta: {
+            title: 'Создать заказ',
+        },
+        component: require('./views/OrdersCreate.vue').default
     },
     {
         path: '/tasks',

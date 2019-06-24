@@ -9,89 +9,68 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/address',
-            baseOrders: 'api/orders',
-            headerOrders: [
-                {
-                    text: 'Клиент',
-                    align: 'left',
-                    sortable: true,
-                    value: 'clients_id',
-                    selectText: 'actual_title',
-                    TableGetIdName: 'actual_title',
-                    selectApi: 'api/clients',
-                    input: "select",
-                },
-                { 
-                    text: 'Дата начала размещения', 
-                    input: "dateStart",
-                    sortable: true,
-                    close: false,
-                    value: 'order_start_date' 
-                },
-                { 
-                    text: 'Дата конца размещения', 
-                    input: "dateEnd",
-                    sortable: true,
-                    close: false,
-                    value: 'order_end_date' 
-                }
-            ],
+            baseUrl: 'api/address_to_orders',
             headers: [
                 {
-                    text: 'Город',
+                    text: 'Заказ',
                     align: 'left',
                     sortable: true,
-                    value: 'city_id',
-                    selectText: 'name',
-                    TableGetIdName: 'city',
-                    selectApi: 'api/cities_to_works',
+                    value: 'order_id',
+                    selectText: 'actual_title',
+                    TableGetIdName: 'orders',
+                    selectApi: 'api/orders',
                     input: "select",
                 },
                 {
-                    text: 'Район',
+                    text: 'Адрес',
                     align: 'left',
                     sortable: true,
-                    value: 'area_id',
-                    selectText: 'name',
-                    TableGetIdName: 'area',
-                    selectApi: 'api/areas',
+                    value: 'address_id',
+                    selectText: 'city',
+                    TableGetIdName: 'address',
+                    selectApi: 'api/address',
                     input: "select",
                 },
                 { 
-                    text: 'Улица', 
-                    input: "text",
-                    value: 'street' 
-                },
-                { 
-                    text: 'Номер дома', 
-                    input: "text",
-                    value: 'house_number' 
-                },
-                { 
-                    text: 'Количество подъездов', 
-                    input: "text",
-                    value: 'number_entrances' 
-                },
-                { 
-                    text: 'Управляющая компания', 
-                    input: "text",
-                    value: 'management_company' 
-                },
-                { 
-                    text: 'Статус', 
-                    input: "text",
-                    value: 'result' 
-                },
-                { 
-                    text: 'Параметры', 
-                    value: 'params', 
-                    sortable: false 
+                    value: 'files', 
+                    sortable: false,
+                    input: "images",
+                    visibility: 'd-none',
                 }
             ],
             search: true,
             pagination: true,
-            excel: true
+            excel: false
+            // baseUrl: 'api/orders',
+            // headers: [
+            //     {
+            //         text: 'Клиент',
+            //         align: 'left',
+            //         sortable: true,
+            //         value: 'clients_id',
+            //         selectText: 'actual_title',
+            //         TableGetIdName: 'actual_title',
+            //         selectApi: 'api/clients',
+            //         input: "select",
+            //     },
+            //     { 
+            //         text: 'Дата начала размещения', 
+            //         input: "date",
+            //         sortable: true,
+            //         close: false,
+            //         value: 'order_start_date' 
+            //     },
+            //     { 
+            //         text: 'Дата конца размещения', 
+            //         input: "date",
+            //         sortable: true,
+            //         close: false,
+            //         value: 'order_end_date' 
+            //     }
+            // ],
+            // search: true,
+            // pagination: true,
+            // excel: false
         }
     })
 }
