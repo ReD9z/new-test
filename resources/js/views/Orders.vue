@@ -9,68 +9,73 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/address_to_orders',
+            orderAddress: {
+                baseUrl: 'api/address_to_orders',
+                headers: [
+                    {
+                        text: 'Клиент',
+                        align: 'left',
+                        sortable: true,
+                        value: 'order_id',
+                        selectText: 'actual_title',
+                        TableGetIdName: 'orders',
+                        selectApi: 'api/orders',
+                        input: "select",
+                    },
+                    {
+                        text: 'Адрес',
+                        align: 'left',
+                        sortable: true,
+                        value: 'address_id',
+                        selectText: 'city',
+                        TableGetIdName: 'address',
+                        selectApi: 'api/address',
+                        input: "select",
+                    },
+                    { 
+                        value: 'files', 
+                        sortable: false,
+                        input: "images",
+                        visibility: 'd-none',
+                    }
+                ],
+            },
+            baseUrl: 'api/orders',
             headers: [
                 {
-                    text: 'Заказ',
+                    text: 'Клиент',
                     align: 'left',
                     sortable: true,
-                    value: 'order_id',
+                    value: 'clients_id',
                     selectText: 'actual_title',
-                    TableGetIdName: 'orders',
-                    selectApi: 'api/orders',
-                    input: "select",
-                },
-                {
-                    text: 'Адрес',
-                    align: 'left',
-                    sortable: true,
-                    value: 'address_id',
-                    selectText: 'city',
-                    TableGetIdName: 'address',
-                    selectApi: 'api/address',
+                    TableGetIdName: 'actual_title',
+                    selectApi: 'api/clients',
                     input: "select",
                 },
                 { 
-                    value: 'files', 
+                    text: 'Дата начала размещения', 
+                    input: "date",
+                    sortable: true,
+                    close: false,
+                    value: 'order_start_date' 
+                },
+                { 
+                    text: 'Дата конца размещения', 
+                    input: "date",
+                    sortable: true,
+                    close: false,
+                    value: 'order_end_date' 
+                },
+                { 
+                    value: 'address', 
                     sortable: false,
-                    input: "images",
+                    input: "address",
                     visibility: 'd-none',
                 }
             ],
             search: true,
             pagination: true,
             excel: false
-            // baseUrl: 'api/orders',
-            // headers: [
-            //     {
-            //         text: 'Клиент',
-            //         align: 'left',
-            //         sortable: true,
-            //         value: 'clients_id',
-            //         selectText: 'actual_title',
-            //         TableGetIdName: 'actual_title',
-            //         selectApi: 'api/clients',
-            //         input: "select",
-            //     },
-            //     { 
-            //         text: 'Дата начала размещения', 
-            //         input: "date",
-            //         sortable: true,
-            //         close: false,
-            //         value: 'order_start_date' 
-            //     },
-            //     { 
-            //         text: 'Дата конца размещения', 
-            //         input: "date",
-            //         sortable: true,
-            //         close: false,
-            //         value: 'order_end_date' 
-            //     }
-            // ],
-            // search: true,
-            // pagination: true,
-            // excel: false
         }
     })
 }

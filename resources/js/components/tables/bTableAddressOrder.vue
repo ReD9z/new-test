@@ -1,10 +1,5 @@
 <template>
 <div>
-    <v-toolbar color="#fff" fixed app clipped-righ>
-        <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn color="green" large class="mb-2 white--text" to="orders-create"><v-icon left>add</v-icon>Создать заказ</v-btn>
-    </v-toolbar>
     <v-navigation-drawer v-model="dialog" right temporary fixed>
         <v-card height="100%">
             <v-toolbar color="pink" dark>
@@ -126,12 +121,10 @@
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
-    <v-navigation-drawer v-model="listAddressOrder" right temporary fixed width="1200px">
-       <b-table-address-order :params="params.orderAddress" :idOrder="idOrder"></b-table-address-order>
-    </v-navigation-drawer>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
-            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
+            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details>
+            </v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
         <v-icon>filter_list</v-icon>
@@ -156,7 +149,7 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table v-model="selected" :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
             <th
@@ -178,9 +171,6 @@
             </td>
             <td>
                 <v-flex>
-                    <v-icon v-if="props.item.address" small class="mr-2" @click="editAddress(props.item)">
-                        folder
-                    </v-icon>
                     <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
                         image
                     </v-icon>
@@ -211,11 +201,9 @@ export default {
         search: '',
         dialog: false,
         dialogImages: false,
-        listAddressOrder: false,
         loading: true,
         loadingExcel: false,
         files: [],
-        idOrder: 0,
         deleteImage: false,
         desserts: [],
         editedIndex: -1,
@@ -236,7 +224,8 @@ export default {
         selected: [],
     }),
     props: {
-        params: Object
+        params: Object,
+        idOrder: Number
     },
     computed: {
         formTitle () {
@@ -249,6 +238,9 @@ export default {
     watch: {
         dialog (val) {
             val || this.close()
+        },
+        idOrder() {
+            this.initialize();
         }
     },
     created () {
@@ -256,11 +248,6 @@ export default {
         this.selectStatus();
     },
     methods: {
-        editAddress(data) {
-            this.listAddressOrder = true;
-            this.idOrder = data.id;
-            console.log(data.id);
-        },
         toggleAll () {
             if (this.selected.length) this.selected = []
             else this.selected = this.desserts.slice()
@@ -276,7 +263,7 @@ export default {
         initialize () {
             axios({
                 method: 'get',
-                url: this.params.baseUrl
+                url: 'api/address_to_orders_one/' + this.idOrder
             })
             .then(
                 response => {
@@ -492,3 +479,4 @@ export default {
     }
 }
 </script>
+

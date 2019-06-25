@@ -174,12 +174,9 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table v-model="selected" :pagination.sync="pagination" select-all item-key="name" :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
-            <th>
-                <v-checkbox :input-value="props.all" :indeterminate="props.indeterminate" primary hide-details @click.stop="toggleAll"></v-checkbox>
-            </th>
             <th
                 v-for="header in props.headers"
                 :key="header.text"
@@ -191,9 +188,6 @@
             </th>
         </template>
         <template v-slot:items="props">
-            <td>
-                <v-checkbox :input-value="props.selected" primary hide-details ></v-checkbox>
-            </td>
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
                 <v-flex v-if="param.input !== 'images'">
                     <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>

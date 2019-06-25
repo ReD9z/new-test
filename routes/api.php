@@ -87,6 +87,7 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('address_to_orders', 'Api\AddressToOrdersController@store');  // Edit one item
         Route::delete('address_to_orders/{id}', 'Api\AddressToOrdersController@destroy'); // Delete one item
         Route::get('address_to_orders', 'Api\AddressToOrdersController@index'); // Show list
+        Route::get('address_to_orders_one/{id}', 'Api\AddressToOrdersController@indexOne'); // Show list
 
         // CitiesToWorks
         Route::post('cities_to_works', 'Api\CitiesToWorksController@store'); // Add one item

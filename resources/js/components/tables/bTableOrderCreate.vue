@@ -163,14 +163,14 @@
                     <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
-                <v-flex v-if="param.value === 'params'">
+                <!-- <v-flex v-if="param.value === 'params'">
                     <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
                         image
                     </v-icon>
                     <v-icon v-if="props.item.data" small @click="deleteItem(props.item)">
                         delete
                     </v-icon>
-                </v-flex>
+                </v-flex> -->
             </td>
         </template>
         <template v-slot:no-data>

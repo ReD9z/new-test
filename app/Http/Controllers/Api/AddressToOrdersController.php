@@ -22,6 +22,13 @@ class AddressToOrdersController extends Controller
         return AddressToOrdersResource::collection($torders);
     }
 
+    public function indexOne($id)
+    {
+        $torders = AddressToOrders::with('address', 'orders', 'files')->where('order_id', $id)->get();
+            
+        return AddressToOrdersResource::collection($torders);
+    }
+
     /**
      * Store a newly created resource in storage.
      *

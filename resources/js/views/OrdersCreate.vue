@@ -82,11 +82,6 @@ export default {
                     text: 'Статус', 
                     input: "text",
                     value: 'result' 
-                },
-                { 
-                    text: 'Параметры', 
-                    value: 'params', 
-                    sortable: false 
                 }
             ],
             search: true,
