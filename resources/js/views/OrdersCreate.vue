@@ -21,20 +21,29 @@ export default {
                     TableGetIdName: 'actual_title',
                     selectApi: 'api/clients',
                     input: "select",
+                    validate: [
+                        v => !!v || 'Поле "Клиент" обязательно',
+                    ],
                 },
                 { 
                     text: 'Дата начала размещения', 
                     input: "dateStart",
                     sortable: true,
                     close: false,
-                    value: 'order_start_date' 
+                    value: 'order_start_date',
+                    validate: [
+                        v => !!v || 'Поле "Дата начала размещения" обязательно',
+                    ],
                 },
                 { 
                     text: 'Дата конца размещения', 
                     input: "dateEnd",
                     sortable: true,
                     close: false,
-                    value: 'order_end_date' 
+                    value: 'order_end_date',
+                    validate: [
+                        v => !!v || 'Поле "Дата конца размещения" обязательно',
+                    ],
                 }
             ],
             headers: [

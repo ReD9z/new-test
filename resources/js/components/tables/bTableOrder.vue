@@ -57,11 +57,11 @@
                                         v-on="on"
                                     ></v-text-field>
                                 </template>
-                                <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                                <v-date-picker v-model="picker" :rules="param.validate" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
                             </v-menu>
                         </div>
                         <div v-if="param.input == 'password'">
-                            <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
+                            <v-text-field :type="param.value" :rules="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
                         </div>
                         <div v-if="param.value == 'status'">
                             <v-combobox
