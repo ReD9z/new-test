@@ -5,7 +5,8 @@ let routers =  [
         component: require('./views/Home.vue').default,
         meta: { 
             title: 'Рабочий стол',
-            requiresAuth: true
+            requiresAuth: true,
+            // isLoggedUser: isLoggedUser.role == 'installer'          
         }
     },
     {
