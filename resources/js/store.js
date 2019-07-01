@@ -1,4 +1,11 @@
-let store = {
+import Vue from 'vue'
+import Vuex from 'vuex'
+import axios from 'axios'
+
+Vue.use(Vuex)
+
+export default new Vuex.Store({
+
     state: {
         status: '',
         token: localStorage.getItem('token') || '',
@@ -63,8 +70,7 @@ let store = {
     getters : {
         isLoggedIn: state => !!state.token,
         isLoggedUser: state => state.user,
-        authStatus: state => state.status
+        isAuthStatus: state => state.status,
+        isUserRole: state => state.user.role
     }
-};
-
-export default store;
+})

@@ -55,9 +55,39 @@ let router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
     if(to.matched.some(record => record.meta.requiresAuth)) {
-        if (store.state.token) {
-            next()
-            return
+        if (store.getters.isLoggedIn) {
+            if(to.meta.adminAuth) {
+                if (store.getters.isUserRole === 'admin') {
+                    next()
+                    return
+                }
+            }
+            if (to.meta.moderatorAuth) {
+                if (store.getters.isUserRole === 'moderator') {
+                    next()
+                    return
+                }
+            }
+            if (to.meta.installerAuth) {
+                if (store.getters.isUserRole === 'installer') {
+                    next()
+                    return
+                }
+            }
+            if (to.meta.managerAuth) {
+                if (store.getters.isUserRole === 'manager') {
+                    next()
+                    return
+                }
+            }
+            if (to.meta.clientAuth) {
+                if (store.getters.isUserRole === 'client') {
+                    next()
+                    return
+                }
+            }
+            // next()
+            // return
         }
         next('/auth')
     } else {
@@ -71,6 +101,6 @@ router.beforeEach((to, from, next) => {
 
 const app = new Vue({
     el: '#app',
-    store: new Vuex.Store(store),
+    store,
     router: router
 });
