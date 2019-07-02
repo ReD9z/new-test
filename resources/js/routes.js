@@ -25,11 +25,24 @@ let routers =  [
             title: 'Адреса',
             adminAuth: true,
             moderatorAuth: true,
-            installerAuth: true,
-            managerAuth: true,
-            clientAuth: true   
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: false   
         },
         component: require('./views/Address.vue').default
+    },
+    {
+        path: '/tasks',
+        name: 'tasks',
+        meta: {
+            title: 'Задачи',
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: true,
+            managerAuth: false,
+            clientAuth: false
+        },
+        component: require('./views/Tasks.vue').default
     },
     {
         path: '/users',
@@ -149,17 +162,18 @@ let routers =  [
         component: require('./views/OrdersCreate.vue').default
     },
     {
-        path: '/tasks',
-        name: 'tasks',
+        path: '/orders-address/:id',
+        name: 'orders-address',
+        props: true,
         meta: {
-            title: 'Задачи',
+            title: 'Адреса заказов',
             adminAuth: true,
             moderatorAuth: true,
-            installerAuth: true,
+            installerAuth: false,
             managerAuth: false,
             clientAuth: false 
         },
-        component: require('./views/Tasks.vue').default
+        component: require('./views/OrdersToAddress.vue').default
     },
     {
         path: '/typestoworks',

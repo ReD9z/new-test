@@ -119,7 +119,7 @@ Route::group(['middleware' => ['json.response']], function () {
 
         // Orders 
         Route::post('orders', 'Api\OrdersController@store');  // Add one item  
-        Route::get('orders', 'Api\OrdersController@show'); // Show one item
+        Route::get('orders/{id}', 'Api\OrdersController@show'); // Show one item
         Route::put('orders', 'Api\OrdersController@store');  // Edit one item
         Route::delete('orders/{id}', 'Api\OrdersController@destroy'); // Delete one item
         Route::get('orders', 'Api\OrdersController@index'); // Show list
