@@ -18,7 +18,7 @@ class OrdersController extends Controller
      */
     public function index(Request $request)
     {
-        $orders = Orders::with('clients')->get(); 
+        $orders = Orders::with('clients', 'orderAddress')->get(); 
         
         return OrdersResource::collection($orders);
     }
@@ -58,7 +58,7 @@ class OrdersController extends Controller
      */
     public function show($id)
     {
-        $orders = Orders::findOrFail($id);
+        $orders = Orders::with('orderAddress')->findOrFail($id);
         return new OrdersResource($orders);
     }
 

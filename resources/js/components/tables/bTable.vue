@@ -196,12 +196,6 @@
             </td>
             <td>
                 <v-flex>
-                    <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
-                        image
-                    </v-icon>
-                    <v-icon small class="mr-2" @click="editItem(props.item)">
-                        edit
-                    </v-icon>
                     <v-icon small @click="deleteItem(props.item)">
                         delete
                     </v-icon>

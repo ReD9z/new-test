@@ -91,6 +91,12 @@ export default {
                     text: 'Статус', 
                     input: "text",
                     value: 'result' 
+                },
+                { 
+                    value: 'files', 
+                    sortable: false,
+                    input: "images",
+                    visibility: 'd-none',
                 }
             ],
             search: true,

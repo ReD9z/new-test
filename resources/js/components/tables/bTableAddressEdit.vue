@@ -3,7 +3,7 @@
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>Заказ №{{order.id}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn color="green" large class="mb-2 white--text" to="orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
+        <v-btn color="green" large class="mb-2 white--text" to="/orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
     </v-toolbar>
     <v-card>
         <v-card-text>
@@ -40,7 +40,7 @@
                         >
                             <template v-slot:activator="{ on }">
                                 <v-text-field
-                                    v-model="editedItem[param.value]"
+                                    v-model="dateStart"
                                     :rules="param.validate"
                                     hint="YYYY-MM-DD формат"
                                     persistent-hint
@@ -49,7 +49,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="editedItem[param.value]" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
                     <div v-if="param.input == 'dateEnd'">
@@ -66,7 +66,7 @@
                         >
                             <template v-slot:activator="{ on }">
                                 <v-text-field
-                                    v-model="editedItem[param.value]"
+                                    v-model="dateEnd"
                                     hint="YYYY-MM-DD формат"
                                     persistent-hint
                                     prepend-icon="event"
@@ -75,17 +75,56 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="editedItem[param.value]" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
                 </v-flex>
             </v-form>
         </v-card-text>
     </v-card>
+    <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
+        <v-card height="100%">
+            <v-toolbar color="pink" dark>
+                <v-toolbar-title>Изображения</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-icon right dark @click='pickImages'>control_point</v-icon>
+                <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
+                <v-btn icon @click="close">
+                    <v-icon>close</v-icon>
+                </v-btn>
+            </v-toolbar>
+            <v-progress-linear value="15" :indeterminate="true" v-show="loadImages" color="blue" class="ma-0"></v-progress-linear>
+            <v-card-text>
+                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
+                    <v-flex xs12 v-if="param.input == 'images'">
+                        <v-layout row wrap>
+                            <v-flex v-for="(file, key) in editedItem.files" :key="key" xs4 d-flex>
+                                <v-card flat tile class="d-flex pr-1 pb-1">
+                                    <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
+                                        <template v-slot:placeholder>
+                                            <v-layout fill-height align-center justify-center ma-0 >
+                                                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                            </v-layout>
+                                        </template>
+                                        <template>
+                                            <v-layout fill-height right top ma-0 >
+                                                <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
+                                                    <v-icon>close</v-icon>
+                                                </v-btn>
+                                            </v-layout>
+                                        </template>
+                                    </v-img>
+                                </v-card>
+                            </v-flex>
+                        </v-layout>
+                    </v-flex>
+                </v-flex>
+            </v-card-text>
+        </v-card>
+    </v-navigation-drawer>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
-            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details>
-            </v-text-field>
+            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
         <v-icon>filter_list</v-icon>
@@ -128,6 +167,16 @@
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
             </td>
+            <td>
+                <v-flex>
+                    <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
+                        image
+                    </v-icon>
+                    <v-icon small @click="deleteItem(props.item)">
+                        delete
+                    </v-icon>
+                </v-flex>
+            </td>
         </template>
         <template v-slot:no-data>
             <v-btn color="primary" @click="initialize">Сброс</v-btn>
@@ -164,12 +213,16 @@ import XLSX from 'xlsx';
 export default {
     data: () => ({
         search: '',
+        dialogImages: false,
+        files: [],
+        loadImages: false,
         loading: true,
         desserts: [],
         editedIndex: -1,
         editedItem: {},
         defaultItem: {},
         select: [],
+        addOrderImages: [],
         keywords: '',
         dateStart: null,
         dateEnd: null,
@@ -214,11 +267,52 @@ export default {
         this.initializeOrder();
     },
     methods: {
-        toggleAll () {
+        toggleAll() {
             if (this.selected.length) this.selected = []
             else this.selected = this.desserts.slice();
         },
-        changeSort (column) {
+        elementLoadToFileImage() {
+            this.loadImages = true;
+            this.files = this.$refs.images.files;
+            let vm = this;
+            Array.from(this.files).forEach(files => {
+                this.formData.append('file[]', files);
+            });
+            axios.post('/api/files', this.formData, {
+                headers: {'Content-Type': 'multipart/form-data'}
+            })
+            .then(
+                res => {
+                    console.log(vm.desserts);
+                    axios({
+                        method: 'put',
+                        url: '/api/address_to_orders',
+                        data: vm.addOrderImages,
+                        params: {
+                            images: res.data.files
+                        }
+                    })
+                    .then(
+                        response => {
+                            console.log(response);
+                            // Object.assign(this.desserts.data, response.data);
+                            // this.loadImages = false;
+                            // this.resetFilesLoad();
+                        }
+                    ).catch(error => {
+                        console.log(error);
+                    })
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            );
+        },
+        pickImages() {
+            this.$refs.images.click();
+        },
+        changeSort(column) {
             if (this.pagination.sortBy === column) {
                 this.pagination.descending = !this.pagination.descending
             } else {
@@ -247,6 +341,8 @@ export default {
                                 if(dateStart >= itemDateStart && dateEnd <= itemDateEnd) {
                                     item.result = 'Занято';
                                     item.data = stats;
+                                    item.files = stats.files;
+                                    vm.editedItem.files = stats.files;
                                     let index = vm.desserts.indexOf(item);
                                     Object.assign(vm.desserts[index], item);
                                 } 
@@ -254,6 +350,7 @@ export default {
                         } else {
                             item.result = 'Свободно';
                             item.data = null;
+                            item.files = null;
                             let index = vm.desserts.indexOf(item);
                             Object.assign(vm.desserts[index], item);
                         }
@@ -267,13 +364,12 @@ export default {
         initializeOrder() {
             axios({
                 method: 'get',
-                url: this.params.baseOrders+"/"+ this.idRouteOrder
+                url: this.params.baseOrders + "/" + this.idRouteOrder
             })
             .then(
                 response => {
                     this.order = response.data;
                     this.editItem(response.data);
-                    console.log(this);
                 }
             ).catch(error => {
                 console.log(error);
@@ -291,12 +387,7 @@ export default {
                     .then(
                         res => {
                             if(res) {
-                                this.select.push(
-                                    {
-                                        data: res.data,
-                                        url: element.selectApi
-                                    }
-                                );
+                                this.select.push({data: res.data, url: element.selectApi});
                             }
                         }
                     ).catch(
@@ -309,30 +400,39 @@ export default {
         },
         editItem (item) {
             this.editedItem = Object.assign({}, item);
-            // this.dialog = true;
+            this.dateStart = item.order_start_date;
+            this.dateEnd = item.order_end_date;
+        },
+        editPhotos(item) {
+            this.addOrderImages = item.data;
+            // this.editedIndex = this.desserts.indexOf(item);
+            // this.editedItem = Object.assign({}, item)
+            this.dialogImages = true;
+            // this.initialize();
         },
         deleteItem (item) {
-            if (confirm('Вы уверены, что хотите удалить этот элемент?')) {
-                axios({
-                    method: 'delete',
-                    url: this.params.baseOrders+'/'+item.data.orders.id,
-                })
-                .then(
-                    response => {
-                        this.initialize();
-                    }
-                ).catch(error => {
-                    console.log(error);
-                })
-            }
+            console.log(item.data);       
+            // if (confirm('Вы уверены, что хотите удалить этот элемент?')) {
+            //     axios({
+            //         method: 'delete',
+            //         url: this.params.baseOrders + '/' + item.data.orders.id,
+            //     })
+            //     .then(
+            //         response => {
+            //             this.initialize();
+            //         }
+            //     ).catch(error => {
+            //         console.log(error);
+            //     })
+            // }
         },
         close () {
             this.dialog = false
             this.dialogImages = false
-            setTimeout(() => {
-                this.editedItem = Object.assign({}, this.defaultItem)
-                this.editedIndex = -1
-            }, 300)
+            // setTimeout(() => {
+            //     this.editedItem = Object.assign({}, this.defaultItem)
+            //     this.editedIndex = -1
+            // }, 300)
         },
         save () {
             if (this.$refs.forms.validate() == false) {
@@ -342,26 +442,27 @@ export default {
                 this.selectedStatus = true;
             }     
             if(this.$refs.forms.validate() == true && this.selected.length > 0) {
-                this.selectedStatus = false;
-                this.loaderSaveBtn = true;
-                this.loadingSaveBtn = true;
-                axios({
-                    method: 'post',
-                        url: this.params.baseOrders,
-                        data: {
-                            client: this.editedItem,
-                            address: this.selected.filter(item => item.result !== 'Занято'),
-                            dateStart: this.dateStart,
-                            dateEnd: this.dateEnd
-                        }
-                    })
-                    .then(response => {
-                        this.initialize();
-                        this.loaderSaveBtn=null;
-                        this.loadingSaveBtn=false;
-                    }).catch(error => {
-                        console.log(error);
-                });
+                console.log(this.editedItem);
+                // this.selectedStatus = false;
+                // this.loaderSaveBtn = true;
+                // this.loadingSaveBtn = true;
+                // axios({
+                //     method: 'post',
+                //         url: this.params.baseOrders,
+                //         data: {
+                //             client: this.editedItem,
+                //             address: this.selected.filter(item => item.result !== 'Занято'),
+                //             dateStart: this.dateStart,
+                //             dateEnd: this.dateEnd
+                //         }
+                //     })
+                //     .then(response => {
+                //         this.initialize();
+                //         this.loaderSaveBtn=null;
+                //         this.loadingSaveBtn=false;
+                //     }).catch(error => {
+                //         console.log(error);
+                // });
             }
         },
         remove(item) {
