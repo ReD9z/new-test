@@ -178,22 +178,9 @@
             </td>
             <td>
                 <v-flex>
-                    <!-- <v-icon v-if="props.item.address" small class="mr-2" @click="editAddress(props.item)">
-                        folder
-                    </v-icon> -->
-                    <!-- <v-btn v-if="props.item.address" :to="'/orders-address/' + props.item.id">
-                        <v-icon left>folder</v-icon>    
-                    </v-btn> -->
-                    <!-- <v-btn v-if="props.item.address" color="green" large class="mb-2 white--text" to="orders-create"><v-icon left>add</v-icon>Создать заказ</v-btn> -->
-                    <!-- <v-icon v-if="props.item.address" small class="mr-2" :to="'/orders-address' + props.item.id">
-                        folder
-                    </v-icon> -->
-                    <v-btn icon small :to="'/orders-address/' + props.item.id" class="mr-2">
-                        <v-icon>folder</v-icon>     
-                    </v-btn>
-                    <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
-                        image
-                    </v-icon>
+                    <a class="mr-2" :href="'/orders-address/' + props.item.id" style="text-decoration: none;">
+                        <v-icon small>folder</v-icon>
+                    </a>
                     <v-icon small class="mr-2" @click="editItem(props.item)">
                         edit
                     </v-icon>

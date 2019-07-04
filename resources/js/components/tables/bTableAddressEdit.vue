@@ -98,7 +98,7 @@
                 <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
                     <v-flex xs12 v-if="param.input == 'images'">
                         <v-layout row wrap>
-                            <v-flex v-for="(file, key) in editedItem.files" :key="key" xs4 d-flex>
+                            <v-flex v-for="(file, key) in addOrderImages.files" :key="key" xs4 d-flex>
                                 <v-card flat tile class="d-flex pr-1 pb-1">
                                     <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
                                         <template v-slot:placeholder>
@@ -172,7 +172,7 @@
                     <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
                         image
                     </v-icon>
-                    <v-icon small @click="deleteItem(props.item)">
+                    <v-icon small class="mr-2" v-if="props.item.data !== null"  @click="deleteItem(props.item)">
                         delete
                     </v-icon>
                 </v-flex>
@@ -224,6 +224,7 @@ export default {
         select: [],
         addOrderImages: [],
         keywords: '',
+        deleteImage: false,
         dateStart: null,
         dateEnd: null,
         loadingSaveBtn: false,
@@ -274,7 +275,6 @@ export default {
         elementLoadToFileImage() {
             this.loadImages = true;
             this.files = this.$refs.images.files;
-            let vm = this;
             Array.from(this.files).forEach(files => {
                 this.formData.append('file[]', files);
             });
@@ -283,11 +283,10 @@ export default {
             })
             .then(
                 res => {
-                    console.log(vm.desserts);
                     axios({
                         method: 'put',
                         url: '/api/address_to_orders',
-                        data: vm.addOrderImages,
+                        data: this.addOrderImages,
                         params: {
                             images: res.data.files
                         }
@@ -295,9 +294,16 @@ export default {
                     .then(
                         response => {
                             console.log(response);
-                            // Object.assign(this.desserts.data, response.data);
-                            // this.loadImages = false;
-                            // this.resetFilesLoad();
+                            Object.assign(this.addOrderImages, response.data);
+                            // vm.addOrderImages = [];
+                            // vm.addOrderImages = response.data.files;
+                            // vm.addOrderImages = response.data;
+                            // console.log(vm.desserts.data);
+                            // Object.assign(vm.addOrderImages, response.data.files);
+                            // vm.initializeOrder();
+                            // vm.initialize();
+                            this.loadImages = false;
+                            this.resetFilesLoad();
                         }
                     ).catch(error => {
                         console.log(error);
@@ -309,6 +315,11 @@ export default {
                 }
             );
         },
+        resetFilesLoad() {
+            this.files = [];
+            this.$refs.images.value = '';
+            this.formData.delete('file[]');
+        },
         pickImages() {
             this.$refs.images.click();
         },
@@ -319,6 +330,20 @@ export default {
                 this.pagination.sortBy = column
                 this.pagination.descending = false
             }
+        },
+        removeImg(data) {
+            this.loadImages = true;
+            axios.post('/api/files/remove', data)
+            .then(
+                res => {
+                    this.addOrderImages.files.splice(this.addOrderImages.files.indexOf(data.id), 1);
+                    this.loadImages = false;
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            );
         },
         initialize() {
             axios({
@@ -342,7 +367,6 @@ export default {
                                     item.result = 'Занято';
                                     item.data = stats;
                                     item.files = stats.files;
-                                    vm.editedItem.files = stats.files;
                                     let index = vm.desserts.indexOf(item);
                                     Object.assign(vm.desserts[index], item);
                                 } 
@@ -404,27 +428,24 @@ export default {
             this.dateEnd = item.order_end_date;
         },
         editPhotos(item) {
-            this.addOrderImages = item.data;
-            // this.editedIndex = this.desserts.indexOf(item);
-            // this.editedItem = Object.assign({}, item)
+            this.addOrderImages = Object.assign({}, item.data);
             this.dialogImages = true;
-            // this.initialize();
         },
         deleteItem (item) {
-            console.log(item.data);       
-            // if (confirm('Вы уверены, что хотите удалить этот элемент?')) {
-            //     axios({
-            //         method: 'delete',
-            //         url: this.params.baseOrders + '/' + item.data.orders.id,
-            //     })
-            //     .then(
-            //         response => {
-            //             this.initialize();
-            //         }
-            //     ).catch(error => {
-            //         console.log(error);
-            //     })
-            // }
+            // console.log(item.data);
+            if (confirm('Вы уверены, что хотите удалить этот элемент?')) {
+                axios({
+                    method: 'delete',
+                    url: '/api/address_to_orders/' + item.data.id,
+                })
+                .then(
+                    response => {
+                        this.initialize();
+                    }
+                ).catch(error => {
+                    console.log(error);
+                })
+            }
         },
         close () {
             this.dialog = false
@@ -443,26 +464,27 @@ export default {
             }     
             if(this.$refs.forms.validate() == true && this.selected.length > 0) {
                 console.log(this.editedItem);
-                // this.selectedStatus = false;
-                // this.loaderSaveBtn = true;
-                // this.loadingSaveBtn = true;
-                // axios({
-                //     method: 'post',
-                //         url: this.params.baseOrders,
-                //         data: {
-                //             client: this.editedItem,
-                //             address: this.selected.filter(item => item.result !== 'Занято'),
-                //             dateStart: this.dateStart,
-                //             dateEnd: this.dateEnd
-                //         }
-                //     })
-                //     .then(response => {
-                //         this.initialize();
-                //         this.loaderSaveBtn=null;
-                //         this.loadingSaveBtn=false;
-                //     }).catch(error => {
-                //         console.log(error);
-                // });
+                this.selectedStatus = false;
+                this.loaderSaveBtn = true;
+                this.loadingSaveBtn = true;
+                axios({
+                        method: 'put',
+                        url: this.params.baseOrders,
+                        data: {
+                            order: this.editedItem,
+                            address: this.selected.filter(item => item.result !== 'Занято'),
+                            dateStart: this.dateStart,
+                            dateEnd: this.dateEnd
+                        }
+                    })
+                    .then(response => {
+                        this.initialize();
+                        console.log(response);
+                        this.loaderSaveBtn=null;
+                        this.loadingSaveBtn=false;
+                    }).catch(error => {
+                        console.log(error);
+                });
             }
         },
         remove(item) {

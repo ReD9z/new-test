@@ -31,10 +31,10 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-        $orders = new Orders;
-        
-        $orders->id = $request->input('id');
-        $orders->clients_id = $request['client']['clients_id'];
+        $orders = Orders::findOrFail($request['order']['id']);
+        // изменять id
+        // $orders->id = $request->input('id');
+        $orders->clients_id = $request['order']['clients_id'];
         $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request['dateStart']));
         $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request['dateEnd']));
         $orders->save();
