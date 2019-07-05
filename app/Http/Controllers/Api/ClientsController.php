@@ -31,9 +31,11 @@ class ClientsController extends Controller
      */
     public function store(Request $request)
     {
-        $users = $request->isMethod('put') ? User::findOrFail($request->id) : new User;
+        $users = $request->isMethod('put') ? User::findOrFail($request->users_id) : new User;
 
-        $users->id = $request->input('id');
+        if(!$request->isMethod('put')) {
+            $users->id = $request->input('id');
+        }
         $users->name = $request->input('name');
         $users->email = $request->input('email');
         $users->phone = $request->input('phone');
@@ -47,7 +49,9 @@ class ClientsController extends Controller
     
         if($users->save()) { 
             $clients = $request->isMethod('put') ? Clients::findOrFail($request->id) : new Clients;
-            $clients->id = $request->input('id');
+            if(!$request->isMethod('put')) {
+                $clients->id = $request->input('id');
+            }
             $clients->users_id = $users->id;
             $clients->city_id = $request->input('city_id');
             $clients->legal_name = $request->input('legal_name');

@@ -31,9 +31,12 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-        $orders = Orders::findOrFail($request['order']['id']);
-        // изменять id
-        // $orders->id = $request->input('id');
+        $orders = $request->isMethod('put') ? Orders::findOrFail($request['order']['id']) : new Orders;
+        
+        if(!$request->isMethod('put')) {
+            $orders->id = $request->input('id');
+        }
+        
         $orders->clients_id = $request['order']['clients_id'];
         $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request['dateStart']));
         $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request['dateEnd']));

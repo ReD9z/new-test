@@ -195,6 +195,11 @@
                 </v-flex>
             </td>
             <td>
+                 <v-flex>
+                    <v-icon small class="mr-2" @click="editItem(props.item)">	
+                        edit	
+                    </v-icon>
+                </v-flex>
                 <v-flex>
                     <v-icon small @click="deleteItem(props.item)">
                         delete

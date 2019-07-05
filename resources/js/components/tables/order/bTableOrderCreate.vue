@@ -1,9 +1,9 @@
 <template>
 <div>
     <v-toolbar color="#fff" fixed app clipped-righ>
-        <v-toolbar-title>Заказ №{{order.id}}</v-toolbar-title>
+        <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn color="green" large class="mb-2 white--text" to="/orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
+        <v-btn color="green" large class="mb-2 white--text" to="orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
     </v-toolbar>
     <v-card>
         <v-card-text>
@@ -21,6 +21,7 @@
                                     :item-text="param.selectText"
                                     item-value="id"
                                     :label="param.text"
+                                    :rules="param.validate"
                                     >
                                 </v-autocomplete>
                             </div>
@@ -75,56 +76,17 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker :rules="param.validate" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
                 </v-flex>
             </v-form>
         </v-card-text>
     </v-card>
-    <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
-        <v-card height="100%">
-            <v-toolbar color="pink" dark>
-                <v-toolbar-title>Изображения</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-icon right dark @click='pickImages'>control_point</v-icon>
-                <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
-                <v-btn icon @click="close">
-                    <v-icon>close</v-icon>
-                </v-btn>
-            </v-toolbar>
-            <v-progress-linear value="15" :indeterminate="true" v-show="loadImages" color="blue" class="ma-0"></v-progress-linear>
-            <v-card-text>
-                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                    <v-flex xs12 v-if="param.input == 'images'">
-                        <v-layout row wrap>
-                            <v-flex v-for="(file, key) in addOrderImages.files" :key="key" xs4 d-flex>
-                                <v-card flat tile class="d-flex pr-1 pb-1">
-                                    <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
-                                        <template v-slot:placeholder>
-                                            <v-layout fill-height align-center justify-center ma-0 >
-                                                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
-                                            </v-layout>
-                                        </template>
-                                        <template>
-                                            <v-layout fill-height right top ma-0 >
-                                                <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
-                                                    <v-icon>close</v-icon>
-                                                </v-btn>
-                                            </v-layout>
-                                        </template>
-                                    </v-img>
-                                </v-card>
-                            </v-flex>
-                        </v-layout>
-                    </v-flex>
-                </v-flex>
-            </v-card-text>
-        </v-card>
-    </v-navigation-drawer>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
-            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
+            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details>
+            </v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
         <v-icon>filter_list</v-icon>
@@ -167,16 +129,6 @@
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
             </td>
-            <td>
-                <v-flex>
-                    <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
-                        image
-                    </v-icon>
-                    <v-icon small class="mr-2" v-if="props.item.data !== null"  @click="deleteItem(props.item)">
-                        delete
-                    </v-icon>
-                </v-flex>
-            </td>
         </template>
         <template v-slot:no-data>
             <v-btn color="primary" @click="initialize">Сброс</v-btn>
@@ -213,18 +165,13 @@ import XLSX from 'xlsx';
 export default {
     data: () => ({
         search: '',
-        dialogImages: false,
-        files: [],
-        loadImages: false,
         loading: true,
         desserts: [],
         editedIndex: -1,
         editedItem: {},
         defaultItem: {},
         select: [],
-        addOrderImages: [],
         keywords: '',
-        deleteImage: false,
         dateStart: null,
         dateEnd: null,
         loadingSaveBtn: false,
@@ -238,8 +185,7 @@ export default {
         selected: []
     }),
     props: {
-        params: Object,
-        idRouteOrder: String
+        params: Object
     },
     computed: {
         formTitle () {
@@ -268,82 +214,17 @@ export default {
         this.initializeOrder();
     },
     methods: {
-        toggleAll() {
+        toggleAll () {
             if (this.selected.length) this.selected = []
             else this.selected = this.desserts.slice();
         },
-        elementLoadToFileImage() {
-            this.loadImages = true;
-            this.files = this.$refs.images.files;
-            Array.from(this.files).forEach(files => {
-                this.formData.append('file[]', files);
-            });
-            axios.post('/api/files', this.formData, {
-                headers: {'Content-Type': 'multipart/form-data'}
-            })
-            .then(
-                res => {
-                    axios({
-                        method: 'put',
-                        url: '/api/address_to_orders',
-                        data: this.addOrderImages,
-                        params: {
-                            images: res.data.files
-                        }
-                    })
-                    .then(
-                        response => {
-                            console.log(response);
-                            Object.assign(this.addOrderImages, response.data);
-                            // vm.addOrderImages = [];
-                            // vm.addOrderImages = response.data.files;
-                            // vm.addOrderImages = response.data;
-                            // console.log(vm.desserts.data);
-                            // Object.assign(vm.addOrderImages, response.data.files);
-                            // vm.initializeOrder();
-                            // vm.initialize();
-                            this.loadImages = false;
-                            this.resetFilesLoad();
-                        }
-                    ).catch(error => {
-                        console.log(error);
-                    })
-                }
-            ).catch(
-                error => {
-                    console.log(error);
-                }
-            );
-        },
-        resetFilesLoad() {
-            this.files = [];
-            this.$refs.images.value = '';
-            this.formData.delete('file[]');
-        },
-        pickImages() {
-            this.$refs.images.click();
-        },
-        changeSort(column) {
+        changeSort (column) {
             if (this.pagination.sortBy === column) {
                 this.pagination.descending = !this.pagination.descending
             } else {
                 this.pagination.sortBy = column
                 this.pagination.descending = false
             }
-        },
-        removeImg(data) {
-            this.loadImages = true;
-            axios.post('/api/files/remove', data)
-            .then(
-                res => {
-                    this.addOrderImages.files.splice(this.addOrderImages.files.indexOf(data.id), 1);
-                    this.loadImages = false;
-                }
-            ).catch(
-                error => {
-                    console.log(error);
-                }
-            );
         },
         initialize() {
             axios({
@@ -366,7 +247,6 @@ export default {
                                 if(dateStart >= itemDateStart && dateEnd <= itemDateEnd) {
                                     item.result = 'Занято';
                                     item.data = stats;
-                                    item.files = stats.files;
                                     let index = vm.desserts.indexOf(item);
                                     Object.assign(vm.desserts[index], item);
                                 } 
@@ -374,7 +254,6 @@ export default {
                         } else {
                             item.result = 'Свободно';
                             item.data = null;
-                            item.files = null;
                             let index = vm.desserts.indexOf(item);
                             Object.assign(vm.desserts[index], item);
                         }
@@ -388,12 +267,12 @@ export default {
         initializeOrder() {
             axios({
                 method: 'get',
-                url: this.params.baseOrders + "/" + this.idRouteOrder
+                url: this.params.baseOrders
             })
             .then(
                 response => {
                     this.order = response.data;
-                    this.editItem(response.data);
+                    this.loading = false;
                 }
             ).catch(error => {
                 console.log(error);
@@ -411,7 +290,12 @@ export default {
                     .then(
                         res => {
                             if(res) {
-                                this.select.push({data: res.data, url: element.selectApi});
+                                this.select.push(
+                                    {
+                                        data: res.data,
+                                        url: element.selectApi
+                                    }
+                                );
                             }
                         }
                     ).catch(
@@ -423,20 +307,15 @@ export default {
             });
         },
         editItem (item) {
+            this.editedIndex = this.desserts.indexOf(item);
             this.editedItem = Object.assign({}, item);
-            this.dateStart = item.order_start_date;
-            this.dateEnd = item.order_end_date;
-        },
-        editPhotos(item) {
-            this.addOrderImages = Object.assign({}, item.data);
-            this.dialogImages = true;
+            this.dialog = true;
         },
         deleteItem (item) {
-            // console.log(item.data);
             if (confirm('Вы уверены, что хотите удалить этот элемент?')) {
                 axios({
                     method: 'delete',
-                    url: '/api/address_to_orders/' + item.data.id,
+                    url: this.params.baseOrders+'/'+item.data.orders.id,
                 })
                 .then(
                     response => {
@@ -450,10 +329,10 @@ export default {
         close () {
             this.dialog = false
             this.dialogImages = false
-            // setTimeout(() => {
-            //     this.editedItem = Object.assign({}, this.defaultItem)
-            //     this.editedIndex = -1
-            // }, 300)
+            setTimeout(() => {
+                this.editedItem = Object.assign({}, this.defaultItem)
+                this.editedIndex = -1
+            }, 300)
         },
         save () {
             if (this.$refs.forms.validate() == false) {
@@ -463,12 +342,11 @@ export default {
                 this.selectedStatus = true;
             }     
             if(this.$refs.forms.validate() == true && this.selected.length > 0) {
-                console.log(this.editedItem);
                 this.selectedStatus = false;
                 this.loaderSaveBtn = true;
                 this.loadingSaveBtn = true;
                 axios({
-                        method: 'put',
+                    method: 'post',
                         url: this.params.baseOrders,
                         data: {
                             order: this.editedItem,
@@ -478,8 +356,8 @@ export default {
                         }
                     })
                     .then(response => {
-                        this.initialize();
-                        console.log(response);
+                        this.editedItem = [];
+                        this.selected = [];
                         this.loaderSaveBtn=null;
                         this.loadingSaveBtn=false;
                     }).catch(error => {

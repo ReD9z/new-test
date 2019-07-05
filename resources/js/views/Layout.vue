@@ -74,7 +74,7 @@ export default {
             },
             { 
                 title: 'Монтажники', icon: 'build', src: 'installers',
-                role: {admin: 'admin', moderator: 'moderator',}
+                role: {admin: 'admin', moderator: 'moderator'}
             },
             { 
                 title: 'Продажи', icon: 'account_balance_wallet', wrapLink:
@@ -89,7 +89,7 @@ export default {
                     },
                     { 
                         title: 'Адреса', icon: 'question_answer', src: 'address',
-                        role: {admin: 'admin', moderator: 'moderator', manager: 'manager',}
+                        role: {admin: 'admin', moderator: 'moderator'}
                     }
                 ],
                 role: {admin: 'admin', moderator: 'moderator', manager: 'manager', client: 'client'}
