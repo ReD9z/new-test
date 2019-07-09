@@ -91,7 +91,7 @@ Route::group(['middleware' => ['json.response']], function () {
 
         // CitiesToWorks
         Route::post('cities_to_works', 'Api\CitiesToWorksController@store'); // Add one item
-        Route::get('cities_to_works', 'Api\CitiesToWorksController@show'); // Show one item
+        Route::get('cities_to_works/{id}', 'Api\CitiesToWorksController@show'); // Show one item
         Route::put('cities_to_works', 'Api\CitiesToWorksController@store');  // Edit one item
         Route::delete('cities_to_works/{id}', 'Api\CitiesToWorksController@destroy'); // Delete one item
         Route::get('cities_to_works', 'Api\CitiesToWorksController@index'); // Show list
@@ -102,13 +102,15 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('clients', 'Api\ClientsController@store');  // Edit one item
         Route::delete('clients/{id}', 'Api\ClientsController@destroy'); // Delete one item
         Route::get('clients', 'Api\ClientsController@index'); // Show list
-
+        Route::get('managersAddress/{id}', 'Api\ClientsController@managersAddress'); // Show managersAddress list
+       
         // Installers
         Route::post('installers', 'Api\InstallersController@store');  // Add one item
         Route::get('installers', 'Api\InstallersController@show'); // Show one item
         Route::put('installers', 'Api\InstallersController@store');  // Edit one item
         Route::delete('installers/{id}', 'Api\InstallersController@destroy'); // Delete one item
         Route::get('installers', 'Api\InstallersController@index'); // Show list
+        Route::get('moderatorsInstallers/{id}', 'Api\InstallersController@moderatorsInstallers'); // Show managersAddress list
 
         // Managers   
         Route::post('managers', 'Api\ManagersController@store');  // Add one item

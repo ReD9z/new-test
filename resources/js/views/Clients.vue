@@ -101,9 +101,6 @@ export default {
                     value: 'settlement_account' 
                 }
             ],
-            filters: [
-
-            ],
             search: true,
             pagination: true,
             excel: false

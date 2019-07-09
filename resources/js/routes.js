@@ -32,6 +32,32 @@ let routers =  [
         component: require('./views/Address.vue').default
     },
     {
+        path: '/clients_managers',
+        name: 'clients_managers',
+        meta: {
+            title: 'Клиенты',
+            adminAuth: false,
+            moderatorAuth: false,
+            installerAuth: false,
+            managerAuth: true,
+            clientAuth: false
+        },
+        component: require('./views/ClientsManagers.vue').default
+    },
+    {
+        path: '/moderator_installers',
+        name: 'moderator_installers',
+        meta: {
+            title: 'Монтажники',
+            adminAuth: false,
+            moderatorAuth: false,
+            installerAuth: false,
+            managerAuth: true,
+            clientAuth: false
+        },
+        component: require('./views/ModeratorInstallers.vue').default
+    },
+    {
         path: '/tasks',
         name: 'tasks',
         meta: {

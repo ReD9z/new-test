@@ -22,6 +22,10 @@ class InstallersController extends Controller
         return InstallersResource::collection($installers);
     }
 
+    public function moderatorsInstallers($id) {
+        $installers = Installers::with('users', 'cities', 'moderator.users')->where('moderator_id', $id)->get(); 
+        return InstallersResource::collection($installers);
+    }
 
     /**
      * Store a newly created resource in storage.

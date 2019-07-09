@@ -112,7 +112,7 @@ class AddressController extends Controller
      */
     public function destroy($id)
     {
-       $address = Address::findOrFail($id);
+        $address = Address::findOrFail($id);
 
         if($address->delete()) {
             return new AddressResource($address);

@@ -40,6 +40,9 @@
                         <div v-if="param.input == 'text'">
                             <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
+                        <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
+                            <v-text-field v-model="editedItem[param.value] = isLoggedUser.moderators.city_id" :value="isLoggedUser.moderators.city_id" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                        </div>
                         <div v-if="param.input == 'select'">
                             <div v-for="item in select" :key="item[0]">
                                 <div v-if="item.url == param.selectApi">
@@ -256,6 +259,9 @@ export default {
         },
         computedDateFormatted () {
             return this.formatDate(this.date)
+        },
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
         }
     },
     watch: {

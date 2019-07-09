@@ -37,4 +37,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function managers()
+    {
+        return $this->hasOne('App\Models\Managers', 'users_id', 'id');
+    }
+
+    public function moderators()
+    {
+        return $this->hasOne('App\Models\Moderators', 'users_id', 'id');
+    }
 }

@@ -16,7 +16,7 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::get(); 
+        $users = User::with('managers')->get(); 
         return UsersResource::collection($users);
     }
 
@@ -25,11 +25,10 @@ class UsersController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
-     */
+    */
     public function store(Request $request)
     {
         $users = $request->isMethod('put') ? User::findOrFail($request->id) : new User;
-
         $users->id = $request->input('id');
         $users->name = $request->input('name');
         $users->email = $request->input('email');

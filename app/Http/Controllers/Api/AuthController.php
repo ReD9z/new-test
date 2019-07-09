@@ -45,7 +45,8 @@ class AuthController extends Controller
                 'message' => 'Unauthorized'
             ], 401);
 
-        $user = $request->user();
+        $user = User::with('managers', 'moderators')->where('email', $request->email)->first();
+        // $user = $request->user();
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
         if ($request->remember_me) 

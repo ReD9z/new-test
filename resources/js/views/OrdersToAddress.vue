@@ -12,7 +12,7 @@ export default {
             baseUrl: '/api/address',
             baseOrders: '/api/orders',
             headerOrders: [
-                 {
+                {
                     text: 'Клиент',
                     align: 'left',
                     sortable: true,
