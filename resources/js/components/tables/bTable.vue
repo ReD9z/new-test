@@ -41,7 +41,7 @@
                             <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
-                            <v-text-field v-model="editedItem[param.value] = isLoggedUser.moderators.city_id" :value="isLoggedUser.moderators.city_id" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                            <v-text-field v-model="editedItem[param.value] = param.show"  :rules="param.validate" type="hidden" :label="param.text" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
                             <div v-for="item in select" :key="item[0]">
@@ -289,7 +289,10 @@ export default {
         initialize () {
             axios({
                 method: 'get',
-                url: this.params.baseUrl
+                url: this.params.baseUrl,
+                params: {
+                    user: this.params.user
+                }
             })
             .then(
                 response => {

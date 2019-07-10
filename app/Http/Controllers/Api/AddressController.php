@@ -18,7 +18,12 @@ class AddressController extends Controller
      */
     public function index(Request $request)
     {
-        $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders')->get();
+        if($request->user) {
+            $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders')->where('city_id', $request->user)->get();
+        }
+        else {
+            $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders')->get();
+        }
         return AddressResource::collection($address);
     }
 

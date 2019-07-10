@@ -54,7 +54,7 @@ export default {
                     value: 'city_id',
                     selectText: 'name',
                     TableGetIdName: 'city',
-                    selectApi: 'api/cities_to_works',
+                    selectApi: '/api/cities_to_works',
                     input: "select",
                 },
                 {
@@ -64,7 +64,7 @@ export default {
                     value: 'area_id',
                     selectText: 'name',
                     TableGetIdName: 'area',
-                    selectApi: 'api/areas',
+                    selectApi: '/api/areas',
                     input: "select",
                 },
                 { 
@@ -103,6 +103,16 @@ export default {
             pagination: true,
             excel: false
         }
-    })
+    }),
+    computed: {
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
+        }
+    },
+    created () {
+        if(this.isLoggedUser.role == "moderator") {
+            this.params.user = this.isLoggedUser.moderators.city_id;
+        }
+    }
 }
 </script>

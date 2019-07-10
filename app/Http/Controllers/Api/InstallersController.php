@@ -17,13 +17,12 @@ class InstallersController extends Controller
      */
     public function index(Request $request)
     {
-        $installers = Installers::with('users', 'cities', 'moderator.users')->get(); 
-        
-        return InstallersResource::collection($installers);
-    }
-
-    public function moderatorsInstallers($id) {
-        $installers = Installers::with('users', 'cities', 'moderator.users')->where('moderator_id', $id)->get(); 
+        if($request->user) {
+            $installers = Installers::with('users', 'cities', 'moderator.users')->where('moderator_id', $request->user)->get(); 
+        }
+        else {
+            $installers = Installers::with('users', 'cities', 'moderator.users')->get(); 
+        }
         return InstallersResource::collection($installers);
     }
 
@@ -59,10 +58,6 @@ class InstallersController extends Controller
             if($installers->save()) {
                 return new InstallersResource($installers);
             }
-        }
-     
-        if($installers->save()) {
-            return new InstallersResource($installers);
         }
     }
 

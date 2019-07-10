@@ -256,7 +256,6 @@ export default {
         editAddress(data) {
             this.listAddressOrder = true;
             this.idOrder = data.id;
-            console.log(data.id);
         },
         toggleAll () {
             if (this.selected.length) this.selected = []
@@ -273,7 +272,10 @@ export default {
         initialize () {
             axios({
                 method: 'get',
-                url: this.params.baseUrl
+                url: this.params.baseUrl,
+                params: {
+                    user: this.params.user
+                }
             })
             .then(
                 response => {

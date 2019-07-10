@@ -74,11 +74,7 @@ export default {
             },
             { 
                 title: 'Монтажники', icon: 'build', src: 'installers',
-                role: {admin: 'admin'}
-            },
-            { 
-                title: 'Монтажники', icon: 'build', src: 'moderator_installers',
-                role: {admin: 'moderator'}
+                role: {admin: 'admin', moderator: 'moderator'}
             },
             { 
                 title: 'Продажи', icon: 'account_balance_wallet', wrapLink:
@@ -93,13 +89,13 @@ export default {
                     },
                     { 
                         title: 'Задачи', icon: 'question_answer', src: 'tasks',
-                        role: {admin: 'admin', moderator: 'moderator', installer: 'installer'}
+                        role: {admin: 'admin', installer: 'installer'}
                     }
                 ],
                 role: {admin: 'admin', moderator: 'moderator', client: 'client'}
             },
             { 
-                title: 'Клиенты', icon: 'question_answer', src: 'clients_managers',
+                title: 'Клиенты', icon: 'question_answer', src: 'clients',
                 role: {manager: 'manager'}
             },
             { 

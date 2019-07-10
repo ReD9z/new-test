@@ -41,6 +41,7 @@ export default {
                 ],
             },
             baseUrl: 'api/orders',
+            user: null,
             headers: [
                 {
                     text: 'Клиент',
@@ -77,6 +78,16 @@ export default {
             pagination: true,
             excel: false
         }
-    })
+    }),
+    computed: {
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
+        }
+    },
+    created () { 
+        if(this.isLoggedUser.role == "moderator") {
+            this.params.user = this.isLoggedUser.moderators.city_id;
+        }
+    }
 }
 </script>

@@ -17,7 +17,12 @@ class ClientsController extends Controller
     */
     public function index(Request $request)
     {
-        $clients = Clients::with('cities', 'users')->get();
+        if($request->user) {
+            $clients = Clients::with('cities', 'users')->where('city_id', $request->user)->get();
+        }
+        else {
+            $clients = Clients::with('cities', 'users')->get();
+        }
         return ClientsResource::collection($clients);
     }
 
@@ -98,7 +103,7 @@ class ClientsController extends Controller
      */
     public function destroy($id)
     {
-       $clients = Clients::findOrFail($id);
+        $clients = Clients::findOrFail($id);
 
         if($clients->delete()) {
             return new ClientsResource($clients);

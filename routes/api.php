@@ -110,7 +110,6 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('installers', 'Api\InstallersController@store');  // Edit one item
         Route::delete('installers/{id}', 'Api\InstallersController@destroy'); // Delete one item
         Route::get('installers', 'Api\InstallersController@index'); // Show list
-        Route::get('moderatorsInstallers/{id}', 'Api\InstallersController@moderatorsInstallers'); // Show managersAddress list
 
         // Managers   
         Route::post('managers', 'Api\ManagersController@store');  // Add one item

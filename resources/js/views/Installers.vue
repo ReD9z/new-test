@@ -9,7 +9,8 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/installers',
+            baseUrl: '/api/installers',
+            user: null,
             headers: [
                 { 
                     text: 'Имя', 
@@ -36,26 +37,6 @@ export default {
                     value: 'login' 
                 },
                 {
-                    text: 'Город',
-                    align: 'left',
-                    sortable: true,
-                    value: 'city_id',
-                    selectText: 'name',
-                    TableGetIdName: 'city',
-                    selectApi: 'api/cities_to_works',
-                    input: "select",
-                },
-                {
-                    text: 'Модератор',
-                    align: 'left',
-                    sortable: true,
-                    value: 'moderator_id',
-                    selectText: 'name',
-                    TableGetIdName: 'moderator',
-                    selectApi: 'api/moderators',
-                    input: "select",
-                },
-                {
                     text: "Пароль",
                     input: "password",
                     sortable: false,
@@ -67,6 +48,57 @@ export default {
             pagination: true,
             excel: false
         }
-    })
+    }),
+    computed: {
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
+        }
+    },
+    created () {
+        if(this.isLoggedUser.role == "moderator") {
+            this.params.user = this.isLoggedUser.moderators.id;
+            this.params.headers.push(
+                {
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city_id',
+                    show: this.isLoggedUser.moderators.city_id,
+                    input: "hidden",
+                    visibility: 'd-none'
+                },
+                {
+                    text: 'Модератор',
+                    align: 'left',
+                    sortable: true,
+                    value: 'moderator_id',
+                    show: this.isLoggedUser.moderators.id,
+                    input: "hidden",
+                    visibility: 'd-none'
+                }
+            );
+        } else {
+            this.params.headers.push({
+                text: 'Город',
+                align: 'left',
+                sortable: true,
+                value: 'city_id',
+                selectText: 'name',
+                TableGetIdName: 'city',
+                selectApi: '/api/cities_to_works',
+                input: "select",
+            },
+            {
+                text: 'Модератор',
+                align: 'left',
+                sortable: true,
+                value: 'moderator_id',
+                selectText: 'name',
+                TableGetIdName: 'moderator',
+                selectApi: '/api/moderators',
+                input: "select",
+            });
+        }
+    }
 }
 </script>

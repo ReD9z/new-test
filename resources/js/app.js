@@ -5,7 +5,7 @@ import store from './store.js';
 import routers from './routes.js';
 import Vue from 'vue';
 import Vuetify from 'vuetify';
-import ru from 'vuetify/es5/locale/ru'
+import ru from 'vuetify/es5/locale/ru';
 import 'vuetify/dist/vuetify.min.css';
 
 Vue.use(Vuetify, {

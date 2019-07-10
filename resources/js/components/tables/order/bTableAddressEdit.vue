@@ -206,6 +206,7 @@
             </template>
         </v-btn>
     </v-flex>
+    
 </div>
 </template>
 <script>
@@ -340,7 +341,10 @@ export default {
         initialize() {
             axios({
                 method: 'get',
-                url: this.params.baseUrl
+                url: this.params.baseUrl,
+                params: {
+                    user: this.params.user
+                }
             })
             .then(
                 response => {

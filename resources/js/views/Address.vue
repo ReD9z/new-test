@@ -10,18 +10,19 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/address',
+            baseUrl: '/api/address',
+            user: null,
             headers: [
-                {
-                    text: 'Город',
-                    align: 'left',
-                    sortable: true,
-                    value: 'city_id',
-                    selectText: 'name',
-                    TableGetIdName: 'city',
-                    selectApi: 'api/cities_to_works',
-                    input: "select",
-                },
+                // {
+                //     text: 'Город',
+                //     align: 'left',
+                //     sortable: true,
+                //     value: 'city_id',
+                //     selectText: 'name',
+                //     TableGetIdName: 'city',
+                //     selectApi: '/api/cities_to_works',
+                //     input: "select",
+                // },                                                                                                                
                 {
                     text: 'Район',
                     align: 'left',
@@ -29,7 +30,7 @@ export default {
                     value: 'area_id',
                     selectText: 'name',
                     TableGetIdName: 'area',
-                    selectApi: 'api/areas',
+                    selectApi: '/api/areas',
                     input: "select",
                 },
                 { 
@@ -57,6 +58,43 @@ export default {
             pagination: true,
             excel: true
         }
-    })
+    }),
+    computed: {
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
+        }
+    },
+    created () { 
+        if(this.isLoggedUser.role == "moderator") {
+            this.params.user = this.isLoggedUser.moderators.city_id;
+            this.params.headers.push(
+                { 
+                    text: 'Город', 
+                    value: 'city' 
+                },   
+                {
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city_id',
+                    show: this.isLoggedUser.moderators.city_id,
+                    input: "hidden",
+                    visibility: 'd-none'
+                }
+               
+            );
+        } else {
+            this.params.headers.push({
+                text: 'Город',
+                align: 'left',
+                sortable: true,
+                value: 'city_id',
+                selectText: 'name',
+                TableGetIdName: 'city',
+                selectApi: '/api/cities_to_works',
+                input: "select"
+            });
+        }
+    }
 }
 </script>

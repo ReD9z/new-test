@@ -9,7 +9,7 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/address_to_orders',
+            baseUrl: '/api/address_to_orders',
             headers: [
                 {
                     text: 'Заказ',
@@ -18,7 +18,7 @@ export default {
                     value: 'order_id',
                     selectText: 'actual_title',
                     TableGetIdName: 'orders',
-                    selectApi: 'api/orders',
+                    selectApi: '/api/orders',
                     input: "select",
                 },
                 {
@@ -28,7 +28,7 @@ export default {
                     value: 'address_id',
                     selectText: 'city',
                     TableGetIdName: 'address',
-                    selectApi: 'api/address',
+                    selectApi: '/api/address',
                     input: "select",
                 },
                 { 
