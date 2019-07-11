@@ -122,6 +122,7 @@
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
+    <b-maps :items="desserts"></b-maps>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>

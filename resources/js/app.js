@@ -15,7 +15,6 @@ Vue.use(Vuetify, {
     }
 });
 
-
 require('./bootstrap');
 Vue.use(require('vue-moment'));
 window.Vue = require('vue');
@@ -40,6 +39,7 @@ Vue.component('b-table-order', require('./components/tables/order/bTableOrder.vu
 Vue.component('b-table-order-create', require('./components/tables/order/bTableOrderCreate.vue').default);
 Vue.component('b-table-address-order', require('./components/tables/order/bTableAddressOrder.vue').default);
 Vue.component('b-table-address-order-edit', require('./components/tables/order/bTableAddressEdit.vue').default);
+Vue.component('b-maps', require('./components/bMaps.vue').default);
 
 /**
  * VueRouter components
