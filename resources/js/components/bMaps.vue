@@ -1,5 +1,8 @@
 <template>
-   <div id="YMapsID"></div>
+    <div style="position:relative">
+        <div id="YMapsID"></div>
+        <v-progress-circular indeterminate class="maps-loader" v-show="mapLoader"></v-progress-circular>
+    </div>
 </template>
 <style type="text/css">
     #YMapsID {
@@ -7,6 +10,14 @@
         height: 400px;
         padding: 0;
         margin: 0;
+    }
+    .maps-loader {
+        position: absolute;
+        margin: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
     }
 </style>
 
@@ -16,13 +27,8 @@ export default {
         items: Array,
     },
     data: () => ({
-       
+       mapLoader:true, 
     }),
-    watch: {
-        // items: function (val) {
-        //     this.items =;
-        // }
-    },
     methods: {
         initializeYandexMap() { 
             let vm = this;
@@ -35,8 +41,8 @@ export default {
                 });
                 vm.items.forEach((element) => {
                     if(element.data != null) {
-                        console.log(element.city + " " + element.street + " " + element.house_number);
-                        ymaps.geocode(element.city + " " + element.street + " " + element.house_number).then(function(res) {
+                        // console.log(element.city + " " + element.street + " " + element.house_number);
+                        ymaps.geocode(element.city + ", " + element.street + ", " + element.house_number).then(function(res) {
                             const coord = res.geoObjects.get(0).geometry.getCoordinates();
                             const address = res.metaData.geocoder.request;
 
@@ -45,19 +51,8 @@ export default {
                                 balloonContent: address,
                                 draggable: true,
                             });
-
-                            /* Событие dragend - получение нового адреса */
-                            // myPlacemark.events.add('dragend', function(e){
-                            //     var cord = e.get('target').geometry.getCoordinates();
-                            //     $('#ypoint').val(cord);
-                            //     ymaps.geocode(cord).then(function(res) {
-                            //         var data = res.geoObjects.get(0).properties.getAll();
-                            //         $('#address').val(data.text);
-                            //     });
-                            // });
-                            
+                            vm.mapLoader = false;
                             myMap.geoObjects.add(myPlacemark);    
-                            // myMap.setCenter(coord, 15);
                         });
                     }
                 });

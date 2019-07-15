@@ -122,7 +122,7 @@
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
-    <b-maps :items="desserts"></b-maps>
+    <b-maps :items="desserts" v-if="renderComponent"></b-maps>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
@@ -207,7 +207,6 @@
             </template>
         </v-btn>
     </v-flex>
-    
 </div>
 </template>
 <script>
@@ -220,6 +219,7 @@ export default {
         loadImages: false,
         loading: true,
         desserts: [],
+        renderComponent: true,
         editedIndex: -1,
         editedItem: {},
         defaultItem: {},
@@ -270,6 +270,13 @@ export default {
         this.initializeOrder();
     },
     methods: {
+        forceRerender() {
+            this.renderComponent = false;
+
+            this.$nextTick().then(() => {
+                this.renderComponent = true;
+            });
+        },
         toggleAll() {
             if (this.selected.length) this.selected = []
             else this.selected = this.desserts.slice();
@@ -436,6 +443,7 @@ export default {
                 })
                 .then(
                     response => {
+                        this.forceRerender();   
                         this.initialize();
                     }
                 ).catch(error => {
@@ -451,7 +459,7 @@ export default {
             //     this.editedIndex = -1
             // }, 300)
         },
-        save () {
+        save() {
             if (this.$refs.forms.validate() == false) {
                 this.snackbar = true;
             } 
@@ -475,7 +483,8 @@ export default {
                     .then(response => {
                         this.initialize();
                         this.loaderSaveBtn=null;
-                        this.loadingSaveBtn=false;
+                        this.loadingSaveBtn = false;
+                        this.forceRerender();  
                     }).catch(error => {
                         console.log(error);
                 });
@@ -485,6 +494,9 @@ export default {
             this.chips.splice(this.chips.indexOf(item), 1)
             this.chips = [...this.chips]
         }
+    },
+    mounted() {
+        console.log(this);
     }
 }
 </script>
