@@ -150,7 +150,7 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table v-model="selected" select-all :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table v-model="selected" select-all :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:items="props">
             <td>
@@ -262,6 +262,9 @@ export default {
         dateEnd(after, before) {
             this.initialize();
             this.selected = [];
+        },
+        search(val) {
+            this.filteredItems();
         }
     },
     created () {
@@ -270,6 +273,56 @@ export default {
         this.initializeOrder();
     },
     methods: {
+        filteredItems() {
+            // this.initialize();
+            // console.log("ewfweff");
+            // this.desserts.filter(item => {
+            //     return item.city.indexOf(this.search) > -1;
+                // console.log(item.area);
+                // console.log(item.city);
+                // console.log(item.house_number);
+                // console.log(item.management_company);
+                // console.log(item.number_entrances);
+                // console.log();
+                // if(item.city) {
+                //     this.find(item.city);
+                // }
+            // })
+            // let value = this.search;
+            // let test = this.desserts.filter(function(customer){
+            //     return //customer.city.indexOf(value) > -1 ||
+            //             customer.area.indexOf(value) > -1; //||
+            //             //customer.number_entrances.indexOf(value) > -1
+            //     console.log(customer.area);
+            // });
+            // console.log(test);
+            let vm = this;
+            const value = this.search.toLowerCase().split(" ");
+            // console.log(value);
+            let test = this.desserts.filter(function(item){
+                value.forEach(function (val) {
+                    return item.city.toLowerCase().indexOf(val) > -1;
+                })
+            //    console.log(item)
+                // console.log(vm.find(customer));
+                    // return item.city.toLowerCase().indexOf(value) > -1 ||
+                    // item.area.toLowerCase().indexOf(value) > -1 ||
+                    // item.street.toLowerCase().indexOf(value) > -1
+            });
+            console.log(test);
+        },
+        // find(value) {
+        //     // const value = this.search.toLowerCase().split(" ");
+        //     if(this.search != null && this.search != "") {
+        //         this.search.split(' ').forEach(item => {
+        //             return value.city.toLowerCase().indexOf(item.toLowerCase()) > -1;
+        //             // console.log(value.city.toLowerCase().indexOf(item.toLowerCase()) > -1);
+        //             //  return value.city.toLowerCase().indexOf(item) > -1 ||
+        //             // value.area.toLowerCase().indexOf(item) > -1 ||
+        //             // value.street.toLowerCase().indexOf(item) > -1
+        //         });
+        //     }
+        // },
         forceRerender() {
             this.renderComponent = false;
 

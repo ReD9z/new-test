@@ -94,11 +94,11 @@ export default {
                 title: 'Пользователи', icon: 'people', wrapLink:
                 [
                     { 
-                        title: 'Менеджеры', icon: 'people', src: 'managers', 
+                        title: 'Менеджеры', icon: 'question_answer', src: 'managers', 
                         role: {admin: 'admin'}
                     },
                     { 
-                        title: 'Монтажники', icon: 'build', src: 'installers',
+                        title: 'Монтажники', icon: 'question_answer', src: 'installers',
                         role: {admin: 'admin', moderator: 'moderator'}
                     },
                     { 
