@@ -40,7 +40,7 @@
                         >
                             <template v-slot:activator="{ on }">
                                 <v-text-field
-                                    v-model="dateStart"
+                                    v-model="computedDateFormatted"
                                     :rules="param.validate"
                                     hint="YYYY-MM-DD формат"
                                     persistent-hint
@@ -66,7 +66,7 @@
                         >
                             <template v-slot:activator="{ on }">
                                 <v-text-field
-                                    v-model="dateEnd"
+                                    v-model="dateEndFormatted"
                                     hint="YYYY-MM-DD формат"
                                     persistent-hint
                                     prepend-icon="event"
@@ -122,7 +122,6 @@
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
-    <b-maps :items="desserts" v-if="renderComponent"></b-maps>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
@@ -207,6 +206,7 @@
             </template>
         </v-btn>
     </v-flex>
+    <b-maps :items="desserts" v-if="renderComponent"></b-maps>
 </div>
 </template>
 <script>
@@ -237,7 +237,9 @@ export default {
         chipsItem: ['Фильтер1', 'Фильтер2'],
         valid: true,
         order: [],
-        selected: []
+        selected: [],
+        dateStartFormatted: null,
+        dateEndFormatted: null
     }),
     props: {
         params: Object,
@@ -248,7 +250,7 @@ export default {
             return this.editedIndex === -1 ? 'Добавить' : 'Редактировать'
         },
         computedDateFormatted () {
-            return this.formatDate(this.date)
+            return this.formatDate(this.dateStart);
         }
     },
     watch: {
@@ -258,13 +260,15 @@ export default {
         dateStart(after, before) {
             this.initialize();
             this.selected = [];
+            this.dateStartFormatted = this.formatDate(this.dateStart);
         },
         dateEnd(after, before) {
             this.initialize();
             this.selected = [];
+            // this.dateEndFormatted = this.formatDate(this.dateEnd);
         },
         search(val) {
-            this.filteredItems();
+            this.initialize();
         }
     },
     created () {
@@ -273,56 +277,26 @@ export default {
         this.initializeOrder();
     },
     methods: {
-        filteredItems() {
-            // this.initialize();
-            // console.log("ewfweff");
-            // this.desserts.filter(item => {
-            //     return item.city.indexOf(this.search) > -1;
-                // console.log(item.area);
-                // console.log(item.city);
-                // console.log(item.house_number);
-                // console.log(item.management_company);
-                // console.log(item.number_entrances);
-                // console.log();
-                // if(item.city) {
-                //     this.find(item.city);
-                // }
-            // })
-            // let value = this.search;
-            // let test = this.desserts.filter(function(customer){
-            //     return //customer.city.indexOf(value) > -1 ||
-            //             customer.area.indexOf(value) > -1; //||
-            //             //customer.number_entrances.indexOf(value) > -1
-            //     console.log(customer.area);
-            // });
-            // console.log(test);
-            let vm = this;
-            const value = this.search.toLowerCase().split(" ");
-            // console.log(value);
-            let test = this.desserts.filter(function(item){
-                value.forEach(function (val) {
-                    return item.city.toLowerCase().indexOf(val) > -1;
-                })
-            //    console.log(item)
-                // console.log(vm.find(customer));
-                    // return item.city.toLowerCase().indexOf(value) > -1 ||
-                    // item.area.toLowerCase().indexOf(value) > -1 ||
-                    // item.street.toLowerCase().indexOf(value) > -1
-            });
-            console.log(test);
+        formatDate (date) {
+            if (!date) return null
+
+            const [year, month, day] = date.split('-')
+            return `${month}-${day}-${year}`
         },
-        // find(value) {
-        //     // const value = this.search.toLowerCase().split(" ");
-        //     if(this.search != null && this.search != "") {
-        //         this.search.split(' ').forEach(item => {
-        //             return value.city.toLowerCase().indexOf(item.toLowerCase()) > -1;
-        //             // console.log(value.city.toLowerCase().indexOf(item.toLowerCase()) > -1);
-        //             //  return value.city.toLowerCase().indexOf(item) > -1 ||
-        //             // value.area.toLowerCase().indexOf(item) > -1 ||
-        //             // value.street.toLowerCase().indexOf(item) > -1
-        //         });
-        //     }
-        // },
+        filteredItems(data) {
+            this.desserts = data;
+            let searchTerm = this.search.trim().toLowerCase(),
+              useOr = this.search == "or",
+              AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+              OR_RegEx = searchTerm.replace(/ +/g,"|"),
+              regExExpression = useOr ? OR_RegEx : AND_RegEx,
+              searchTest = new RegExp(regExExpression, "ig");
+            // if( searchTerm.length < 2 || !this.desserts.length ) return this.desserts;
+
+            return this.desserts = this.desserts.filter(function(item) {
+                return searchTest.test([item.city,item.street].join(" ")); 
+            });
+        },
         forceRerender() {
             this.renderComponent = false;
 
@@ -419,8 +393,8 @@ export default {
 
                                 let dateStart = vm.$moment(vm.dateStart, 'YYYY-MM-DD').unix() * 1000;
                                 let dateEnd = vm.$moment(vm.dateEnd, 'YYYY-MM-DD').unix() * 1000;
-    
-                                if(dateStart >= itemDateStart && dateEnd <= itemDateEnd) {
+
+                                if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
                                     item.result = 'Занято';
                                     item.data = stats;
                                     item.files = stats.files;
@@ -436,6 +410,7 @@ export default {
                             Object.assign(vm.desserts[index], item);
                         }
                     });
+                    this.filteredItems(response.data);
                     this.loading = false;
                 }
             ).catch(error => {
@@ -455,11 +430,6 @@ export default {
             ).catch(error => {
                 console.log(error);
             })
-        },
-        parseDate (date) {
-            if (!date) return null
-            const [year, month, day] = date.split('-')
-            return `${month}-${day}-${year}`
         },
         selectStatus() {
             this.params.headerOrders.forEach(element => {
@@ -481,8 +451,8 @@ export default {
         },
         editItem (item) {
             this.editedItem = Object.assign({}, item);
-            this.dateStart = item.order_start_date;
-            this.dateEnd = item.order_end_date;
+            this.dateStart = this.formatDate(item.order_start_date);
+            this.dateEnd = this.formatDate(item.order_end_date);
         },
         editPhotos(item) {
             this.addOrderImages = Object.assign({}, item.data);
@@ -547,9 +517,6 @@ export default {
             this.chips.splice(this.chips.indexOf(item), 1)
             this.chips = [...this.chips]
         }
-    },
-    mounted() {
-        console.log(this);
     }
 }
 </script>

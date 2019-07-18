@@ -1,5 +1,5 @@
 <template>
-    <div style="position:relative">
+    <div style="position:relative" v-show="this.items.lenght > 0">
         <div id="YMapsID"></div>
         <v-progress-circular indeterminate class="maps-loader" v-show="mapLoader"></v-progress-circular>
     </div>
@@ -41,7 +41,6 @@ export default {
                 });
                 vm.items.forEach((element) => {
                     if(element.data != null) {
-                        // console.log(element.city + " " + element.street + " " + element.house_number);
                         ymaps.geocode(element.city + ", " + element.street + ", " + element.house_number).then(function(res) {
                             const coord = res.geoObjects.get(0).geometry.getCoordinates();
                             const address = res.metaData.geocoder.request;
@@ -60,57 +59,16 @@ export default {
         }
     },
     created () { 
-        // Установить скрипты для использования яндекс карты
-        let scriptYandexMap = document.createElement('script');
-        scriptYandexMap.setAttribute('src', 'https://api-maps.yandex.ru/2.1/?lang=ru_RU');
-        document.head.appendChild(scriptYandexMap);
-
-        // Инициализировать яндекс карту
-        scriptYandexMap.addEventListener("load", this.initializeYandexMap);
+        if(this.items.lenght > 0) {
+            let scriptYandexMap = document.createElement('script');
+            scriptYandexMap.setAttribute('src', 'https://api-maps.yandex.ru/2.1/?lang=ru_RU');
+            document.head.appendChild(scriptYandexMap);
     
-        // let vm = this;
-        // ymaps.ready().done(function (ym) {
-        //     const myMap = new ym.Map('YMapsID', {
-        //         center: [55.751574, 37.573856],
-        //         zoom: 3
-        //     }, {
-        //         searchControlProvider: 'yandex#search'
-        //     });
+            scriptYandexMap.addEventListener("load", this.initializeYandexMap);
+        } else {
+            this.mapLoader = false;
+        }
 
-        //     vm.items.forEach((element) => {
-        //         if(element.data != null) {
-        //             console.log(element.city + " " + element.street + " " + element.house_number);
-        //             ymaps.geocode(element.city + " " + element.street + " " + element.house_number).then(function(res) {
-        //                 const coord = res.geoObjects.get(0).geometry.getCoordinates();
-        //                 const test = res.metaData.geocoder.request;
-
-        //                 const myPlacemark = new ymaps.Placemark(coord, {
-        //                     preset: 'islands#blueDotIcon',
-        //                     balloonContent: test,
-        //                     draggable: true
-        //                 });
-
-        //                 /* Событие dragend - получение нового адреса */
-        //                 // myPlacemark.events.add('dragend', function(e){
-        //                 //     var cord = e.get('target').geometry.getCoordinates();
-        //                 //     $('#ypoint').val(cord);
-        //                 //     ymaps.geocode(cord).then(function(res) {
-        //                 //         var data = res.geoObjects.get(0).properties.getAll();
-        //                 //         $('#address').val(data.text);
-        //                 //     });
-        //                 // });
-                        
-        //                 myMap.geoObjects.add(myPlacemark);    
-        //                 myMap.setCenter(coord, 15);
-        //             });
-        //         }
-        //     });
-
-
-        //     // jQuery.getJSON('data.json', function (json) {
-              
-        //     // var geoObjects = ym.geoQuery(json) .addToMap(myMap) .applyBoundsToMap(myMap, {checkZoomRange: true }); });
-        // });
     }
     
 }
