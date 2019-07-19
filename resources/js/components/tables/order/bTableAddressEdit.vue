@@ -3,6 +3,14 @@
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>Заказ №{{order.id}}</v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-btn color="info" large @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
+            Сохранить
+            <template v-slot:loaderSaveBtn>
+                <span class="custom-loader">
+                <v-icon light>cached</v-icon>
+                </span>
+            </template>
+        </v-btn>
         <v-btn color="green" large class="mb-2 white--text" to="/orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
     </v-toolbar>
     <v-card>
@@ -40,9 +48,9 @@
                         >
                             <template v-slot:activator="{ on }">
                                 <v-text-field
-                                    v-model="computedDateFormatted"
+                                    v-model="dateStartFormatted"
                                     :rules="param.validate"
-                                    hint="YYYY-MM-DD формат"
+                                    hint="Формат дд.мм.гггг"
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
@@ -67,7 +75,7 @@
                             <template v-slot:activator="{ on }">
                                 <v-text-field
                                     v-model="dateEndFormatted"
-                                    hint="YYYY-MM-DD формат"
+                                    hint="Формат дд.мм.гггг"
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
@@ -168,24 +176,28 @@
                 </v-flex>
             </td>
             <td>
-                <v-flex>
-                    <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
-                        image
-                    </v-icon>
-                    <v-icon small class="mr-2" v-if="props.item.data !== null"  @click="deleteItem(props.item)">
-                        delete
-                    </v-icon>
-                </v-flex>
+                <v-layout row wrap>
+                    <v-flex xs6>
+                        <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
+                            image
+                        </v-icon>
+                    </v-flex>
+                    <v-flex xs6>
+                        <v-icon small class="mr-2" v-if="props.item.data !== null"  @click="deleteItem(props.item)">
+                            delete
+                        </v-icon>
+                    </v-flex>
+                </v-layout>
             </td>
         </template>
         <template v-slot:no-data>
             <v-btn color="primary" @click="initialize">Сброс</v-btn>
         </template>
-        <template v-slot:no-results>
+        <!-- <template v-slot:no-data>
             <v-alert :value="true" color="error" icon="warning">
                 По запросу "{{ search }}" ничего не найдено.
             </v-alert>
-        </template>
+        </template> -->
         <template v-if="selectedStatus" v-slot:footer>
             <td :colspan="params.headers.length">
                 <div class="v-messages theme--light error--text">
@@ -196,7 +208,7 @@
             </td>
         </template>
     </v-data-table>
-    <v-flex class="text-xs-center" mt-4>
+    <!-- <v-flex class="text-xs-center" mt-4>
         <v-btn color="info" large @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
             Сохранить
             <template v-slot:loaderSaveBtn>
@@ -205,7 +217,7 @@
                 </span>
             </template>
         </v-btn>
-    </v-flex>
+    </v-flex> -->
     <b-maps :items="desserts" v-if="renderComponent"></b-maps>
 </div>
 </template>
@@ -225,6 +237,8 @@ export default {
         defaultItem: {},
         select: [],
         addOrderImages: [],
+        dateStartFormatted: null,
+        dateEndFormatted: null,
         keywords: '',
         deleteImage: false,
         dateStart: null,
@@ -237,9 +251,7 @@ export default {
         chipsItem: ['Фильтер1', 'Фильтер2'],
         valid: true,
         order: [],
-        selected: [],
-        dateStartFormatted: null,
-        dateEndFormatted: null
+        selected: []
     }),
     props: {
         params: Object,
@@ -248,28 +260,25 @@ export default {
     computed: {
         formTitle () {
             return this.editedIndex === -1 ? 'Добавить' : 'Редактировать'
-        },
-        computedDateFormatted () {
-            return this.formatDate(this.dateStart);
         }
     },
     watch: {
         dialog (val) {
             val || this.close()
         },
-        dateStart(after, before) {
+        dateStart(val) {
+            this.dateStartFormatted = this.formatDate(this.dateStart);
             this.initialize();
             this.selected = [];
-            this.dateStartFormatted = this.formatDate(this.dateStart);
         },
         dateEnd(after, before) {
+            this.dateEndFormatted = this.formatDate(this.dateStart);
             this.initialize();
             this.selected = [];
-            // this.dateEndFormatted = this.formatDate(this.dateEnd);
         },
-        search(val) {
-            this.initialize();
-        }
+        search : _.debounce(function () {
+            this.initialize()
+        }, 300)
     },
     created () {
         this.initialize();
@@ -281,7 +290,7 @@ export default {
             if (!date) return null
 
             const [year, month, day] = date.split('-')
-            return `${month}-${day}-${year}`
+            return `${day}-${month}-${year}`
         },
         filteredItems(data) {
             this.desserts = data;
@@ -451,8 +460,8 @@ export default {
         },
         editItem (item) {
             this.editedItem = Object.assign({}, item);
-            this.dateStart = this.formatDate(item.order_start_date);
-            this.dateEnd = this.formatDate(item.order_end_date);
+            this.dateStart = item.order_start_date;
+            this.dateEnd =  item.order_end_date;
         },
         editPhotos(item) {
             this.addOrderImages = Object.assign({}, item.data);

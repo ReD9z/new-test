@@ -1,5 +1,5 @@
 <template>
-    <div style="position:relative" v-show="this.items.lenght > 0">
+    <div style="position:relative" v-show="this.items.length > 0">
         <div id="YMapsID"></div>
         <v-progress-circular indeterminate class="maps-loader" v-show="mapLoader"></v-progress-circular>
     </div>
@@ -9,7 +9,7 @@
         width: 100%;
         height: 400px;
         padding: 0;
-        margin: 0;
+        margin: 20px 0;
     }
     .maps-loader {
         position: absolute;
@@ -58,17 +58,12 @@ export default {
             });
         }
     },
-    created () { 
-        if(this.items.lenght > 0) {
-            let scriptYandexMap = document.createElement('script');
-            scriptYandexMap.setAttribute('src', 'https://api-maps.yandex.ru/2.1/?lang=ru_RU');
-            document.head.appendChild(scriptYandexMap);
-    
-            scriptYandexMap.addEventListener("load", this.initializeYandexMap);
-        } else {
-            this.mapLoader = false;
-        }
+    created () {
+        let scriptYandexMap = document.createElement('script');
+        scriptYandexMap.setAttribute('src', 'https://api-maps.yandex.ru/2.1/?lang=ru_RU');
+        document.head.appendChild(scriptYandexMap);
 
+        scriptYandexMap.addEventListener("load", this.initializeYandexMap);
     }
     
 }
