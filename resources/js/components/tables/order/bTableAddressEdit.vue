@@ -57,7 +57,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker locale="ru" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
                     <div v-if="param.input == 'dateEnd'">
@@ -83,7 +83,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker locale="ru" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
                 </v-flex>
@@ -176,18 +176,14 @@
                 </v-flex>
             </td>
             <td>
-                <v-layout row wrap>
-                    <v-flex xs6>
-                        <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
-                            image
-                        </v-icon>
-                    </v-flex>
-                    <v-flex xs6>
-                        <v-icon small class="mr-2" v-if="props.item.data !== null"  @click="deleteItem(props.item)">
-                            delete
-                        </v-icon>
-                    </v-flex>
-                </v-layout>
+                <v-flex>
+                    <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
+                        image
+                    </v-icon>
+                    <v-icon small class="mr-2" v-if="props.item.data !== null"  @click="deleteItem(props.item)">
+                        delete
+                    </v-icon>
+                </v-flex>
             </td>
         </template>
         <template v-slot:no-data>

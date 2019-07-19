@@ -177,13 +177,12 @@
                 </v-flex>
             </td>
             <td>
-                <v-flex>
-                    <a class="mr-2" :href="'/orders-address/' + props.item.id" style="text-decoration: none;">
-                        <v-icon small>folder</v-icon>
+                <v-flex class="mr-2" xs6>
+                    <a :href="'/orders-address/' + props.item.id" style="text-decoration: none;">
+                        <v-icon small>edit</v-icon>
                     </a>
-                    <v-icon small class="mr-2" @click="editItem(props.item)">
-                        edit
-                    </v-icon>
+                </v-flex>
+                <v-flex class="mr-2" xs6>
                     <v-icon small @click="deleteItem(props.item)">
                         delete
                     </v-icon>
