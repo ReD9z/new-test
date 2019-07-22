@@ -175,19 +175,18 @@
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
             </td>
-            <td>
-                <v-flex>
-                    <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
-                        image
-                    </v-icon>
-                    <v-icon small class="mr-2" v-if="props.item.data !== null"  @click="deleteItem(props.item)">
-                        delete
-                    </v-icon>
-                </v-flex>
+            <td class="justify-center layout px-0">
+                <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
+                    image
+                </v-icon>
+                <v-icon small class="mr-2" v-if="props.item.data !== null"  @click="deleteItem(props.item)">
+                    delete
+                </v-icon>
             </td>
         </template>
         <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Сброс</v-btn>
+            <v-flex>По запросу "{{ search }}" ничего не найдено!</v-flex>
+            <!-- <v-btn color="primary" @click="initialize">Сброс</v-btn> -->
         </template>
         <!-- <template v-slot:no-data>
             <v-alert :value="true" color="error" icon="warning">
