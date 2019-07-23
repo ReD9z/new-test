@@ -159,7 +159,7 @@
                 @click="changeSort(header.value)"
             >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
             <th class="text-xs-left">
-                Парамеры  
+                Действия
             </th>
         </template>
         <template v-slot:items="props">
@@ -169,18 +169,16 @@
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
             </td>
-            <td>
-                <v-flex>
-                    <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
-                        image
-                    </v-icon>
-                    <v-icon small class="mr-2" @click="editItem(props.item)">
-                        edit
-                    </v-icon>
-                    <v-icon small @click="deleteItem(props.item)">
-                        delete
-                    </v-icon>
-                </v-flex>
+            <td class="justify-left layout">
+                <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
+                    image
+                </v-icon>
+                <v-icon small class="mr-2" @click="editItem(props.item)">
+                    edit
+                </v-icon>
+                <v-icon small class="mr-2"  @click="deleteItem(props.item)">
+                    delete
+                </v-icon>
             </td>
         </template>
         <template v-slot:no-data>

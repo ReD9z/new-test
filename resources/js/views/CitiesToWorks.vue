@@ -19,6 +19,7 @@ export default {
                     input: "text"
                 }
             ],
+            searchValue: ['name'],
             search: true,
             pagination: true,
             excel: false

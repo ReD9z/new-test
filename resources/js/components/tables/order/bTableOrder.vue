@@ -106,12 +106,12 @@
                                 <v-card flat tile class="d-flex pr-1 pb-1">
                                     <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
                                         <template v-slot:placeholder>
-                                            <v-layout fill-height align-center justify-center ma-0 >
+                                            <v-layout fill-height align-center justify-center ma-0>
                                                 <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
                                             </v-layout>
                                         </template>
                                         <template>
-                                            <v-layout fill-height right top ma-0 >
+                                            <v-layout fill-height right top ma-0>
                                                 <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
                                                     <v-icon>close</v-icon>
                                                 </v-btn>
@@ -156,7 +156,7 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
             <th
@@ -166,7 +166,7 @@
                 @click="changeSort(header.value)"
             >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
             <th class="text-xs-left">
-                Парамеры  
+                Действия
             </th>
         </template>
         <template v-slot:items="props">
@@ -176,26 +176,17 @@
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
             </td>
-            <td>
-                <v-flex class="mr-2" xs6>
-                    <a :href="'/orders-address/' + props.item.id" style="text-decoration: none;">
-                        <v-icon small>edit</v-icon>
-                    </a>
-                </v-flex>
-                <v-flex class="mr-2" xs6>
-                    <v-icon small @click="deleteItem(props.item)">
-                        delete
-                    </v-icon>
-                </v-flex>
+            <td class="justify-left layout">
+                <v-icon small class="mr-2" @click="redirectEdit(props.item.id)">
+                    edit
+                </v-icon>
+                <v-icon small class="mr-2" @click="deleteItem(props.item)">
+                    delete
+                </v-icon>
             </td>
         </template>
         <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Сброс</v-btn>
-        </template>
-        <template v-slot:no-results>
-            <v-alert :value="true" color="error" icon="warning">
-                По запросу "{{ search }}" ничего не найдено.
-            </v-alert>
+            <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
     </v-data-table>
 </div>
@@ -245,7 +236,10 @@ export default {
     watch: {
         dialog (val) {
             val || this.close()
-        }
+        },
+        search: _.debounce(function () {
+            this.initialize()
+        }, 400)
     },
     created () {
         this.initialize();
@@ -255,6 +249,29 @@ export default {
         editAddress(data) {
             this.listAddressOrder = true;
             this.idOrder = data.id;
+        },
+        filteredItems(data) {
+            this.desserts = data;
+            let searchTerm = this.search.trim().toLowerCase(),
+            useOr = this.search == "or",
+            AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+            OR_RegEx = searchTerm.replace(/ +/g,"|"),
+            regExExpression = useOr ? OR_RegEx : AND_RegEx,
+            searchTest = new RegExp(regExExpression, "ig");
+            let thisSearch = this.params.searchValue;
+            // if( searchTerm.length < 2 || !this.desserts.length ) return this.desserts;
+            return this.desserts = this.desserts.filter(function(item) {
+                let arr = [];
+                thisSearch.forEach(function(val) {
+                    arr.push(item[val]);
+                })
+                return searchTest.test(arr.join(" ")); 
+            });
+        },
+        refreshSearch() {
+            this.loading = true;
+            this.search = '';
+            this.initialize();
         },
         toggleAll () {
             if (this.selected.length) this.selected = []
@@ -279,6 +296,7 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
+                    this.filteredItems(response.data);
                     this.loading = false;
                 }
             ).catch(error => {
@@ -350,6 +368,9 @@ export default {
                     console.log(error);
                 }
             );
+        },
+        redirectEdit(id) {
+            this.$router.push(`orders-address/${id}`);
         },
         async loadExecel(file) {
             let vm = this;

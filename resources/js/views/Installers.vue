@@ -44,6 +44,7 @@ export default {
                     visibility: 'd-none',
                 }
             ],
+            searchValue: ['name','email','phone','login'],
             search: true,
             pagination: true,
             excel: false

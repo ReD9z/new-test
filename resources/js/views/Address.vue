@@ -54,6 +54,7 @@ export default {
                     value: 'management_company' 
                 }
             ],
+            searchValue: ['area', 'street', 'house_number', 'number_entrances', 'management_company'],
             search: true,
             pagination: true,
             excel: true

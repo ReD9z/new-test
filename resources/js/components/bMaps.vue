@@ -1,23 +1,25 @@
 <template>
     <div style="position:relative" v-show="this.items.length > 0">
+        <v-progress-linear height="5" v-show="mapLoader" indeterminate class="maps-loader"></v-progress-linear>
         <div id="YMapsID"></div>
-        <v-progress-circular indeterminate class="maps-loader" v-show="mapLoader"></v-progress-circular>
+        <!-- <v-progress-circular indeterminate class="maps-loader" v-show="mapLoader"></v-progress-circular> -->
     </div>
 </template>
 <style type="text/css">
     #YMapsID {
         width: 100%;
         height: 400px;
-        padding: 0;
-        margin: 20px 0;
+        padding: 5px 0;
+        /* margin:20px auto; */
+        /* margin-bottom: 20px; */
     }
     .maps-loader {
         position: absolute;
         margin: auto;
-        left: 0;
-        right: 0;
+        /* left: 0;
+        right: 0; */
         top: 0;
-        bottom: 0;
+        /* bottom: 0; */
     }
 </style>
 

@@ -55,6 +55,7 @@ export default {
                     value: 'comment',
                 }
             ],
+            searchValue: ['actual_title', 'installers','types','task_date_completion','comment'],
             search: true,
             pagination: true,
             excel: false

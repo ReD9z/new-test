@@ -46,6 +46,7 @@ export default {
                     ],
                 }
             ],
+            searchValue: ['city', 'street', 'management_company', 'number_entrances', 'area', 'house_number', 'result'],
             headers: [
                 {
                     text: 'Город',

@@ -54,7 +54,8 @@ export default {
                     value: 'password',
                     visibility: 'd-none',
                 }
-            ]
+            ],
+            searchValue: ['name','email','phone','login'],
         }
     })
 }

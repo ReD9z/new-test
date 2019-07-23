@@ -63,6 +63,7 @@ export default {
                     visibility: 'd-none',
                 }
             ],
+            searchValue: ['name','email','phone','login','city','moderator'],
             search: true,
             pagination: true,
             excel: false

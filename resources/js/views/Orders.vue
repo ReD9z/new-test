@@ -74,6 +74,7 @@ export default {
                     visibility: 'd-none',
                 }
             ],
+            searchValue: ['actual_title', 'order_start_date', 'order_end_date'],
             search: true,
             pagination: true,
             excel: false

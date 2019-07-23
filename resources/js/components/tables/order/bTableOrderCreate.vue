@@ -3,6 +3,14 @@
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-btn color="info" large @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
+            Сохранить
+            <template v-slot:loaderSaveBtn>
+                <span class="custom-loader">
+                <v-icon light>cached</v-icon>
+                </span>
+            </template>
+        </v-btn>
         <v-btn color="green" large class="mb-2 white--text" to="orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
     </v-toolbar>
     <v-card>
@@ -85,8 +93,7 @@
     </v-card>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
-            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details>
-            </v-text-field>
+            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
         <v-icon>filter_list</v-icon>
@@ -148,7 +155,7 @@
             </td>
         </template>
     </v-data-table>
-    <v-flex class="text-xs-center" mt-4>
+    <!-- <v-flex class="text-xs-center" mt-4>
         <v-btn color="info" large @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
             Сохранить
             <template v-slot:loaderSaveBtn>
@@ -157,11 +164,12 @@
                 </span>
             </template>
         </v-btn>
-    </v-flex>
+    </v-flex> -->
 </div>
 </template>
 <script>
 import XLSX from 'xlsx';
+
 export default {
     data: () => ({
         search: '',
@@ -359,10 +367,16 @@ export default {
                         }
                     })
                     .then(response => {
-                        this.editedItem = [];
-                        this.selected = [];
-                        this.loaderSaveBtn=null;
-                        this.loadingSaveBtn=false;
+                        // this.$route.router.go('/orders-address/' + this.editedItem.id);
+                        // console.log(response);
+                        // router.push({ name: 'orders-address', params: { id: response.data.id }});
+                        this.$router.push(`orders-address/${response.data.id}`);
+                        // router.push({ path: `/orders-address/${response.data.id}`});
+                        // window.location.href = '/orders-address/' + response.data.id;
+                        // this.editedItem = [];
+                        // this.selected = [];
+                        // this.loaderSaveBtn=null;
+                        // this.loadingSaveBtn=false;
                     }).catch(error => {
                         console.log(error);
                 });
@@ -372,6 +386,9 @@ export default {
             this.chips.splice(this.chips.indexOf(item), 1)
             this.chips = [...this.chips]
         }
+    },
+    mounted() {
+    //    this.$router.push('orders-address/3');
     }
 }
 </script>

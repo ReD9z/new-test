@@ -22,6 +22,7 @@ export default {
                     ],
                 }
             ],
+            searchValue: ['title'],
             search: true,
             pagination: true,
             excel: false
