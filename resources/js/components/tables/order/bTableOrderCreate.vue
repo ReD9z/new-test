@@ -49,16 +49,16 @@
                         >
                             <template v-slot:activator="{ on }">
                                 <v-text-field
-                                    v-model="dateStart"
+                                    v-model="dateStartFormatted"
                                     :rules="param.validate"
-                                    hint="YYYY-MM-DD формат"
+                                    hint="Формат дд.мм.гггг"
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker locale="ru" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
                     <div v-if="param.input == 'dateEnd'">
@@ -75,8 +75,8 @@
                         >
                             <template v-slot:activator="{ on }">
                                 <v-text-field
-                                    v-model="dateEnd"
-                                    hint="YYYY-MM-DD формат"
+                                    v-model="dateEndFormatted"
+                                    hint="Формат дд.мм.гггг"
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
@@ -84,7 +84,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker :rules="param.validate" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker locale="ru" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
                 </v-flex>
@@ -177,6 +177,8 @@ export default {
         desserts: [],
         editedIndex: -1,
         editedItem: {},
+        dateStartFormatted: null,
+        dateEndFormatted: null,
         defaultItem: {},
         select: [],
         keywords: '',
@@ -222,6 +224,12 @@ export default {
         this.initializeOrder();
     },
     methods: {
+        formatDate (date) {
+            if (!date) return null
+
+            const [year, month, day] = date.split('-')
+            return `${day}-${month}-${year}`
+        },
         toggleAll () {
             if (this.selected.length) this.selected = []
             else this.selected = this.desserts.slice();
@@ -254,10 +262,11 @@ export default {
 
                                 let dateStart = vm.$moment(vm.dateStart, 'YYYY-MM-DD').unix() * 1000;
                                 let dateEnd = vm.$moment(vm.dateEnd, 'YYYY-MM-DD').unix() * 1000;
-    
-                                if(dateStart >= itemDateStart && dateEnd <= itemDateEnd) {
+
+                                if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
                                     item.result = 'Занято';
                                     item.data = stats;
+                                    item.files = stats.files;
                                     let index = vm.desserts.indexOf(item);
                                     Object.assign(vm.desserts[index], item);
                                 } 
@@ -265,10 +274,12 @@ export default {
                         } else {
                             item.result = 'Свободно';
                             item.data = null;
+                            item.files = null;
                             let index = vm.desserts.indexOf(item);
                             Object.assign(vm.desserts[index], item);
                         }
                     });
+                    this.filteredItems(response.data);
                     this.loading = false;
                 }
             ).catch(error => {

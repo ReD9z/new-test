@@ -175,7 +175,7 @@
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
             </td>
-            <td class="justify-left layout">
+            <td class="justify-center layout px-0">
                 <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
                     image
                 </v-icon>
@@ -185,8 +185,14 @@
             </td>
         </template>
         <template v-slot:no-data>
-            <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
+            <v-flex>По запросу "{{ search }}" ничего не найдено!</v-flex>
+            <!-- <v-btn color="primary" @click="initialize">Сброс</v-btn> -->
         </template>
+        <!-- <template v-slot:no-data>
+            <v-alert :value="true" color="error" icon="warning">
+                По запросу "{{ search }}" ничего не найдено.
+            </v-alert>
+        </template> -->
         <template v-if="selectedStatus" v-slot:footer>
             <td :colspan="params.headers.length">
                 <div class="v-messages theme--light error--text">
@@ -197,6 +203,16 @@
             </td>
         </template>
     </v-data-table>
+    <!-- <v-flex class="text-xs-center" mt-4>
+        <v-btn color="info" large @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
+            Сохранить
+            <template v-slot:loaderSaveBtn>
+                <span class="custom-loader">
+                <v-icon light>cached</v-icon>
+                </span>
+            </template>
+        </v-btn>
+    </v-flex> -->
     <b-maps :items="desserts" v-if="renderComponent"></b-maps>
 </div>
 </template>
@@ -255,9 +271,9 @@ export default {
             this.initialize();
             this.selected = [];
         },
-        search: _.debounce(function () {
+        search : _.debounce(function () {
             this.initialize()
-        }, 400)
+        }, 300)
     },
     created () {
         this.initialize();
@@ -274,25 +290,16 @@ export default {
         filteredItems(data) {
             this.desserts = data;
             let searchTerm = this.search.trim().toLowerCase(),
-            useOr = this.search == "or",
-            AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
-            OR_RegEx = searchTerm.replace(/ +/g,"|"),
-            regExExpression = useOr ? OR_RegEx : AND_RegEx,
-            searchTest = new RegExp(regExExpression, "ig");
-            let thisSearch = this.params.searchValue;
+              useOr = this.search == "or",
+              AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+              OR_RegEx = searchTerm.replace(/ +/g,"|"),
+              regExExpression = useOr ? OR_RegEx : AND_RegEx,
+              searchTest = new RegExp(regExExpression, "ig");
             // if( searchTerm.length < 2 || !this.desserts.length ) return this.desserts;
+
             return this.desserts = this.desserts.filter(function(item) {
-                let arr = [];
-                thisSearch.forEach(function(val) {
-                    arr.push(item[val]);
-                })
-                return searchTest.test(arr.join(" ")); 
+                return searchTest.test([item.city,item.street].join(" ")); 
             });
-        },
-        refreshSearch() {
-            this.loading = true;
-            this.search = '';
-            this.initialize();
         },
         forceRerender() {
             this.renderComponent = false;
@@ -465,7 +472,6 @@ export default {
                     response => {
                         this.forceRerender();   
                         this.initialize();
-                        this.selected = [];
                     }
                 ).catch(error => {
                     console.log(error);
