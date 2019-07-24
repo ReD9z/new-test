@@ -193,15 +193,6 @@
                 По запросу "{{ search }}" ничего не найдено.
             </v-alert>
         </template> -->
-        <template v-if="selectedStatus" v-slot:footer>
-            <td :colspan="params.headers.length">
-                <div class="v-messages theme--light error--text">
-                    <div class="v-messages__wrapper">
-                        <div class="v-messages__message" style="">Выберите адрес!</div>
-                    </div>
-                </div>
-            </td>
-        </template>
     </v-data-table>
     <!-- <v-flex class="text-xs-center" mt-4>
         <v-btn color="info" large @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
@@ -240,7 +231,6 @@ export default {
         dateEnd: null,
         loadingSaveBtn: false,
         loaderSaveBtn: null,
-        selectedStatus: false,
         formData: new FormData(),
         chips: [],
         chipsItem: ['Фильтер1', 'Фильтер2'],
@@ -490,11 +480,7 @@ export default {
             if (this.$refs.forms.validate() == false) {
                 this.snackbar = true;
             } 
-            if(this.selected.length <= 0) {
-                this.selectedStatus = true;
-            }     
-            if(this.$refs.forms.validate() == true && this.selected.length > 0) {
-                this.selectedStatus = false;
+            if(this.$refs.forms.validate() == true) {
                 this.loaderSaveBtn = true;
                 this.loadingSaveBtn = true;
                 axios({

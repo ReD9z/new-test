@@ -29,7 +29,7 @@
                                         :item-text="param.selectText"
                                         item-value="id"
                                         :label="param.text"
-                                        >
+                                    >
                                     </v-autocomplete>
                                 </div>
                             </div>
@@ -134,10 +134,10 @@
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
-        <v-icon>filter_list</v-icon>
         <div>
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
         </div>
+        <v-icon>filter_list</v-icon>
         <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
             <template v-slot:activator="{ on }">
                 <v-btn icon v-on="on">
@@ -164,7 +164,9 @@
                 :key="header.text"
                 :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
-            >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
+            >
+                {{ header.text }}<v-icon small>arrow_upward</v-icon>
+            </th>
             <th class="text-xs-left">
                 Действия
             </th>
@@ -214,7 +216,7 @@ export default {
         loaderSaveBtn: null,
         formData: new FormData(),
         chips: [],
-        chipsItem: ['Фильтер1', 'Фильтер2'],
+        chipsItem: [],
         picker: new Date().toISOString().substr(0, 10),
         valid: true,
         pagination: {
@@ -231,24 +233,85 @@ export default {
         },
         computedDateFormatted () {
             return this.formatDate(this.date)
-        }
+        },
     },
     watch: {
         dialog (val) {
-            val || this.close()
+            val || this.close();
         },
         search: _.debounce(function () {
-            this.initialize()
-        }, 400)
+            this.initialize();
+        }, 400),
+        chips(val) {
+            this.initialize();
+        }
     },
     created () {
         this.initialize();
         this.selectStatus();
+        this.getFiltered();
     },
     methods: {
         editAddress(data) {
             this.listAddressOrder = true;
             this.idOrder = data.id;
+        },
+        async getFiltered() {
+            await this.params.filter.forEach((item) => {
+                axios({
+                    method: 'get',
+                    url: item.api,
+                })
+                .then(
+                    response => {
+                        let data = response.data;
+                        data.filter((items) => {
+                            this.chipsItem.push(items[item.value]);
+                        });
+                    }
+                ).catch(error => {
+                    console.log(error);
+                })
+            })
+        },
+        filtered(data) {
+            // let vm = this;
+            // this.params.filter.forEach((item) => {
+            //     data.forEach((value) => {
+            //         console.log(value.clients_name);
+            //     });
+            //     // console.log(vm.chipsItem);
+            // });
+            // console.log(data);
+            // if(!this.chips) {
+            //     this.initialize();
+            // } else {
+            //     return this.desserts.filter((item) => {
+            //         return item.clients_name === category; 
+            //     });
+            // }
+            // this.chips;
+            
+            if(this.chips) {
+                let searchTerm = this.chips.join(''),
+                useOr = this.chips.join('') == "or",
+                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                searchTest = new RegExp(regExExpression, "ig");
+            
+                let thisSearch = ['clients_name'];
+                return this.desserts = this.desserts.filter(function(item) {
+                    let arr = [];
+                    thisSearch.forEach(function(val) {
+                        arr.push(item[val]);
+                    });
+                    console.log(searchTest.test(arr.join('')));
+                    return searchTest.test(arr.join('')); 
+                });
+            } else {
+                this.initialize();
+            }
         },
         filteredItems(data) {
             this.desserts = data;
@@ -259,7 +322,6 @@ export default {
             regExExpression = useOr ? OR_RegEx : AND_RegEx,
             searchTest = new RegExp(regExExpression, "ig");
             let thisSearch = this.params.searchValue;
-            // if( searchTerm.length < 2 || !this.desserts.length ) return this.desserts;
             return this.desserts = this.desserts.filter(function(item) {
                 let arr = [];
                 thisSearch.forEach(function(val) {
@@ -285,7 +347,7 @@ export default {
                 this.pagination.descending = false
             }
         },
-        initialize () {
+        initialize() {
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
@@ -297,6 +359,7 @@ export default {
                 response => {
                     this.desserts = response.data;
                     this.filteredItems(response.data);
+                    this.filtered(response.data);
                     this.loading = false;
                 }
             ).catch(error => {

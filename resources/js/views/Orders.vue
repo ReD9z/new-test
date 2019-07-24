@@ -10,16 +10,16 @@ export default {
     data: () => ({
         params: {
             orderAddress: {
-                baseUrl: 'api/address_to_orders',
+                baseUrl: '/api/address_to_orders',
                 headers: [
                     {
                         text: 'Клиент',
                         align: 'left',
                         sortable: true,
                         value: 'order_id',
-                        selectText: 'actual_title',
+                        selectText: 'clients_name',
                         TableGetIdName: 'orders',
-                        selectApi: 'api/orders',
+                        selectApi: '/api/orders',
                         input: "select",
                     },
                     {
@@ -29,7 +29,7 @@ export default {
                         value: 'address_id',
                         selectText: 'city',
                         TableGetIdName: 'address',
-                        selectApi: 'api/address',
+                        selectApi: '/api/address',
                         input: "select",
                     },
                     { 
@@ -40,7 +40,7 @@ export default {
                     }
                 ],
             },
-            baseUrl: 'api/orders',
+            baseUrl: '/api/orders',
             user: null,
             headers: [
                 {
@@ -48,9 +48,9 @@ export default {
                     align: 'left',
                     sortable: true,
                     value: 'clients_id',
-                    selectText: 'actual_title',
-                    TableGetIdName: 'actual_title',
-                    selectApi: 'api/clients',
+                    selectText: 'clients_name',
+                    TableGetIdName: 'clients_name',
+                    selectApi: '/api/clients',
                     input: "select",
                 },
                 { 
@@ -74,7 +74,13 @@ export default {
                     visibility: 'd-none',
                 }
             ],
-            searchValue: ['actual_title', 'order_start_date', 'order_end_date'],
+            filter: [
+                {
+                    api: '/api/clients',
+                    value: 'name'
+                },
+            ],
+            searchValue: ['clients_name', 'order_start_date', 'order_end_date'],
             search: true,
             pagination: true,
             excel: false
