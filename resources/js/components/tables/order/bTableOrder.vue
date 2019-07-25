@@ -135,7 +135,7 @@
         </v-flex>
         <v-spacer></v-spacer>
         <div>
-            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
+            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item.data}}</v-chip>
         </div>
         <v-icon>filter_list</v-icon>
         <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
@@ -146,12 +146,17 @@
             </template>
             <v-card>
                 <v-divider></v-divider>
-                <v-list>
-                    <v-list-tile v-for="(item, key) in chipsItem" :key="key">
-                        <v-list-tile-action>
-                            <v-checkbox v-model="chips" :label="item" :value="item"></v-checkbox>
-                        </v-list-tile-action>
-                    </v-list-tile>
+                <v-list v-for="items in params.filter" :key="items.value">
+                    <v-subheader>
+                        {{items.title}}
+                    </v-subheader>
+                    <div v-for="(item, key) in chipsItem" :key="key">
+                        <v-list-tile v-if="items.api == item.api">
+                            <v-list-tile-action>
+                                <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                      </div>
                 </v-list>
             </v-card>
         </v-menu>
@@ -159,8 +164,7 @@
     <v-data-table :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
-            <th
-                v-for="header in props.headers"
+            <th v-for="header in props.headers"
                 :key="header.text"
                 :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
@@ -266,7 +270,11 @@ export default {
                     response => {
                         let data = response.data;
                         data.filter((items) => {
-                            this.chipsItem.push(items[item.value]);
+                            this.chipsItem.push({
+                                data: items[item.value],
+                                api: item.api,
+                                input: item.input
+                            });
                         });
                     }
                 ).catch(error => {
@@ -275,42 +283,19 @@ export default {
             })
         },
         filtered(data) {
-            // let vm = this;
-            // this.params.filter.forEach((item) => {
-            //     data.forEach((value) => {
-            //         console.log(value.clients_name);
-            //     });
-            //     // console.log(vm.chipsItem);
-            // });
-            // console.log(data);
-            // if(!this.chips) {
-            //     this.initialize();
-            // } else {
-            //     return this.desserts.filter((item) => {
-            //         return item.clients_name === category; 
-            //     });
-            // }
-            // this.chips;
-            
-            if(this.chips) {
-                let searchTerm = this.chips.join(''),
-                useOr = this.chips.join('') == "or",
-                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
-                OR_RegEx = searchTerm.replace(/ +/g,"|"),
-                regExExpression = useOr ? OR_RegEx : AND_RegEx,
-                searchTest = new RegExp(regExExpression, "ig");
-            
-                let thisSearch = ['clients_name'];
-                return this.desserts = this.desserts.filter(function(item) {
-                    let arr = [];
-                    thisSearch.forEach(function(val) {
-                        arr.push(item[val]);
+            if(this.chips.length > 0) {
+                let vm = this;
+                let array = [];
+                this.chips.forEach((chip) => {
+                    vm.desserts.filter(function(item) {
+                        if(chip.data === item[chip.input]) {
+                            array.push(item);
+                        }
                     });
-                    console.log(searchTest.test(arr.join('')));
-                    return searchTest.test(arr.join('')); 
                 });
+                this.desserts = array;
             } else {
-                this.initialize();
+                this.desserts = data;
             }
         },
         filteredItems(data) {
@@ -331,6 +316,7 @@ export default {
             });
         },
         refreshSearch() {
+            this.chips = [];
             this.loading = true;
             this.search = '';
             this.initialize();

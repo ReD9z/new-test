@@ -135,24 +135,29 @@
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
-        <v-icon>filter_list</v-icon>
         <div>
-            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
+            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item.data}}</v-chip>
         </div>
+        <v-icon>filter_list</v-icon>
         <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
-            <template v-slot:activator="{on}">
+            <template v-slot:activator="{ on }">
                 <v-btn icon v-on="on">
                     <v-icon>more_vert</v-icon>
                 </v-btn>
             </template>
             <v-card>
                 <v-divider></v-divider>
-                <v-list>
-                    <v-list-tile v-for="(item, key) in chipsItem" :key="key">
-                        <v-list-tile-action>
-                            <v-checkbox v-model="chips" :label="item" :value="item"></v-checkbox>
-                        </v-list-tile-action>
-                    </v-list-tile>
+                <v-list v-for="items in params.filter" :key="items.value">
+                    <v-subheader>
+                        {{items.title}}
+                    </v-subheader>
+                    <div v-for="(item, key) in chipsItem" :key="key">
+                        <v-list-tile v-if="items.api == item.api">
+                            <v-list-tile-action>
+                                <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                      </div>
                 </v-list>
             </v-card>
         </v-menu>
@@ -185,8 +190,8 @@
             </td>
         </template>
         <template v-slot:no-data>
-            <v-flex>По запросу "{{ search }}" ничего не найдено!</v-flex>
-            <!-- <v-btn color="primary" @click="initialize">Сброс</v-btn> -->
+            <!-- <v-flex>По запросу "{{ search }}" ничего не найдено!</v-flex> -->
+            <v-btn color="primary" @click="initialize">Сброс</v-btn>
         </template>
         <!-- <template v-slot:no-data>
             <v-alert :value="true" color="error" icon="warning">
@@ -233,7 +238,7 @@ export default {
         loaderSaveBtn: null,
         formData: new FormData(),
         chips: [],
-        chipsItem: ['Фильтер1', 'Фильтер2'],
+        chipsItem: [],
         valid: true,
         order: [],
         selected: []
@@ -263,12 +268,16 @@ export default {
         },
         search : _.debounce(function () {
             this.initialize()
-        }, 300)
+        }, 300),
+        chips(val) {
+            this.initialize();
+        }
     },
     created () {
         this.initialize();
         this.selectStatus();
         this.initializeOrder();
+        this.getFiltered();
     },
     methods: {
         formatDate (date) {
@@ -276,6 +285,44 @@ export default {
 
             const [year, month, day] = date.split('-')
             return `${day}-${month}-${year}`
+        },
+        async getFiltered() {
+            await this.params.filter.forEach((item) => {
+                axios({
+                    method: 'get',
+                    url: item.api,
+                })
+                .then(
+                    response => {
+                        let data = response.data;
+                        data.filter((items) => {
+                            this.chipsItem.push({
+                                data: items[item.value],
+                                api: item.api,
+                                input: item.input
+                            });
+                        });
+                    }
+                ).catch(error => {
+                    console.log(error);
+                })
+            })
+        },
+        filtered(data) {
+            if(this.chips.length > 0) {
+                let vm = this;
+                let array = [];
+                this.chips.forEach((chip) => {
+                    vm.desserts.filter(function(item) {
+                        if(chip.data === item[chip.input]) {
+                            array.push(item);
+                        }
+                    });
+                });
+                this.desserts = array;
+            } else {
+                this.desserts = data;
+            }
         },
         filteredItems(data) {
             this.desserts = data;
@@ -337,6 +384,12 @@ export default {
                 }
             );
         },
+        refreshSearch() {
+            this.chips = [];
+            this.loading = true;
+            this.search = '';
+            this.initialize();
+        },
         resetFilesLoad() {
             this.files = [];
             this.$refs.images.value = '';
@@ -382,11 +435,11 @@ export default {
                     this.desserts.map(function (item) {
                         if(item.status) {
                             let test = item.status.map(function (stats) {
-                                let itemDateStart = vm.$moment(stats.orders.order_start_date, 'YYYY-MM-DD').unix() * 1000;
-                                let itemDateEnd = vm.$moment(stats.orders.order_end_date, 'YYYY-MM-DD').unix() * 1000;
+                                let itemDateStart = vm.$moment(stats.orders.order_start_date, 'DD-MM-YYYY').unix() * 1000;
+                                let itemDateEnd = vm.$moment(stats.orders.order_end_date, 'DD-MM-YYYY').unix() * 1000;
 
-                                let dateStart = vm.$moment(vm.dateStart, 'YYYY-MM-DD').unix() * 1000;
-                                let dateEnd = vm.$moment(vm.dateEnd, 'YYYY-MM-DD').unix() * 1000;
+                                let dateStart = vm.$moment(vm.dateStart, 'DD-MM-YYYY').unix() * 1000;
+                                let dateEnd = vm.$moment(vm.dateEnd, 'DD-MM-YYYY').unix() * 1000;
 
                                 if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
                                     item.result = 'Занято';
@@ -404,6 +457,7 @@ export default {
                             Object.assign(vm.desserts[index], item);
                         }
                     });
+                    this.filtered(response.data);
                     this.filteredItems(response.data);
                     this.loading = false;
                 }

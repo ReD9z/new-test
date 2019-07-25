@@ -76,9 +76,11 @@ export default {
             ],
             filter: [
                 {
+                    title: 'Клиенты',
                     api: '/api/clients',
-                    value: 'name'
-                },
+                    value: 'name',
+                    input: 'clients_name'
+                }
             ],
             searchValue: ['clients_name', 'order_start_date', 'order_end_date'],
             search: true,

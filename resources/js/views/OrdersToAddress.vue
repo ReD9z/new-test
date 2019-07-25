@@ -100,6 +100,14 @@ export default {
                     visibility: 'd-none',
                 }
             ],
+            filter: [
+                {
+                    title: 'Адреса',
+                    api: '/api/cities_to_works',
+                    value: 'name',
+                    input: 'city'
+                }
+            ],
             search: true,
             pagination: true,
             excel: false

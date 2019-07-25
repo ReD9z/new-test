@@ -257,11 +257,11 @@ export default {
                     this.desserts.map(function (item) {
                         if(item.status) {
                             let test = item.status.map(function (stats) {
-                                let itemDateStart = vm.$moment(stats.orders.order_start_date, 'YYYY-MM-DD').unix() * 1000;
-                                let itemDateEnd = vm.$moment(stats.orders.order_end_date, 'YYYY-MM-DD').unix() * 1000;
+                                let itemDateStart = vm.$moment(stats.orders.order_start_date, 'DD-MM-YYYY').unix() * 1000;
+                                let itemDateEnd = vm.$moment(stats.orders.order_end_date, 'DD-MM-YYYY').unix() * 1000;
 
-                                let dateStart = vm.$moment(vm.dateStart, 'YYYY-MM-DD').unix() * 1000;
-                                let dateEnd = vm.$moment(vm.dateEnd, 'YYYY-MM-DD').unix() * 1000;
+                                let dateStart = vm.$moment(vm.dateStart, 'DD-MM-YYYY').unix() * 1000;
+                                let dateEnd = vm.$moment(vm.dateEnd, 'DD-MM-YYYY').unix() * 1000;
 
                                 if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
                                     item.result = 'Занято';
