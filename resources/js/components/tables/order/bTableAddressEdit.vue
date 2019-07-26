@@ -1,5 +1,5 @@
 <template>
-<div>
+<v-flex>
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>Заказ №{{order.id}}</v-toolbar-title>
         <v-spacer></v-spacer>
@@ -17,10 +17,10 @@
         <v-card-text>
             <v-form ref="forms" v-model="valid" lazy-validation>
                 <v-flex v-for="(param, key) in params.headerOrders" :key="key" xs12>
-                    <div v-if="param.input == 'text'">
+                    <div v-if="param.input == 'text'" xs12>
                         <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                     </div>
-                    <div v-if="param.input == 'select'">
+                    <div v-if="param.input == 'select'" xs12>
                         <div v-for="item in select" :key="item[0]">
                             <div v-if="item.url == param.selectApi">
                                 <v-autocomplete
@@ -34,7 +34,7 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="param.input == 'dateStart'">
+                    <div v-if="param.input == 'dateStart'" xs6>
                         <v-menu
                             v-model="param.close"
                             :close-on-content-click="false"
@@ -60,7 +60,7 @@
                             <v-date-picker locale="ru" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </div>
-                    <div v-if="param.input == 'dateEnd'">
+                    <div v-if="param.input == 'dateEnd'" xs6>
                         <v-menu
                             v-model="param.close"
                             :close-on-content-click="false"
@@ -152,7 +152,12 @@
                         {{items.title}}
                     </v-subheader>
                     <div v-for="(item, key) in chipsItem" :key="key">
-                        <v-list-tile v-if="items.api == item.api">
+                        <v-list-tile v-if="item.api && items.api == item.api">
+                            <v-list-tile-action>
+                                <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                        <v-list-tile v-if="item.text && items.text == item.text">
                             <v-list-tile-action>
                                 <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
                             </v-list-tile-action>
@@ -190,27 +195,11 @@
             </td>
         </template>
         <template v-slot:no-data>
-            <!-- <v-flex>По запросу "{{ search }}" ничего не найдено!</v-flex> -->
-            <v-btn color="primary" @click="initialize">Сброс</v-btn>
+            <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
-        <!-- <template v-slot:no-data>
-            <v-alert :value="true" color="error" icon="warning">
-                По запросу "{{ search }}" ничего не найдено.
-            </v-alert>
-        </template> -->
     </v-data-table>
-    <!-- <v-flex class="text-xs-center" mt-4>
-        <v-btn color="info" large @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
-            Сохранить
-            <template v-slot:loaderSaveBtn>
-                <span class="custom-loader">
-                <v-icon light>cached</v-icon>
-                </span>
-            </template>
-        </v-btn>
-    </v-flex> -->
     <b-maps :items="desserts" v-if="renderComponent"></b-maps>
-</div>
+</v-flex>
 </template>
 <script>
 import XLSX from 'xlsx';
@@ -262,7 +251,7 @@ export default {
             this.selected = [];
         },
         dateEnd(after, before) {
-            this.dateEndFormatted = this.formatDate(this.dateStart);
+            this.dateEndFormatted = this.formatDate(this.dateEnd);
             this.initialize();
             this.selected = [];
         },
@@ -280,33 +269,44 @@ export default {
         this.getFiltered();
     },
     methods: {
-        formatDate (date) {
+      formatDate (date) {
             if (!date) return null
 
-            const [year, month, day] = date.split('-')
+            const [day, month, year] = date.split('-')
+            console.log(date);
             return `${day}-${month}-${year}`
         },
         async getFiltered() {
             await this.params.filter.forEach((item) => {
-                axios({
-                    method: 'get',
-                    url: item.api,
-                })
-                .then(
-                    response => {
-                        let data = response.data;
-                        data.filter((items) => {
-                            this.chipsItem.push({
-                                data: items[item.value],
-                                api: item.api,
-                                input: item.input
+                if(item.api) {
+                    axios({
+                        method: 'get',
+                        url: item.api,
+                    })
+                    .then(
+                        response => {
+                            let data = response.data;
+                            data.filter((items) => {
+                                this.chipsItem.push({
+                                    data: items[item.value],
+                                    api: item.api,
+                                    input: item.input
+                                });
                             });
+                        }
+                    ).catch(error => {
+                        console.log(error);
+                    })
+                } else {
+                    item.data.filter((items) => {
+                        this.chipsItem.push({
+                            data: items[item.value],
+                            text: item.text,
+                            input: item.input
                         });
-                    }
-                ).catch(error => {
-                    console.log(error);
-                })
-            })
+                    });
+                }
+            });
         },
         filtered(data) {
             if(this.chips.length > 0) {
@@ -319,23 +319,26 @@ export default {
                         }
                     });
                 });
-                this.desserts = array;
+                return this.desserts = array;
             } else {
-                this.desserts = data;
+                return this.desserts = data;
             }
         },
         filteredItems(data) {
             this.desserts = data;
             let searchTerm = this.search.trim().toLowerCase(),
-              useOr = this.search == "or",
-              AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
-              OR_RegEx = searchTerm.replace(/ +/g,"|"),
-              regExExpression = useOr ? OR_RegEx : AND_RegEx,
-              searchTest = new RegExp(regExExpression, "ig");
-            // if( searchTerm.length < 2 || !this.desserts.length ) return this.desserts;
-
+            useOr = this.search == "or",
+            AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+            OR_RegEx = searchTerm.replace(/ +/g,"|"),
+            regExExpression = useOr ? OR_RegEx : AND_RegEx,
+            searchTest = new RegExp(regExExpression, "ig");
+            let thisSearch = this.params.searchValue;
             return this.desserts = this.desserts.filter(function(item) {
-                return searchTest.test([item.city,item.street].join(" ")); 
+                let arr = [];
+                thisSearch.forEach(function(val) {
+                    arr.push(item[val]);
+                })
+                return searchTest.test(arr.join(" ")); 
             });
         },
         forceRerender() {
@@ -457,8 +460,8 @@ export default {
                             Object.assign(vm.desserts[index], item);
                         }
                     });
-                    this.filtered(response.data);
                     this.filteredItems(response.data);
+                    this.filtered(this.desserts);
                     this.loading = false;
                 }
             ).catch(error => {

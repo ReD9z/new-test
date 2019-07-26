@@ -527,9 +527,9 @@ export default {
                 this.loadingSaveBtn = true;
                 let method = null;
                 if (this.editedIndex > -1) {
-                    method = 'put'
+                    method = 'put';
                 } else {
-                    method = 'post'
+                    method = 'post';
                 }
                 axios({
                     method: method,

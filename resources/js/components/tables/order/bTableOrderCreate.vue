@@ -209,14 +209,16 @@ export default {
         dialog (val) {
             val || this.close()
         },
-        dateStart(after, before) {
+        dateStart(val) {
+            this.dateStartFormatted = this.formatDate(this.dateStart);
             this.initialize();
             this.selected = [];
         },
         dateEnd(after, before) {
+            this.dateEndFormatted = this.formatDate(this.dateEnd);
             this.initialize();
             this.selected = [];
-        }
+        },
     },
     created () {
         this.initialize();
@@ -227,7 +229,7 @@ export default {
         formatDate (date) {
             if (!date) return null
 
-            const [year, month, day] = date.split('-')
+            const [day, month, year] = date.split('-')
             return `${day}-${month}-${year}`
         },
         toggleAll () {
