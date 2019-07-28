@@ -147,11 +147,11 @@
             </template>
             <v-card>
                 <v-divider></v-divider>
-                <v-list v-for="items in params.filter" :key="items.value">
+                <v-list v-for="(items, keys) in params.filter" :key="`A-${keys}`">
                     <v-subheader>
                         {{items.title}}
                     </v-subheader>
-                    <div v-for="(item, key) in chipsItem" :key="key">
+                    <div v-for="(item, key) in chipsItem" :key="`A-${key}`">
                         <v-list-tile v-if="item.api && items.api == item.api">
                             <v-list-tile-action>
                                 <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
@@ -179,10 +179,22 @@
                 >
                 </v-checkbox>
             </td>
-            <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
+            <td v-for="(param, key) in params.headers" :key="`A-${key}`" :class="param.visibility">
                 <v-flex v-if="param.input !== 'images' && param.value !== 'params'">
-                    <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
-                    <v-flex v-else>{{props.item[param.value]}}</v-flex>
+                    <v-flex v-if="param.selectText">
+                        {{props.item[param.TableGetIdName]}}
+                    </v-flex>
+                    <v-flex v-else>
+                        <span v-if="param.value == 'result' && props.item[param.value] === 'Занято'" style="font-weight: bold; color:red">
+                            {{props.item[param.value]}}
+                        </span>
+                        <span v-if="param.value == 'result' && props.item[param.value] === 'Свободен'" style="font-weight: bold; color:green">
+                            {{props.item[param.value]}}
+                        </span>
+                        <span v-if="param.value != 'result'">
+                            {{props.item[param.value]}}
+                        </span>
+                    </v-flex>
                 </v-flex>
             </td>
             <td class="justify-center layout px-0">
@@ -246,12 +258,12 @@ export default {
             val || this.close()
         },
         dateStart(val) {
-            this.dateStartFormatted = this.formatDate(this.dateStart);
+            this.dateStartFormatted = this.formatDate(val);
             this.initialize();
             this.selected = [];
         },
-        dateEnd(after, before) {
-            this.dateEndFormatted = this.formatDate(this.dateEnd);
+        dateEnd(val) {
+            this.dateEndFormatted = this.formatDate(val);
             this.initialize();
             this.selected = [];
         },
@@ -269,12 +281,9 @@ export default {
         this.getFiltered();
     },
     methods: {
-      formatDate (date) {
+        formatDate (date) {
             if (!date) return null
-
-            const [day, month, year] = date.split('-')
-            console.log(date);
-            return `${day}-${month}-${year}`
+            return this.$moment(date).format("DD-MM-YYYY");
         },
         async getFiltered() {
             await this.params.filter.forEach((item) => {
@@ -435,14 +444,17 @@ export default {
                 response => {
                     this.desserts = response.data;
                     let vm = this;
+
+                    let date1 = this.dateStartFormatted;
+                    let date2 = this.dateEndFormatted;
+
                     this.desserts.map(function (item) {
                         if(item.status) {
-                            let test = item.status.map(function (stats) {
-                                let itemDateStart = vm.$moment(stats.orders.order_start_date, 'DD-MM-YYYY').unix() * 1000;
-                                let itemDateEnd = vm.$moment(stats.orders.order_end_date, 'DD-MM-YYYY').unix() * 1000;
-
-                                let dateStart = vm.$moment(vm.dateStart, 'DD-MM-YYYY').unix() * 1000;
-                                let dateEnd = vm.$moment(vm.dateEnd, 'DD-MM-YYYY').unix() * 1000;
+                            return item.status.map(function (stats) {
+                                let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
+                                let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
+                                let dateStart = vm.$moment(date1, 'DD-MM-YYYY').unix() * 1000;
+                                let dateEnd = vm.$moment(date2, 'DD-MM-YYYY').unix() * 1000;
 
                                 if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
                                     item.result = 'Занято';
@@ -502,8 +514,8 @@ export default {
         },
         editItem (item) {
             this.editedItem = Object.assign({}, item);
-            this.dateStart = item.order_start_date;
-            this.dateEnd =  item.order_end_date;
+            this.dateStartFormatted = item.order_start_date;
+            this.dateEndFormatted =  item.order_end_date;
         },
         editPhotos(item) {
             this.addOrderImages = Object.assign({}, item.data);
@@ -546,8 +558,8 @@ export default {
                         data: {
                             order: this.editedItem,
                             address: this.selected.filter(item => item.result !== 'Занято'),
-                            dateStart: this.dateStart,
-                            dateEnd: this.dateEnd
+                            dateStart: this.dateStartFormatted,
+                            dateEnd: this.dateEndFormatted
                         }
                     })
                     .then(response => {

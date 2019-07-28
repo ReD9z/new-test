@@ -98,7 +98,7 @@
         <v-spacer></v-spacer>
         <v-icon>filter_list</v-icon>
         <div>
-            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
+            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item.data}}</v-chip>
         </div>
         <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
             <template v-slot:activator="{on}">
@@ -108,17 +108,27 @@
             </template>
             <v-card>
                 <v-divider></v-divider>
-                <v-list>
-                    <v-list-tile v-for="(item, key) in chipsItem" :key="key">
-                        <v-list-tile-action>
-                            <v-checkbox v-model="chips" :label="item" :value="item"></v-checkbox>
-                        </v-list-tile-action>
-                    </v-list-tile>
+                <v-list v-for="items in params.filter" :key="items.value">
+                    <v-subheader>
+                        {{items.title}}
+                    </v-subheader>
+                    <div v-for="(item, key) in chipsItem" :key="key">
+                        <v-list-tile v-if="item.api && items.api == item.api">
+                            <v-list-tile-action>
+                                <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                        <v-list-tile v-if="item.text && items.text == item.text">
+                            <v-list-tile-action>
+                                <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                      </div>
                 </v-list>
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table v-model="selected" select-all :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table v-model="selected" select-all :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:items="props">
             <td>
@@ -133,7 +143,17 @@
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
                 <v-flex v-if="param.input !== 'images' && param.value !== 'params'">
                     <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
-                    <v-flex v-else>{{props.item[param.value]}}</v-flex>
+                    <v-flex v-else>
+                        <span v-if="param.value == 'result' && props.item[param.value] === 'Занято'" style="font-weight: bold; color:red">
+                            {{props.item[param.value]}}
+                        </span>
+                        <span v-if="param.value == 'result' && props.item[param.value] === 'Свободен'" style="font-weight: bold; color:green">
+                            {{props.item[param.value]}}
+                        </span>
+                        <span v-if="param.value != 'result'">
+                            {{props.item[param.value]}}
+                        </span>
+                    </v-flex>
                 </v-flex>
             </td>
         </template>
@@ -189,7 +209,7 @@ export default {
         selectedStatus: false,
         formData: new FormData(),
         chips: [],
-        chipsItem: ['Фильтер1', 'Фильтер2'],
+        chipsItem: [],
         valid: true,
         order: [],
         selected: []
@@ -200,9 +220,6 @@ export default {
     computed: {
         formTitle () {
             return this.editedIndex === -1 ? 'Добавить' : 'Редактировать'
-        },
-        computedDateFormatted () {
-            return this.formatDate(this.date)
         }
     },
     watch: {
@@ -214,16 +231,23 @@ export default {
             this.initialize();
             this.selected = [];
         },
-        dateEnd(after, before) {
+        dateEnd(val) {
             this.dateEndFormatted = this.formatDate(this.dateEnd);
             this.initialize();
             this.selected = [];
         },
+        search : _.debounce(function () {
+            this.initialize()
+        }, 300),
+        chips(val) {
+            this.initialize();
+        }
     },
     created () {
         this.initialize();
         this.selectStatus();
         this.initializeOrder();
+        this.getFiltered();
     },
     methods: {
         formatDate (date) {
@@ -243,6 +267,71 @@ export default {
                 this.pagination.sortBy = column
                 this.pagination.descending = false
             }
+        },
+        async getFiltered() {
+            await this.params.filter.forEach((item) => {
+                if(item.api) {
+                    axios({
+                        method: 'get',
+                        url: item.api,
+                    })
+                    .then(
+                        response => {
+                            let data = response.data;
+                            data.filter((items) => {
+                                this.chipsItem.push({
+                                    data: items[item.value],
+                                    api: item.api,
+                                    input: item.input
+                                });
+                            });
+                        }
+                    ).catch(error => {
+                        console.log(error);
+                    })
+                } else {
+                    item.data.filter((items) => {
+                        this.chipsItem.push({
+                            data: items[item.value],
+                            text: item.text,
+                            input: item.input
+                        });
+                    });
+                }
+            });
+        },
+        filtered(data) {
+            if(this.chips.length > 0) {
+                let vm = this;
+                let array = [];
+                this.chips.forEach((chip) => {
+                    vm.desserts.filter(function(item) {
+                        if(chip.data === item[chip.input]) {
+                            array.push(item);
+                        }
+                    });
+                });
+                return this.desserts = array;
+            } else {
+                return this.desserts = data;
+            }
+        },
+        filteredItems(data) {
+            this.desserts = data;
+            let searchTerm = this.search.trim().toLowerCase(),
+            useOr = this.search == "or",
+            AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+            OR_RegEx = searchTerm.replace(/ +/g,"|"),
+            regExExpression = useOr ? OR_RegEx : AND_RegEx,
+            searchTest = new RegExp(regExExpression, "ig");
+            let thisSearch = this.params.searchValue;
+            return this.desserts = this.desserts.filter(function(item) {
+                let arr = [];
+                thisSearch.forEach(function(val) {
+                    arr.push(item[val]);
+                })
+                return searchTest.test(arr.join(" ")); 
+            });
         },
         initialize() {
             axios({
@@ -282,6 +371,7 @@ export default {
                         }
                     });
                     this.filteredItems(response.data);
+                    this.filtered(this.desserts);
                     this.loading = false;
                 }
             ).catch(error => {

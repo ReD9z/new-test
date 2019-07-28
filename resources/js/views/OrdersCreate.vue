@@ -47,6 +47,21 @@ export default {
                 }
             ],
             searchValue: ['city', 'street', 'management_company', 'number_entrances', 'area', 'house_number', 'result'],
+            filter: [
+                {
+                    title: 'Адреса',
+                    api: '/api/cities_to_works',
+                    value: 'name',
+                    input: 'city'
+                },
+                {
+                    data: [{ result: 'Занято' },{ result: 'Свободен' }],
+                    title: 'Статус',
+                    value: 'result',
+                    text: 'status',
+                    input: 'result'
+                }
+            ],
             headers: [
                 {
                     text: 'Город',
