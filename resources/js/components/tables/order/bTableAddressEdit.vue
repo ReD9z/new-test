@@ -35,7 +35,7 @@
                         </div>
                     </div>
                     <div v-if="param.input == 'dateStart'" xs6>
-                        <v-menu
+                       <v-menu
                             v-model="param.close"
                             :close-on-content-click="false"
                             :nudge-right="40"
@@ -54,6 +54,7 @@
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
+                                    @blur="dateStart = parseDate(dateStartFormatted)"
                                     v-on="on"
                                 ></v-text-field>
                             </template>
@@ -79,6 +80,7 @@
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
+                                    @blur="dateEnd = parseDate(dateEndFormatted)"
                                     :rules="param.validate"
                                     v-on="on"
                                 ></v-text-field>
@@ -216,7 +218,7 @@
 <script>
 import XLSX from 'xlsx';
 export default {
-    data: () => ({
+    data: vm => ({
         search: '',
         dialogImages: false,
         files: [],
@@ -242,7 +244,9 @@ export default {
         chipsItem: [],
         valid: true,
         order: [],
-        selected: []
+        selected: [],
+        date: new Date().toISOString().substr(0, 10),
+        dateFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
     }),
     props: {
         params: Object,
@@ -258,32 +262,40 @@ export default {
             val || this.close()
         },
         dateStart(val) {
-            this.dateStartFormatted = this.formatDate(val);
+            this.dateStartFormatted = this.formatDate(this.dateStart);
             this.initialize();
             this.selected = [];
         },
         dateEnd(val) {
-            this.dateEndFormatted = this.formatDate(val);
+            this.dateEndFormatted = this.formatDate(this.dateEnd);
             this.initialize();
             this.selected = [];
         },
         search : _.debounce(function () {
-            this.initialize()
+            this.initialize();
         }, 300),
         chips(val) {
             this.initialize();
         }
     },
-    created () {
-        this.initialize();
-        this.selectStatus();
-        this.initializeOrder();
-        this.getFiltered();
+    async created () {
+        await this.initializeOrder();
+        await this.initialize();
+        await this.selectStatus();
+        await this.getFiltered();
     },
     methods: {
         formatDate (date) {
             if (!date) return null
-            return this.$moment(date).format("DD-MM-YYYY");
+
+            const [year, month, day] = date.split('-')
+            return `${day}-${month}-${year}`
+        },
+        parseDate (date) {
+            if (!date) return null
+
+            const [year, month, day] = date.split('-')
+            return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`
         },
         async getFiltered() {
             await this.params.filter.forEach((item) => {
@@ -433,6 +445,7 @@ export default {
             );
         },
         initialize() {
+            this.loading = true;
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
@@ -444,37 +457,38 @@ export default {
                 response => {
                     this.desserts = response.data;
                     let vm = this;
-
-                    let date1 = this.dateStartFormatted;
-                    let date2 = this.dateEndFormatted;
-
-                    this.desserts.map(function (item) {
-                        if(item.status) {
-                            return item.status.map(function (stats) {
-                                let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
-                                let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
-                                let dateStart = vm.$moment(date1, 'DD-MM-YYYY').unix() * 1000;
-                                let dateEnd = vm.$moment(date2, 'DD-MM-YYYY').unix() * 1000;
-
-                                if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
-                                    item.result = 'Занято';
-                                    item.data = stats;
-                                    item.files = stats.files;
-                                    let index = vm.desserts.indexOf(item);
-                                    Object.assign(vm.desserts[index], item);
-                                } 
-                            });
-                        } else {
-                            item.result = 'Свободно';
-                            item.data = null;
-                            item.files = null;
-                            let index = vm.desserts.indexOf(item);
-                            Object.assign(vm.desserts[index], item);
-                        }
-                    });
-                    this.filteredItems(response.data);
-                    this.filtered(this.desserts);
-                    this.loading = false;
+                    if(!this.dateStartFormatted && !this.dateEndFormatted) {
+                        this.initialize();
+                    } else {
+                        this.desserts.map(function (item) {
+                            if(item.status.length > 0) {
+                                return item.status.map(function (stats) {
+                                    let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
+                                    let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
+                                    let dateStart = vm.$moment(vm.dateStartFormatted, 'DD-MM-YYYY').unix() * 1000;
+                                    let dateEnd = vm.$moment(vm.dateEndFormatted, 'DD-MM-YYYY').unix() * 1000;
+    
+                                    if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
+                                        item.result = 'Занято';
+                                        item.data = stats;
+                                        item.files = stats.files;
+                                        let index = vm.desserts.indexOf(item);
+                                        Object.assign(vm.desserts[index], item);
+                                    } 
+                                });
+                            } 
+                            // else {
+                            //     item.result = 'Свободно';
+                            //     item.data = null;
+                            //     item.files = null;
+                            //     let index = vm.desserts.indexOf(item);
+                            //     Object.assign(vm.desserts[index], item);
+                            // }
+                        });
+                        this.filteredItems(this.desserts);
+                        this.filtered(this.desserts);
+                        this.loading = false;
+                    }
                 }
             ).catch(error => {
                 console.log(error);
@@ -514,8 +528,8 @@ export default {
         },
         editItem (item) {
             this.editedItem = Object.assign({}, item);
-            this.dateStartFormatted = item.order_start_date;
-            this.dateEndFormatted =  item.order_end_date;
+            this.dateStartFormatted = this.order.order_start_date;
+            this.dateEndFormatted =  this.order.order_end_date;
         },
         editPhotos(item) {
             this.addOrderImages = Object.assign({}, item.data);
