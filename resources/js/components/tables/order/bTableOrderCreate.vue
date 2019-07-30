@@ -16,26 +16,27 @@
     <v-card>
         <v-card-text>
             <v-form ref="forms" v-model="valid" lazy-validation>
-                <v-flex v-for="(param, key) in params.headerOrders" :key="key" xs12>
-                    <div v-if="param.input == 'text'">
-                        <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
-                    </div>
-                    <div v-if="param.input == 'select'">
-                        <div v-for="item in select" :key="item[0]">
-                            <div v-if="item.url == param.selectApi">
-                                <v-autocomplete
-                                    :items="item.data"
-                                    v-model="editedItem[param.value]"
-                                    :item-text="param.selectText"
-                                    item-value="id"
-                                    :label="param.text"
-                                    :rules="param.validate"
-                                    >
-                                </v-autocomplete>
+                <v-layout row wrap>
+                    <v-flex v-for="(param, key) in params.headerOrders" :key="`Y-${key}`" xs12>
+                        <div v-if="param.input == 'text'" xs12>
+                            <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                        </div>
+                        <div v-if="param.input == 'select'" xs12>
+                            <div v-for="item in select" :key="item[0]">
+                                <div v-if="item.url == param.selectApi">
+                                    <v-autocomplete
+                                        :items="item.data"
+                                        v-model="editedItem[param.value]"
+                                        :item-text="param.selectText"
+                                        item-value="id"
+                                        :label="param.text"
+                                        >
+                                    </v-autocomplete>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div v-if="param.input == 'dateStart'">
+                    </v-flex>
+                    <v-flex v-for="(param, key) in params.headerOrders" v-if="param.input == 'dateStart'" :key="`C-${key}`" xs12 lg6>
                         <v-menu
                             v-model="param.close"
                             :close-on-content-click="false"
@@ -60,8 +61,8 @@
                             </template>
                             <v-date-picker locale="ru" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
-                    </div>
-                    <div v-if="param.input == 'dateEnd'">
+                    </v-flex>
+                    <v-flex v-for="(param, key) in params.headerOrders" v-if="param.input == 'dateEnd'" :key="`B-${key}`" xs12 lg6>
                         <v-menu
                             v-model="param.close"
                             :close-on-content-click="false"
@@ -86,8 +87,8 @@
                             </template>
                             <v-date-picker locale="ru" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
-                    </div>
-                </v-flex>
+                    </v-flex>
+                </v-layout>
             </v-form>
         </v-card-text>
     </v-card>
@@ -158,7 +159,7 @@
             </td>
         </template>
         <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Сброс</v-btn>
+            <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
         <template v-slot:no-results>
             <v-alert :value="true" color="error" icon="warning">
@@ -191,19 +192,19 @@
 import XLSX from 'xlsx';
 
 export default {
-    data: () => ({
+    data: vm => ({
         search: '',
         loading: true,
         desserts: [],
         editedIndex: -1,
         editedItem: {},
-        dateStartFormatted: null,
-        dateEndFormatted: null,
+        dateStartFormatted: vm.formatDate(vm.getDate()),
+        dateEndFormatted: vm.formatDate(vm.getDate()),
         defaultItem: {},
         select: [],
         keywords: '',
-        dateStart: null,
-        dateEnd: null,
+        dateStart: vm.formatDate(vm.getDate()),
+        dateEnd: vm.formatDate(vm.getDate()),
         loadingSaveBtn: false,
         loaderSaveBtn: null,
         selectedStatus: false,
@@ -250,6 +251,12 @@ export default {
         this.getFiltered();
     },
     methods: {
+        getDate() {
+            // var now = new Date().toISOString().substr(0, 10);
+            // this.$moment(now).startOf('week').isoWeekday(1)
+            var next_week_start = this.$moment();
+            return next_week_start.toISOString().substr(0, 10);
+        },
         formatDate (date) {
             if (!date) return null
 
@@ -484,6 +491,12 @@ export default {
                         console.log(error);
                 });
             }
+        },
+        refreshSearch() {
+            this.chips = [];
+            this.loading = true;
+            this.search = '';
+            this.initialize();
         },
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)

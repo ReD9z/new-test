@@ -16,26 +16,28 @@
     <v-card>
         <v-card-text>
             <v-form ref="forms" v-model="valid" lazy-validation>
-                <v-flex v-for="(param, key) in params.headerOrders" :key="key" xs12>
-                    <div v-if="param.input == 'text'" xs12>
-                        <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
-                    </div>
-                    <div v-if="param.input == 'select'" xs12>
-                        <div v-for="item in select" :key="item[0]">
-                            <div v-if="item.url == param.selectApi">
-                                <v-autocomplete
-                                    :items="item.data"
-                                    v-model="editedItem[param.value]"
-                                    :item-text="param.selectText"
-                                    item-value="id"
-                                    :label="param.text"
-                                    >
-                                </v-autocomplete>
+                <v-layout row wrap>
+                    <v-flex v-for="(param, key) in params.headerOrders" :key="`Y-${key}`" xs12>
+                        <div v-if="param.input == 'text'" xs12>
+                            <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                        </div>
+                        <div v-if="param.input == 'select'" xs12>
+                            <div v-for="item in select" :key="item[0]">
+                                <div v-if="item.url == param.selectApi">
+                                    <v-autocomplete
+                                        :items="item.data"
+                                        v-model="editedItem[param.value]"
+                                        :item-text="param.selectText"
+                                        item-value="id"
+                                        :label="param.text"
+                                        >
+                                    </v-autocomplete>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div v-if="param.input == 'dateStart'" xs6>
-                       <v-menu
+                    </v-flex>
+                    <v-flex v-for="(param, key) in params.headerOrders" v-if="param.input == 'dateStart'"  :key="`T-${key}`" xs12 lg6>
+                        <v-menu
                             v-model="param.close"
                             :close-on-content-click="false"
                             :nudge-right="40"
@@ -54,14 +56,13 @@
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
-                                    @blur="dateStart = parseDate(dateStartFormatted)"
                                     v-on="on"
                                 ></v-text-field>
                             </template>
                             <v-date-picker locale="ru" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
-                    </div>
-                    <div v-if="param.input == 'dateEnd'" xs6>
+                    </v-flex>
+                    <v-flex v-for="(param, key) in params.headerOrders" v-if="param.input == 'dateEnd'"  :key="`M-${key}`" xs12 lg6>
                         <v-menu
                             v-model="param.close"
                             :close-on-content-click="false"
@@ -80,15 +81,14 @@
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
-                                    @blur="dateEnd = parseDate(dateEndFormatted)"
                                     :rules="param.validate"
                                     v-on="on"
                                 ></v-text-field>
                             </template>
                             <v-date-picker locale="ru" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
-                    </div>
-                </v-flex>
+                    </v-flex>
+                </v-layout>
             </v-form>
         </v-card-text>
     </v-card>
@@ -244,9 +244,7 @@ export default {
         chipsItem: [],
         valid: true,
         order: [],
-        selected: [],
-        date: new Date().toISOString().substr(0, 10),
-        dateFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
+        selected: []
     }),
     props: {
         params: Object,
@@ -529,7 +527,7 @@ export default {
         editItem (item) {
             this.editedItem = Object.assign({}, item);
             this.dateStartFormatted = this.order.order_start_date;
-            this.dateEndFormatted =  this.order.order_end_date;
+            this.dateEndFormatted = this.order.order_end_date;
         },
         editPhotos(item) {
             this.addOrderImages = Object.assign({}, item.data);
