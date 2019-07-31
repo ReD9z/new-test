@@ -1,5 +1,30 @@
 <template>
 <div>
+    <v-toolbar color="#fff" fixed app clipped-righ>
+        <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn
+            color="#f2994a"
+            class="white--text"
+            large
+            :loading="loadingExcel"
+            :disabled="loadingExcel"
+            @click='pickExcel'
+            v-show="params.excel"
+        >
+            <v-icon left>vertical_align_bottom</v-icon>
+            Добавить Excel
+            <input
+                type="file"
+                style="display: none"
+                ref="excel"
+                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                @change="elementLoadToFile"
+                multiple
+            >
+        </v-btn>
+        <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Добавить адрес</v-btn>
+    </v-toolbar>
     <v-navigation-drawer v-model="dialog" right temporary fixed>
         <v-card height="100%">
             <v-toolbar color="pink" dark>
@@ -14,6 +39,9 @@
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
                         <div v-if="param.input == 'text'">
                             <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                        </div>
+                        <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
+                            <v-text-field v-model="editedItem[param.value] = param.show"  :rules="param.validate" type="hidden" :label="param.text" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
                             <div v-for="item in select" :key="item[0]">
@@ -127,10 +155,10 @@
             </v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
-        <v-icon>filter_list</v-icon>
         <div>
-            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
+            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item.data}}</v-chip>
         </div>
+        <v-icon>filter_list</v-icon>
         <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
             <template v-slot:activator="{ on }">
                 <v-btn icon v-on="on">
@@ -139,17 +167,27 @@
             </template>
             <v-card>
                 <v-divider></v-divider>
-                <v-list>
-                    <v-list-tile v-for="(item, key) in chipsItem" :key="key">
-                        <v-list-tile-action>
-                            <v-checkbox v-model="chips" :label="item" :value="item"></v-checkbox>
-                        </v-list-tile-action>
-                    </v-list-tile>
+                <v-list v-for="(items, keys) in params.filter" :key="`A-${keys}`">
+                    <v-subheader>
+                        {{items.title}}
+                    </v-subheader>
+                    <div v-for="(item, key) in chipsItem" :key="`A-${key}`">
+                        <v-list-tile v-if="item.api && items.api == item.api">
+                            <v-list-tile-action>
+                                <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                        <v-list-tile v-if="item.text && items.text == item.text">
+                            <v-list-tile-action>
+                                <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                      </div>
                 </v-list>
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' v-model="selected" :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
             <th
@@ -170,24 +208,16 @@
                 </v-flex>
             </td>
             <td class="justify-left layout">
-                <v-icon v-if="props.item.files" small class="mr-2" @click="editPhotos(props.item)">
-                    image
+                <v-icon small class="mr-2" @click="editItem(props.item)">	
+                    edit	
                 </v-icon>
-                <v-icon small class="mr-2" @click="editItem(props.item)">
-                    edit
-                </v-icon>
-                <v-icon small class="mr-2"  @click="deleteItem(props.item)">
+                <v-icon small class="mr-2" @click="deleteItem(props.item)">
                     delete
                 </v-icon>
             </td>
         </template>
         <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Сброс</v-btn>
-        </template>
-        <template v-slot:no-results>
-            <v-alert :value="true" color="error" icon="warning">
-                По запросу "{{ search }}" ничего не найдено.
-            </v-alert>
+            <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
     </v-data-table>
 </div>
@@ -213,7 +243,7 @@ export default {
         loaderSaveBtn: null,
         formData: new FormData(),
         chips: [],
-        chipsItem: ['Фильтер1', 'Фильтер2'],
+        chipsItem: [],
         picker: new Date().toISOString().substr(0, 10),
         valid: true,
         pagination: {
@@ -222,30 +252,108 @@ export default {
         selected: [],
     }),
     props: {
-        params: Object,
-        idOrder: Number
+        params: Object
     },
     computed: {
         formTitle () {
-            return this.editedIndex === -1 ? 'Добавить' : 'Редактировать'
+            return this.editedIndex === -1 ? 'Добавление адреса' : 'Редактирование адреса'
         },
         computedDateFormatted () {
             return this.formatDate(this.date)
+        },
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
         }
     },
     watch: {
         dialog (val) {
             val || this.close()
         },
-        idOrder() {
+        search: _.debounce(function () {
+            this.initialize()
+        }, 400),
+        chips(val) {
             this.initialize();
         }
     },
     created () {
         this.initialize();
         this.selectStatus();
+        this.getFiltered();
     },
     methods: {
+          async getFiltered() {
+            await this.params.filter.forEach((item) => {
+                if(item.api) {
+                    axios({
+                        method: 'get',
+                        url: item.api,
+                    })
+                    .then(
+                        response => {
+                            let data = response.data;
+                            data.filter((items) => {
+                                this.chipsItem.push({
+                                    data: items[item.value],
+                                    api: item.api,
+                                    input: item.input
+                                });
+                            });
+                        }
+                    ).catch(error => {
+                        console.log(error);
+                    })
+                } else {
+                    item.data.filter((items) => {
+                        this.chipsItem.push({
+                            data: items[item.value],
+                            text: item.text,
+                            input: item.input
+                        });
+                    });
+                }
+            });
+        },
+        filtered(data) {
+            if(this.chips.length > 0) {
+                let vm = this;
+                let array = [];
+                this.chips.forEach((chip) => {
+                    vm.desserts.filter(function(item) {
+                        if(chip.data === item[chip.input]) {
+                            array.push(item);
+                        }
+                    });
+                });
+                return this.desserts = array;
+            } else {
+                return this.desserts = data;
+            }
+        },
+        filteredItems(data) {
+            this.desserts = data;
+            let searchTerm = this.search.trim().toLowerCase(),
+            useOr = this.search == "or",
+            AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+            OR_RegEx = searchTerm.replace(/ +/g,"|"),
+            regExExpression = useOr ? OR_RegEx : AND_RegEx,
+            searchTest = new RegExp(regExExpression, "ig");
+            let thisSearch = this.params.searchValue;
+            // if( searchTerm.length < 2 || !this.desserts.length ) return this.desserts;
+            return this.desserts = this.desserts.filter(function(item) {
+                let arr = [];
+                thisSearch.forEach(function(val) {
+                    arr.push(item[val]);
+                })
+                return searchTest.test(arr.join(" ")); 
+            });
+        },
+        refreshSearch() {
+            this.chips = [];
+            this.loading = true;
+            this.search = '';
+            this.initialize();
+        },
         toggleAll () {
             if (this.selected.length) this.selected = []
             else this.selected = this.desserts.slice()
@@ -261,11 +369,16 @@ export default {
         initialize () {
             axios({
                 method: 'get',
-                url: 'api/address_to_orders_one/' + this.idOrder
+                url: this.params.baseUrl,
+                params: {
+                    user: this.params.user
+                }
             })
             .then(
                 response => {
                     this.desserts = response.data;
+                    this.filteredItems(response.data);
+                    this.filtered(response.data);
                     this.loading = false;
                 }
             ).catch(error => {
@@ -477,4 +590,3 @@ export default {
     }
 }
 </script>
-

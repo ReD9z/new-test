@@ -23,7 +23,7 @@
                 multiple
             >
         </v-btn>
-        <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать</v-btn>
+        <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
     </v-toolbar>
     <v-navigation-drawer v-model="dialog" right temporary fixed>
         <v-card height="100%">
@@ -177,7 +177,7 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
+    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
             <th
@@ -246,7 +246,7 @@ export default {
     },
     computed: {
         formTitle () {
-            return this.editedIndex === -1 ? 'Добавить' : 'Редактировать'
+            return this.editedIndex === -1 ? 'Создание задачи' : 'Редактирование задачи'
         },
         computedDateFormatted () {
             return this.formatDate(this.date)

@@ -155,7 +155,7 @@
             </v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
-        <v-icon>filter_list</v-icon>
+        <!-- <v-icon>filter_list</v-icon>
         <div>
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
         </div>
@@ -175,9 +175,9 @@
                     </v-list-tile>
                 </v-list>
             </v-card>
-        </v-menu>
+        </v-menu> -->
     </v-toolbar>
-    <v-data-table :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
+    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
             <th

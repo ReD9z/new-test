@@ -41,6 +41,7 @@ Vue.component('b-table-address-order', require('./components/tables/order/bTable
 Vue.component('b-table-address-order-edit', require('./components/tables/order/bTableAddressEdit.vue').default);
 Vue.component('b-maps', require('./components/bMaps.vue').default);
 Vue.component('b-table-task', require('./components/tables/task/bTableTask.vue').default);
+Vue.component('b-table-address', require('./components/tables/address/bTableAddress.vue').default);
 
 /**
  * VueRouter components

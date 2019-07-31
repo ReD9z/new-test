@@ -16,6 +16,7 @@ class Orders extends JsonResource
     {
         return [
             'id' => $this->id,
+            'order_name' => 'Заказ #'.$this->id,
             'clients_name' => $this->clients->users->name,
             'clients_id' => $this->clients_id,
             'address' => $this->orderAddress ? $this->orderAddress : [],

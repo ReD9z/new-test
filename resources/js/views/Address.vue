@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-4 mt-4">
         <div class="col-md-12 mb-4 mt-4">
-            <b-table :params="params"></b-table>
+            <b-table-address :params="params"></b-table-address>
         </div>
     </div>
 </template>
@@ -57,7 +57,15 @@ export default {
             searchValue: ['area', 'street', 'house_number', 'number_entrances', 'management_company'],
             search: true,
             pagination: true,
-            excel: true
+            excel: true,
+            filter: [
+                {
+                    title: 'Адреса',
+                    api: '/api/cities_to_works',
+                    value: 'name',
+                    input: 'city'
+                }
+            ],
         }
     }),
     computed: {

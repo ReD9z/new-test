@@ -16,7 +16,7 @@ export default {
                     align: 'left',
                     sortable: true,
                     value: 'orders_id',
-                    selectText: 'legal_name',
+                    selectText: 'order_name',
                     TableGetIdName: 'orders',
                     selectApi: 'api/orders',
                     input: "select",
