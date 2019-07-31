@@ -17,7 +17,7 @@ class Tasks extends JsonResource
         return [
             'id' => $this->id,
             'orders_id' => $this->orders_id,
-            'orders' => $this->orders->clients->actual_title,
+            'orders' => $this->orders->clients->legal_name,
             'installer_id' => $this->installer_id,
             'installers' => $this->installers->users->name,
             'types' => $this->types->title,

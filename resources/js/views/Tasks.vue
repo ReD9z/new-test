@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-4 mt-4">
         <div class="col-md-12 mb-4 mt-4">
-            <b-table :params="params"></b-table>
+            <b-table-task :params="params"></b-table-task>
         </div>
     </div>
 </template>
@@ -16,7 +16,7 @@ export default {
                     align: 'left',
                     sortable: true,
                     value: 'orders_id',
-                    selectText: 'actual_title',
+                    selectText: 'legal_name',
                     TableGetIdName: 'orders',
                     selectApi: 'api/orders',
                     input: "select",
@@ -42,7 +42,7 @@ export default {
                     input: "select",
                 },
                 { 
-                    text: 'Дата начала размещения', 
+                    text: 'Дата выполнения', 
                     input: "date",
                     sortable: true,
                     close: false,
