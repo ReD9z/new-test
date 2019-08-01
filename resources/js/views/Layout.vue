@@ -7,9 +7,10 @@
                         <v-list-tile-avatar>
                            <v-icon size="38px">account_circle</v-icon>
                         </v-list-tile-avatar>
-                        <v-list-tile-content>
+                        <v-spacer></v-spacer>
+                        <!-- <v-list-tile-content>
                             <v-list-tile-title>{{isLoggedUser.name}}</v-list-tile-title>
-                        </v-list-tile-content>
+                        </v-list-tile-content> -->
                         <v-list-tile-action>
                             <v-btn icon @click.stop="mini = !mini" >
                                 <v-icon>chevron_left</v-icon>

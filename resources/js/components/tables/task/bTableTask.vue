@@ -41,7 +41,7 @@
                             <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
-                            <v-text-field v-model="editedItem[param.value] = param.show"  :rules="param.validate" type="hidden" :label="param.text" xs12 required></v-text-field>
+                            <v-text-field v-model="editedItem[param.value]" :value="param.show" :rules="param.validate" type="hidden" :label="param.text" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
                             <div v-for="item in select" :key="item[0]">
@@ -72,7 +72,7 @@
                                 <template v-slot:activator="{ on }">
                                     <v-text-field
                                         v-model="editedItem[param.value]"
-                                        hint="DD-MM-YYYY формат"
+                                        hint="Формат дд.мм.гггг"
                                         persistent-hint
                                         @blur="editedItem[param.value] = parseDate(picker)"
                                         prepend-icon="event"
@@ -80,7 +80,7 @@
                                         v-on="on"
                                     ></v-text-field>
                                 </template>
-                                <v-date-picker v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                                <v-date-picker locale="ru" v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
                             </v-menu>
                         </div>
                         <div v-if="param.input == 'password'">
@@ -155,7 +155,7 @@
             </v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
-        <v-icon>filter_list</v-icon>
+        <!-- <v-icon>filter_list</v-icon>
         <div>
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
         </div>
@@ -175,7 +175,7 @@
                     </v-list-tile>
                 </v-list>
             </v-card>
-        </v-menu>
+        </v-menu> -->
     </v-toolbar>
     <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
@@ -233,7 +233,7 @@ export default {
         loaderSaveBtn: null,
         formData: new FormData(),
         chips: [],
-        chipsItem: ['Фильтер1', 'Фильтер2'],
+        chipsItem: [],
         picker: new Date().toISOString().substr(0, 10),
         valid: true,
         pagination: {
@@ -268,6 +268,9 @@ export default {
         this.selectStatus();
     },
     methods: {
+        hiddenItem(item, param) {
+
+        },
         filteredItems(data) {
             this.desserts = data;
             let searchTerm = this.search.trim().toLowerCase(),

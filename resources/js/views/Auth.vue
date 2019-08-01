@@ -1,6 +1,6 @@
 <template>
     <v-layout justify-center align-center>
-        <v-flex sm6>
+        <v-flex sm4>
             <v-card>
                 <v-toolbar color="teal" dark>
                     <v-toolbar-title>Авторизация</v-toolbar-title>

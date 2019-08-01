@@ -17,7 +17,7 @@ export default {
                     sortable: true,
                     value: 'orders_id',
                     selectText: 'order_name',
-                    TableGetIdName: 'orders',
+                    TableGetIdName: 'order_name',
                     selectApi: 'api/orders',
                     input: "select",
                 },
@@ -55,7 +55,7 @@ export default {
                     value: 'comment',
                 }
             ],
-            searchValue: ['actual_title', 'installers','types','task_date_completion','comment'],
+            searchValue: ['order_name', 'installers', 'types', 'task_date_completion', 'comment'],
             search: true,
             pagination: true,
             excel: false
