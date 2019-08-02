@@ -4,6 +4,8 @@ import axios from 'axios'
 
 Vue.use(Vuex)
 
+// localStorage.clear()
+
 export default new Vuex.Store({
 
     state: {
