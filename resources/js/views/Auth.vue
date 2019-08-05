@@ -11,21 +11,27 @@
                         solo
                         label="E-mail"
                         prepend-inner-icon="person"
-                        :rules="emailRules"
                         v-model="user.email"
+                        v-validate="'required|email'"
+                        data-vv-name="email"
+                        :error-messages="errors.collect('email')"
                         required 
                     ></v-text-field>
                     <v-text-field
                         class="pl-4 pr-4"
                         solo 
-                        :rules="passwordRules"
                         label="Пароль"
                         type="password"
                         prepend-inner-icon="work"
                         v-model="user.password"
+                        v-validate="'required'"
+                        data-vv-name="password"
+                        :error-messages="errors.collect('password')"
                         required
                     ></v-text-field>
-                    {{validationErrors}}
+                    <div class="text-xs-center">
+                        <span class="red--text" v-if="validationErrors == 'errors'">Не верный логин или пароль!</span>
+                    </div>
                     <v-checkbox class="pl-4 pr-4" v-model="user.remember_me"  label="Запомнить?" :value="isActive" @click="remember()"></v-checkbox>
                     <v-btn class="mb-4 ml-4 mr-4" color="success" @click="login">
                         Войти
@@ -37,36 +43,31 @@
 </template>
 
 <script>
+    import { Validator } from 'vee-validate'
     export default {
+        inject: ['$validator'],
         data: () => ({
             isActive: false,
             valid: true,
-            validationErrors: [],
+            validationErrors: null,
             user: {
                 email: "",
                 password: "",
                 remember_me: false
-            },
-            emailRules: [
-                v => !!v || 'Поле "Email" обязательно',
-                v => /.+@.+/.test(v) || 'Введите корректный "Email"'
-            ],
-            passwordRules: [
-                v => !!v || 'Поле "Пароль" обязательно'
-            ],
+            }
         }),
         methods: {
             remember() {
                 this.isActive = !this.isActive;
             },
             login() {
-                if (this.$refs.form.validate()) {
+                if (this.$validator.validateAll()) {
                     let email = this.user.email;
                     let password = this.user.password;
                     let remember_me = this.user.remember_me;
                     this.$store.dispatch('login', { email, password, remember_me })
-                    .then((res) => this.$router.push('/'))
-                    .catch((error) => this.validationErrors = error.response.data.errors)
+                        .then((res) => this.$router.push('/'), this.validationErrors=null)
+                        .catch((error) => this.validationErrors = error.response.data.errors) 
                 }
             }
         }

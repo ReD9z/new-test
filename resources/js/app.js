@@ -7,6 +7,8 @@ import Vue from 'vue';
 import Vuetify from 'vuetify';
 import ru from 'vuetify/es5/locale/ru';
 import 'vuetify/dist/vuetify.min.css';
+import VeeValidate from 'vee-validate';
+import VeeValidateLaravel from 'vee-validate-laravel';
 
 Vue.use(Vuetify, {
     lang: {
@@ -16,10 +18,13 @@ Vue.use(Vuetify, {
 });
 
 require('./bootstrap');
+
 Vue.use(require('vue-moment'));
 window.Vue = require('vue');
 Vue.use(VueRouter);
 Vue.use(Vuex);
+Vue.use(VeeValidate, { inject: false })
+Vue.use(VeeValidateLaravel);
 
 let token = window.localStorage.getItem('token');
 if (token) {

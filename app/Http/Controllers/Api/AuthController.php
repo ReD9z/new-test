@@ -34,10 +34,8 @@ class AuthController extends Controller
     }
 
     public function login(Request $request) {
-        $validate = Validator::make($request->all(), [
+        $request->validate([
             'email' => 'required|string|email',
-            'password' => 'required|string',
-            'remember_me' => 'boolean'
         ]);
         // $validate = $this->validate($request, [
         //     'email' => 'required|string|email',
@@ -47,7 +45,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
         if(!Auth::attempt($credentials))
             return response()->json([
-                'errors' => $validate->errors()
+                'errors' => 'errors'
             ], 401);
 
         $user = User::with('managers', 'moderators')->where('email', $request->email)->first();
@@ -56,7 +54,7 @@ class AuthController extends Controller
         $token = $tokenResult->token;
         if ($request->remember_me) 
             $token->expires_at = Carbon::now()->addWeeks(1);
-            $token->save();
+        $token->save();
         return response()->json([
             'access_token' => $tokenResult->accessToken,
             'token_type' => 'Bearer',
@@ -69,7 +67,7 @@ class AuthController extends Controller
 
     public function logout(Request $request) {
 
-        // $request->user()->token()->revoke();
+        $request->user()->token()->revoke();
         $request->user()->token()->delete();
         return response()->json([
             'message' => 'Successfully logged out'
