@@ -2,7 +2,7 @@ let routers =  [
     {
         path: '/',
         name: 'home',
-        component: require('./views/Home.vue').default,
+        component: require('./views/Address.vue').default,
         meta: { 
             title: 'Рабочий стол',
             requiresAuth: true,

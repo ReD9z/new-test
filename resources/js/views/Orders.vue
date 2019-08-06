@@ -43,6 +43,12 @@ export default {
             baseUrl: '/api/orders',
             user: null,
             headers: [
+                { 
+                    text: 'Заказ',
+                    value: 'order_name', 
+                    sortable: true,
+                    input: "order_name",
+                },
                 {
                     text: 'Клиент',
                     align: 'left',
@@ -82,7 +88,7 @@ export default {
                     input: 'clients_name'
                 }
             ],
-            searchValue: ['clients_name', 'order_start_date', 'order_end_date'],
+            searchValue: ['clients_name', 'order_start_date', 'order_end_date', 'order_name'],
             search: true,
             pagination: true,
             excel: false

@@ -9,19 +9,11 @@
             large
             :loading="loadingExcel"
             :disabled="loadingExcel"
-            @click='pickExcel'
+            @click='downloadExcel'
             v-show="params.excel"
         >
             <v-icon left>vertical_align_bottom</v-icon>
-            Добавить Excel
-            <input
-                type="file"
-                style="display: none"
-                ref="excel"
-                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                @change="elementLoadToFile"
-                multiple
-            >
+            Скачать Excel
         </v-btn>
         <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
     </v-toolbar>
@@ -193,8 +185,13 @@
         <template v-slot:items="props">
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
                 <v-flex v-if="param.input !== 'images'">
-                    <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
-                    <v-flex v-else>{{props.item[param.value]}}</v-flex>
+                    <v-flex v-if="param.value === 'orders_id'">
+                        <v-flex v-if="param.selectText"><a :href="'/orders-address/'+props.item['orders_id']">{{props.item[param.TableGetIdName]}}</a></v-flex>
+                    </v-flex>
+                    <v-flex v-else>
+                        <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
+                        <v-flex v-else>{{props.item[param.value]}}</v-flex>
+                    </v-flex>
                 </v-flex>
             </td>
             <td class="justify-left layout">
@@ -268,9 +265,6 @@ export default {
         this.selectStatus();
     },
     methods: {
-        hiddenItem(item, param) {
-
-        },
         filteredItems(data) {
             this.desserts = data;
             let searchTerm = this.search.trim().toLowerCase(),
@@ -390,28 +384,21 @@ export default {
                 }
             );
         },
-        async loadExecel(file) {
-            let vm = this;
-            await file.forEach(function (item) {
-                axios({
-                    method: 'post',
-                    url: vm.params.baseUrl +'/excel',
-                    data: item
-                })
-                .then(
-                    response => {
-                        // Обновлять при сохранении select с адресами
-                        let array = response.data.data;
-                        if(array != undefined) {
-                            vm.desserts.push(array);
-                        }
-                        setTimeout(() => (vm.loadingExcel = false), 1000);
-                        vm.$refs.excel.value = '';
-                    }
-                ).catch(error => {
-                    console.log(error);
-                });
-            })
+        downloadExcel() {
+            // console.log(this.desserts);
+            let map = this.desserts.map((item)=> {
+                return {
+                    "Название организации клиента" : item.orders,
+                    "Дата выполнения задачи"  : item.task_date_completion,
+                    "Тип работы"  : item.types,
+                    "Комментарий" : item.comment,
+                    "Адреса": item.orderAddresses.join(',')
+                }
+            });
+            let ws = XLSX.utils.json_to_sheet(map);
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "People");
+            XLSX.writeFile(wb, "sheetjs.xlsx");
         },
         elementLoadToFile() {
             this.loadingExcel = true;

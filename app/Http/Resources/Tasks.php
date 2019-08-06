@@ -25,6 +25,7 @@ class Tasks extends JsonResource
             'types_to_works_id' => $this->types_to_works_id,
             'task_date_completion' => date("d-m-Y", strtotime($this->task_date_completion)),
             'comment' => $this->comment,
+            'orderAddresses' => $this->orders->orderAddress
         ];
     }
 }

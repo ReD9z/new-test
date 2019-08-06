@@ -42,23 +42,23 @@ export default {
                     input: "select",
                 },
                 { 
+                    text: 'Комментарий', 
+                    input: "text",
+                    sortable: true,
+                    value: 'comment',
+                },
+                { 
                     text: 'Дата выполнения', 
                     input: "date",
                     sortable: true,
                     close: false,
                     value: 'task_date_completion' 
                 },
-                { 
-                    text: 'Комментарий', 
-                    input: "text",
-                    sortable: true,
-                    value: 'comment',
-                }
             ],
             searchValue: ['order_name', 'installers', 'types', 'task_date_completion', 'comment'],
             search: true,
             pagination: true,
-            excel: false
+            excel: true
         }
     })
 }
