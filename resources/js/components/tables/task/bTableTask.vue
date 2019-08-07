@@ -385,20 +385,31 @@ export default {
             );
         },
         downloadExcel() {
-            // console.log(this.desserts);
-            let map = this.desserts.map((item)=> {
-                return {
-                    "Название организации клиента" : item.orders,
-                    "Дата выполнения задачи"  : item.task_date_completion,
-                    "Тип работы"  : item.types,
-                    "Комментарий" : item.comment,
-                    "Адреса": item.orderAddresses.join(',')
-                }
-            });
-            let ws = XLSX.utils.json_to_sheet(map);
-            let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "People");
-            XLSX.writeFile(wb, "sheetjs.xlsx");
+            if(this.desserts.count > 0) {
+                let map = this.desserts.map((item)=> {
+                    let address = '';
+                    item.orderAddresses.map((item2) => {
+                        address += "г." + item2.address.cities.name 
+                        + ", " + item2.address.areas.name + ","
+                        + " ул. " + item2.address.street + ","
+                        + " дом " + item2.address.house_number + ","
+                        + " количество подъездов " + item2.address.number_entrances + ","
+                        + " управляющая компания " + item2.address.management_company + " "
+                        +'\n';
+                    });
+                    return {
+                        "Название организации клиента" : item.orders,
+                        "Дата выполнения задачи"  : item.task_date_completion,
+                        "Тип работы"  : item.types,
+                        "Комментарий" : item.comment,
+                        "Адреса": address
+                    }
+                });
+                let ws = XLSX.utils.json_to_sheet(map);
+                let wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Address");
+                XLSX.writeFile(wb, "Задачи.xlsx");
+            }
         },
         elementLoadToFile() {
             this.loadingExcel = true;

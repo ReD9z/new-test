@@ -16,7 +16,7 @@ class TasksController extends Controller
      */
     public function index(Request $request)
     {
-        $tasks = Tasks::with('orders.clients', 'orders.orderAddress' ,'installers.users', 'types')->get(); 
+        $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.areas', 'installers.users', 'types')->get(); 
         
         return TasksResource::collection($tasks);
     }

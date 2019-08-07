@@ -42,6 +42,12 @@ export default {
                     input: "select",
                 },
                 { 
+                    text: 'Статус', 
+                    input: "text",
+                    sortable: true,
+                    value: 'status',
+                },
+                { 
                     text: 'Комментарий', 
                     input: "text",
                     sortable: true,
