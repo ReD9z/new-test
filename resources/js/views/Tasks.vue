@@ -41,11 +41,12 @@ export default {
                     selectApi: 'api/types_to_work',
                     input: "select",
                 },
-                { 
-                    text: 'Статус', 
-                    input: "text",
-                    sortable: true,
-                    value: 'status',
+                {
+                    data: [{ result: 'В работе' },{ result: 'Завершена' }],
+                    title: 'Статус',
+                    value: 'result',
+                    text: 'status',
+                    input: 'result'
                 },
                 { 
                     text: 'Комментарий', 
