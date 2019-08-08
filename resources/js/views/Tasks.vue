@@ -42,11 +42,14 @@ export default {
                     input: "select",
                 },
                 {
-                    data: [{ result: 'В работе' },{ result: 'Завершена' }],
-                    title: 'Статус',
-                    value: 'result',
-                    text: 'status',
-                    input: 'result'
+                    data: [
+                        {status: 1, text: 'В работе'},
+                        {status: 2, text: 'Завершена' }
+                    ],
+                    input: "status",
+                    value: "status",
+                    text: 'Статус',
+                    sortable: true,
                 },
                 { 
                     text: 'Комментарий', 

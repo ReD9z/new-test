@@ -79,12 +79,14 @@
                             <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
                         </div>
                         <div v-if="param.value == 'status'">
-                            <v-combobox
+                            <v-autocomplete
+                                :items="param.data"
                                 v-model="editedItem[param.value]"
-                                :items="param.status"
+                                :item-text="param.status"
+                                item-value="status"
                                 :label="param.text"
-                                >
-                            </v-combobox>
+                            >
+                            </v-autocomplete>
                         </div>
                     </v-flex>
                     <div class="text-xs-center">
