@@ -4,13 +4,13 @@
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn
+            v-show="desserts.length > 0 && params.excel"
             color="#f2994a"
             class="white--text"
             large
             :loading="loadingExcel"
             :disabled="loadingExcel"
             @click='downloadExcel'
-            v-show="params.excel"
         >
             <v-icon left>vertical_align_bottom</v-icon>
             Скачать Excel
@@ -82,7 +82,7 @@
                             <v-autocomplete
                                 :items="param.data"
                                 v-model="editedItem[param.value]"
-                                :item-text="param.status"
+                                item-text="text"
                                 item-value="status"
                                 :label="param.text"
                             >
@@ -191,7 +191,8 @@
                         <v-flex v-if="param.selectText"><a :href="'/orders-address/'+props.item['orders_id']">{{props.item[param.TableGetIdName]}}</a></v-flex>
                     </v-flex>
                     <v-flex v-else>
-                        <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
+                        <v-flex v-if="param.value === 'status'">{{props.item[param.title]}}</v-flex>
+                        <v-flex v-else-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
                         <v-flex v-else>{{props.item[param.value]}}</v-flex>
                     </v-flex>
                 </v-flex>
@@ -387,7 +388,7 @@ export default {
             );
         },
         downloadExcel() {
-            if(this.desserts.count > 0) {
+            if(this.desserts.length > 0) {
                 let map = this.desserts.map((item)=> {
                     let address = '';
                     item.orderAddresses.map((item2) => {

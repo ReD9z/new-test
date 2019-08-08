@@ -31,6 +31,13 @@ export default {
                     selectApi: 'api/installers',
                     input: "select",
                 },
+                { 
+                    text: 'Дата выполнения', 
+                    input: "date",
+                    sortable: true,
+                    close: false,
+                    value: 'task_date_completion' 
+                },
                 {
                     text: 'Тип работы',
                     align: 'left',
@@ -44,10 +51,11 @@ export default {
                 {
                     data: [
                         {status: 1, text: 'В работе'},
-                        {status: 2, text: 'Завершена' }
+                        {status: 2, text: 'Завершена'}
                     ],
                     input: "status",
                     value: "status",
+                    title: "statusName",
                     text: 'Статус',
                     sortable: true,
                 },
@@ -56,16 +64,9 @@ export default {
                     input: "text",
                     sortable: true,
                     value: 'comment',
-                },
-                { 
-                    text: 'Дата выполнения', 
-                    input: "date",
-                    sortable: true,
-                    close: false,
-                    value: 'task_date_completion' 
-                },
+                }
             ],
-            searchValue: ['order_name', 'installers', 'types', 'task_date_completion', 'comment'],
+            searchValue: ['order_name', 'installers', 'types', 'task_date_completion', 'comment', 'statusName'],
             search: true,
             pagination: true,
             excel: true

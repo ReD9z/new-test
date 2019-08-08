@@ -26,7 +26,8 @@ class Tasks extends JsonResource
             'task_date_completion' => date("d-m-Y", strtotime($this->task_date_completion)),
             'comment' => $this->comment,
             'orderAddresses' => $this->orders->orderAddress,
-            'status' => $this->status
+            'status' => $this->status,
+            'statusName' => $this->status == '1' ? 'В работе' : 'Завершена',
         ];
     }
 }
