@@ -59,7 +59,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker locale="ru" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </v-flex>
                     <v-flex v-for="(param, key) in params.headerOrders" v-if="param.input == 'dateEnd'"  :key="`M-${key}`" xs12 lg6>
@@ -85,7 +85,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker locale="ru" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </v-flex>
                 </v-layout>
@@ -475,13 +475,6 @@ export default {
                                     } 
                                 });
                             } 
-                            // else {
-                            //     item.result = 'Свободно';
-                            //     item.data = null;
-                            //     item.files = null;
-                            //     let index = vm.desserts.indexOf(item);
-                            //     Object.assign(vm.desserts[index], item);
-                            // }
                         });
                         this.filteredItems(this.desserts);
                         this.filtered(this.desserts);
@@ -526,8 +519,9 @@ export default {
         },
         editItem (item) {
             this.editedItem = Object.assign({}, item);
-            this.dateStartFormatted = this.order.order_start_date;
-            this.dateEndFormatted = this.order.order_end_date;
+            let vm = this;
+            this.dateStart = this.$moment(vm.order.order_start_date, "DD-MM-YYYY").format("YYYY-MM-DD");
+            this.dateEnd =  this.$moment(vm.order.order_end_date, "DD-MM-YYYY").format("YYYY-MM-DD");
         },
         editPhotos(item) {
             this.addOrderImages = Object.assign({}, item.data);

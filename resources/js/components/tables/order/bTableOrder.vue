@@ -57,7 +57,7 @@
                                         v-on="on"
                                     ></v-text-field>
                                 </template>
-                                <v-date-picker v-model="picker" :rules="param.validate" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                                <v-date-picker :first-day-of-week="1" v-model="picker" :rules="param.validate" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
                             </v-menu>
                         </div>
                         <div v-if="param.input == 'password'">

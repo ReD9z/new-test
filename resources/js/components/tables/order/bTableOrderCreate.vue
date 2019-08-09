@@ -59,7 +59,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker locale="ru" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </v-flex>
                     <v-flex v-for="(param, key) in params.headerOrders" v-if="param.input == 'dateEnd'" :key="`B-${key}`" xs12 lg6>
@@ -85,7 +85,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker locale="ru" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </v-flex>
                 </v-layout>
@@ -199,12 +199,12 @@ export default {
         editedIndex: -1,
         editedItem: {},
         dateStartFormatted: vm.formatDate(vm.getDate()),
-        dateEndFormatted: vm.formatDate(vm.getDate()),
+        dateEndFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
         defaultItem: {},
         select: [],
         keywords: '',
-        dateStart: vm.formatDate(vm.getDate()),
-        dateEnd: vm.formatDate(vm.getDate()),
+        dateStart: vm.getDate(),
+        dateEnd: new Date().toISOString().substr(0, 10),
         loadingSaveBtn: false,
         loaderSaveBtn: null,
         selectedStatus: false,
@@ -254,13 +254,13 @@ export default {
         getDate() {
             // var now = new Date().toISOString().substr(0, 10);
             // this.$moment(now).startOf('week').isoWeekday(1)
-            var next_week_start = this.$moment();
-            return next_week_start.toISOString().substr(0, 10);
+            var next_week_start = this.$moment().isoWeekday(1);
+            return next_week_start.format("YYYY-MM-DD");
         },
         formatDate (date) {
             if (!date) return null
 
-            const [day, month, year] = date.split('-')
+            const [year, month, day] = date.split('-')
             return `${day}-${month}-${year}`
         },
         toggleAll () {
