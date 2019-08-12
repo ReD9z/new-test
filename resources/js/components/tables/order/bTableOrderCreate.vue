@@ -252,9 +252,7 @@ export default {
     },
     methods: {
         getDate() {
-            // var now = new Date().toISOString().substr(0, 10);
-            // this.$moment(now).startOf('week').isoWeekday(1)
-            var next_week_start = this.$moment().isoWeekday(1);
+            let next_week_start = this.$moment().isoWeekday(1);
             return next_week_start.format("YYYY-MM-DD");
         },
         formatDate (date) {
