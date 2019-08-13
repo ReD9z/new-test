@@ -16,7 +16,8 @@ export default {
                     align: 'left',
                     sortable: true,
                     value: 'name',
-                    input: "text"
+                    input: "text",
+                    validate: 'required',
                 }
             ],
             searchValue: ['name'],

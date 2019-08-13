@@ -7,8 +7,9 @@ import Vue from 'vue';
 import Vuetify from 'vuetify';
 import ru from 'vuetify/es5/locale/ru';
 import 'vuetify/dist/vuetify.min.css';
-import VeeValidate from 'vee-validate';
+import VeeValidate, { Validator } from 'vee-validate';
 import VeeValidateLaravel from 'vee-validate-laravel';
+import ruVee from 'vee-validate/dist/locale/ru';
 
 Vue.use(Vuetify, {
     lang: {
@@ -17,13 +18,15 @@ Vue.use(Vuetify, {
     }
 });
 
+
 require('./bootstrap');
 
 Vue.use(require('vue-moment'));
 window.Vue = require('vue');
 Vue.use(VueRouter);
 Vue.use(Vuex);
-Vue.use(VeeValidate, { inject: false })
+Validator.localize({ ru: ruVee })
+Vue.use(VeeValidate, { inject: false, locale: 'ru' })
 Vue.use(VeeValidateLaravel);
 
 let token = window.localStorage.getItem('token');
@@ -48,17 +51,13 @@ Vue.component('b-maps', require('./components/bMaps.vue').default);
 Vue.component('b-table-task', require('./components/tables/task/bTableTask.vue').default);
 Vue.component('b-table-address', require('./components/tables/address/bTableAddress.vue').default);
 
-/**
- * VueRouter components
- */
-
 let router = new VueRouter({
     mode: 'history',
     routes: routers
 });
 
 /**
- * VueRouter redirect router
+ * VueRouter redirect router auth
  */
 
 router.beforeEach((to, from, next) => {

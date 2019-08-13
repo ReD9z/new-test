@@ -16,24 +16,28 @@ export default {
                     text: 'Имя', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'name' 
                 },
                 { 
                     text: 'Email', 
                     input: "text",
                     sortable: true,
+                    validate: 'required|email',
                     value: 'email' 
                 },
                 { 
                     text: 'Телефон', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'phone' 
                 },
                 { 
                     text: 'Логин', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'login' 
                 },
                 {

@@ -30,11 +30,16 @@
                         required
                     ></v-text-field>
                     <div class="text-xs-center">
-                        <span class="red--text" v-if="validationErrors == 'errors'">Не верный логин или пароль!</span>
+                        <span class="red--text" v-if="validationErrors == 'errors'">Неверный логин или пароль!</span>
                     </div>
                     <v-checkbox class="pl-4 pr-4" v-model="user.remember_me"  label="Запомнить?" :value="isActive" @click="remember()"></v-checkbox>
-                    <v-btn class="mb-4 ml-4 mr-4" color="success" @click="login">
+                    <v-btn class="mb-4 ml-4 mr-4" color="success" @click="login" :loading="loading" :disabled="loading">
                         Войти
+                        <template v-slot:loading>
+                            <span class="custom-loader">
+                            <v-icon light>cached</v-icon>
+                            </span>
+                        </template>
                     </v-btn>
                 </v-card>
             </v-form>
@@ -43,13 +48,13 @@
 </template>
 
 <script>
-    import { Validator } from 'vee-validate'
     export default {
         inject: ['$validator'],
         data: () => ({
             isActive: false,
             valid: true,
             validationErrors: null,
+            loading: false,
             user: {
                 email: "",
                 password: "",
@@ -62,11 +67,12 @@
             },
             login() {
                 if (this.$validator.validateAll()) {
+                    this.loading = true;
                     let email = this.user.email;
                     let password = this.user.password;
                     let remember_me = this.user.remember_me;
                     this.$store.dispatch('login', { email, password, remember_me })
-                        .then((res) => this.$router.push('/'), this.validationErrors=null)
+                        .then((res) => {this.loading = false, this.$router.push('/'), this.validationErrors=null})
                         .catch((error) => this.validationErrors = error.response.data.errors) 
                 }
             }

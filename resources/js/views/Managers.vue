@@ -15,24 +15,28 @@ export default {
                     text: 'Имя', 
                     input: "text",
                     sortable: true,
-                    value: 'name' 
+                    validate: 'required',
+                    value: 'name'
                 },
                 { 
                     text: 'Email', 
                     input: "text",
                     sortable: true,
+                    validate: 'required|email',
                     value: 'email' 
                 },
                 { 
                     text: 'Телефон', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'phone' 
                 },
                 { 
                     text: 'Логин', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'login' 
                 },
                 {
@@ -43,6 +47,7 @@ export default {
                     selectText: 'name',
                     TableGetIdName: 'city',
                     selectApi: 'api/cities_to_works',
+                    validate: 'required',
                     input: "select",
                 },
                 {
@@ -52,8 +57,10 @@ export default {
                     value: 'moderator_id',
                     selectText: 'name',
                     TableGetIdName: 'moderator',
+                    validate: 'required',
                     selectApi: 'api/moderators',
                     input: "select",
+                    validate: 'required'
                 },
                 {
                     text: "Пароль",

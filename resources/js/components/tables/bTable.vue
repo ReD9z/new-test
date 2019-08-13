@@ -38,7 +38,7 @@
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
                         <div v-if="param.input == 'text'">
-                            <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                            <v-text-field :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
                             <v-text-field v-model="editedItem[param.value]" :value="param.show" :rules="param.validate" type="hidden" :label="param.text" xs12 required></v-text-field>
@@ -100,7 +100,7 @@
                             Сохранить
                             <template v-slot:loaderSaveBtn>
                                 <span class="custom-loader">
-                                <v-icon light>cached</v-icon>
+                                    <v-icon light>cached</v-icon>
                                 </span>
                             </template>
                         </v-btn>
@@ -215,6 +215,7 @@
 <script>
 import XLSX from 'xlsx';
 export default {
+    inject: ['$validator'],
     data: () => ({
         search: '',
         dialog: false,
@@ -485,7 +486,7 @@ export default {
             this.formData.delete('file[]');
         },
         save () {
-            if (this.$refs.forms.validate() == false) {
+            if (this.$validator.validateAll()) {
                 this.snackbar = true
             } 
             else {

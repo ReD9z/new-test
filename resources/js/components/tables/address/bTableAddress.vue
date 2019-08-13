@@ -38,10 +38,10 @@
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
                         <div v-if="param.input == 'text'">
-                            <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                            <v-text-field :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
-                            <v-text-field v-model="editedItem[param.value] = param.show"  :rules="param.validate" type="hidden" :label="param.text" xs12 required></v-text-field>
+                            <v-text-field v-model="editedItem[param.value] = param.show"  type="hidden" :label="param.text" xs12></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
                             <div v-for="item in select" :key="item[0]">
@@ -52,6 +52,9 @@
                                         :item-text="param.selectText"
                                         item-value="id"
                                         :label="param.text"
+                                        :data-vv-name="param.value" 
+                                        :error-messages="errors.collect(param.value)" 
+                                        v-validate="param.validate"
                                         >
                                     </v-autocomplete>
                                 </div>
@@ -80,17 +83,20 @@
                                         v-on="on"
                                     ></v-text-field>
                                 </template>
-                                <v-date-picker :first-day-of-week="1" v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                                <v-date-picker :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" :first-day-of-week="1" v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
                             </v-menu>
                         </div>
                         <div v-if="param.input == 'password'">
-                            <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
+                            <v-text-field :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
                         </div>
                         <div v-if="param.value == 'status'">
                             <v-combobox
                                 v-model="editedItem[param.value]"
                                 :items="param.status"
                                 :label="param.text"
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate"
                                 >
                             </v-combobox>
                         </div>
@@ -225,6 +231,7 @@
 <script>
 import XLSX from 'xlsx';
 export default {
+    inject: ['$validator'],
     data: () => ({
         search: '',
         dialog: false,
@@ -549,7 +556,7 @@ export default {
             this.formData.delete('file[]');
         },
         save () {
-            if (this.$refs.forms.validate() == false) {
+            if (this.$validator.validateAll()) {
                 this.snackbar = true
             } 
             else {

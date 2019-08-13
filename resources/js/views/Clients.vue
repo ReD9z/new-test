@@ -15,24 +15,28 @@ export default {
                     text: 'Имя', 
                     input: "text",
                     sortable: true,
-                    value: 'name' 
+                    value: 'name',
+                    validate: 'required'
                 },
                 { 
                     text: 'Email', 
                     input: "text",
                     sortable: true,
-                    value: 'email' 
+                    value: 'email',
+                    validate: 'required:email'
                 },
                 { 
                     text: 'Телефон', 
                     input: "text",
                     sortable: true,
-                    value: 'phone' 
+                    value: 'phone',
+                    validate: 'required'
                 },
                 { 
                     text: 'Логин', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'login' 
                 },
                 {
@@ -56,48 +60,56 @@ export default {
                     text: 'Юридическое название', 
                     input: "text",
                     sortable: true,
-                    value: 'legal_name' 
+                    value: 'legal_name', 
+                    validate: 'required'
                 },
                 { 
                     text: 'Фактическое название', 
                     input: "text",
                     sortable: true,
-                    value: 'actual_title' 
+                    value: 'actual_title',
+                    validate: 'required'
                 },
                 { 
                     text: 'Юридический адрес', 
                     input: "text",
                     sortable: true,
-                    value: 'legal_address' 
+                    value: 'legal_address',
+                    validate: 'required'
                 },
                 { 
                     text: 'Фактический адрес', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'actual_address' 
                 },
                 { 
                     text: 'Название банка', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'bank_name' 
                 },
                 { 
                     text: 'БИК', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'bik' 
                 },
                 { 
                     text: 'Кор. счёт', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'cor_score' 
                 },
                 { 
                     text: 'Расчётный счёт', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'settlement_account' 
                 }
             ],

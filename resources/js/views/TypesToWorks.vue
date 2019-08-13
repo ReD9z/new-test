@@ -17,9 +17,7 @@ export default {
                     sortable: true,
                     input: "text",
                     value: 'title',
-                    validate: [
-                        v => !!v || 'Поле "Название" обязательно',
-                    ],
+                    validate: 'required'
                 }
             ],
             searchValue: ['title'],

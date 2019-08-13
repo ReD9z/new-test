@@ -32,25 +32,30 @@ export default {
                     TableGetIdName: 'area',
                     selectApi: '/api/areas',
                     input: "select",
+                    validate: 'required'
                 },
                 { 
                     text: 'Улица', 
                     input: "text",
-                    value: 'street' 
+                    value: 'street',
+                    validate: 'required'
                 },
                 { 
                     text: 'Номер дома', 
                     input: "text",
-                    value: 'house_number' 
+                    value: 'house_number',
+                    validate: 'required'
                 },
                 { 
                     text: 'Количество подъездов', 
                     input: "text",
+                    validate: 'required',
                     value: 'number_entrances' 
                 },
                 { 
                     text: 'Управляющая компания', 
                     input: "text",
+                    validate: 'required',
                     value: 'management_company' 
                 }
             ],
@@ -99,6 +104,7 @@ export default {
                 sortable: true,
                 value: 'city_id',
                 selectText: 'name',
+                validate: 'required',
                 TableGetIdName: 'city',
                 selectApi: '/api/cities_to_works',
                 input: "select"

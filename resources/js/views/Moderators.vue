@@ -15,30 +15,35 @@ export default {
                     text: 'Имя', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'name' 
                 },
                 { 
                     text: 'Email', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'email' 
                 },
                 { 
                     text: 'Телефон', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'phone' 
                 },
                 { 
                     text: 'Логин', 
                     input: "text",
                     sortable: true,
+                    validate: 'required',
                     value: 'login' 
                 },
                 {
                     text: 'Город',
                     align: 'left',
                     sortable: true,
+                    validate: 'required',
                     value: 'city_id',
                     selectText: 'name',
                     TableGetIdName: 'city',

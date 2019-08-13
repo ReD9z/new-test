@@ -16,6 +16,7 @@ export default {
                     align: 'left',
                     sortable: true,
                     value: 'name',
+                    validate: 'required',
                     input: "text"
                 }
             ],
