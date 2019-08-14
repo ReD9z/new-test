@@ -41,7 +41,7 @@
                             <v-text-field :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
-                            <v-text-field v-model="editedItem[param.value]" :value="param.show" :rules="param.validate" type="hidden" :label="param.text" xs12 required></v-text-field>
+                            <v-text-field v-model="editedItem[param.value]" :value="param.show" type="hidden" :label="param.text" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
                             <div v-for="item in select" :key="item[0]">
@@ -50,6 +50,9 @@
                                         :items="item.data"
                                         v-model="editedItem[param.value]"
                                         :item-text="param.selectText"
+                                        :data-vv-name="param.value" 
+                                        :error-messages="errors.collect(param.value)" 
+                                        v-validate="param.validate"
                                         item-value="id"
                                         :label="param.text"
                                         >
@@ -90,6 +93,9 @@
                             <v-combobox
                                 v-model="editedItem[param.value]"
                                 :items="param.status"
+                                v-validate="param.validate"
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
                                 :label="param.text"
                                 >
                             </v-combobox>
@@ -486,10 +492,16 @@ export default {
             this.formData.delete('file[]');
         },
         save () {
-            if (this.$validator.validateAll()) {
+            if (!this.$validator.validateAll()) {
                 this.snackbar = true
             } 
             else {
+                this.params.headers.map((item) => {
+                    if(item.value == 'email') {
+                        item.validate = 'confirmed:email'; 
+                        
+                    } 
+                });
                 this.loaderSaveBtn = true;
                 this.loadingSaveBtn = true;
                 let method = null;
@@ -516,7 +528,14 @@ export default {
                         this.$refs.forms.reset();
                     }
                 ).catch(error => {
-                    console.log(error);
+                    if(error.response.status == 500) {
+                        this.params.headers.map((item) => {
+                            if(item.value == 'email') {
+                                item.validate = 'required'; 
+                                
+                            } 
+                        });
+                    }
                 })  
             }
         },

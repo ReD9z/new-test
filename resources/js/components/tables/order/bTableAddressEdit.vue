@@ -546,10 +546,6 @@ export default {
         close () {
             this.dialog = false
             this.dialogImages = false
-            // setTimeout(() => {
-            //     this.editedItem = Object.assign({}, this.defaultItem)
-            //     this.editedIndex = -1
-            // }, 300)
         },
         save() {
             if (this.$refs.forms.validate() == false) {

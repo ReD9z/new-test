@@ -60,7 +60,6 @@ export default {
                     validate: 'required',
                     selectApi: 'api/moderators',
                     input: "select",
-                    validate: 'required'
                 },
                 {
                     text: "Пароль",
