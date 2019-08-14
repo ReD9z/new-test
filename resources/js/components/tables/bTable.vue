@@ -492,52 +492,89 @@ export default {
             this.formData.delete('file[]');
         },
         save () {
-            if (!this.$validator.validateAll()) {
-                this.snackbar = true
-            } 
-            else {
-                this.params.headers.map((item) => {
-                    if(item.value == 'email') {
-                        item.validate = 'confirmed:email'; 
-                        
-                    } 
-                });
-                this.loaderSaveBtn = true;
-                this.loadingSaveBtn = true;
-                let method = null;
-                if (this.editedIndex > -1) {
-                    method = 'put'
-                } else {
-                    method = 'post'
-                }
-                axios({
-                    method: method,
-                    url: this.params.baseUrl,
-                    data: this.editedItem
-                })
-                .then(
-                    response => {
-                        if (this.editedIndex > -1) {
-                            Object.assign(this.desserts[this.editedIndex], this.editedItem);
-                        } else {
-                            this.desserts.push(response.data);
+            this.$validator.validateAll().then(() => {
+                console.log(this.errors.items);
+                if(this.$validator.errors.items.length == 0) {
+                    this.loaderSaveBtn = true;
+                    this.loadingSaveBtn = true;
+                    let method = null;
+                    if (this.editedIndex > -1) {
+                        method = 'put'
+                    } else {
+                        method = 'post'
+                    }
+                    axios({
+                        method: method,
+                        url: this.params.baseUrl,
+                        data: this.editedItem
+                    })
+                    .then(
+                        response => {
+                            if (this.editedIndex > -1) {
+                                Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                            } else {
+                                this.desserts.push(response.data);
+                            }
+                            this.loaderSaveBtn = null;
+                            this.loadingSaveBtn = false;
+                            this.close();
+                            this.$refs.forms.reset();
                         }
-                        this.loaderSaveBtn = null;
-                        this.loadingSaveBtn = false;
-                        this.close();
-                        this.$refs.forms.reset();
-                    }
-                ).catch(error => {
-                    if(error.response.status == 500) {
-                        this.params.headers.map((item) => {
-                            if(item.value == 'email') {
-                                item.validate = 'required'; 
-                                
-                            } 
-                        });
-                    }
-                })  
-            }
+                    ).catch(error => {
+                        if(error.response.status == 500) {
+                            const error = {
+                                field: "email",
+                                msg: 'Такой email уже есть.',
+                                rule: 'required', 
+                                scope: null,
+                                regenerate: () => 'some string', 
+                                vmId: 4,
+                                id: "2"
+                            };
+                            // this.$setLaravelValidationErrorsFromResponse(error.response.data);
+                            this.errors.items.push(error);
+                            this.loaderSaveBtn = null;
+                            this.loadingSaveBtn = false;
+                            console.log(this.errors.items);
+                        }
+                    })  
+                } else {
+                    this.snackbar = true
+                }
+                // this.loaderSaveBtn = true;
+                // this.loadingSaveBtn = true;
+                // let method = null;
+                // if (this.editedIndex > -1) {
+                //     method = 'put'
+                // } else {
+                //     method = 'post'
+                // }
+                // axios({
+                //     method: method,
+                //     url: this.params.baseUrl,
+                //     data: this.editedItem
+                // })
+                // .then(
+                //     response => {
+                //         if (this.editedIndex > -1) {
+                //             Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                //         } else {
+                //             this.desserts.push(response.data);
+                //         }
+                //         this.loaderSaveBtn = null;
+                //         this.loadingSaveBtn = false;
+                //         this.close();
+                //         this.$refs.forms.reset();
+                //     }
+                // ).catch(error => {
+                //     if(error.response.status == 500) {
+                //         // this.$setLaravelValidationErrorsFromResponse(error.response.data);
+                //         this.errors.first('email')
+                //     }
+                // })  
+            // }).catch(error => {
+            //     this.snackbar = true
+            });
         },
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)

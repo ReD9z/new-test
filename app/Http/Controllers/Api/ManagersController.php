@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Managers;
+use Illuminate\Support\Facades\Validator;
 use App\User;
 use App\Http\Resources\Managers as ManagersResource;
 
