@@ -15,7 +15,7 @@
                         v-validate="'required|email'"
                         data-vv-name="email"
                         :error-messages="errors.collect('email')"
-                        :data-vv-as="'`Логин`'" 
+                        :data-vv-as="'`E-mail`'" 
                         required 
                     ></v-text-field>
                     <v-text-field
@@ -65,26 +65,46 @@
                 this.isActive = !this.isActive;
             },
             login() {
-                // todo авторизация-валидация и запомнить меня, 
-                // генерация excel файла с переходпами строк в адресе, 
+                // генерация excel файла с переходами строк в адресе, 
                 // валидация добавления excel и обновлния адресов и тд, 
                 // доделать права пользователя на категории 
-                if (this.$validator.validateAll()) {
-                    this.loading = true;
-                    let email = this.user.email;
-                    let password = this.user.password;
-                    let remember_me = this.user.remember_me;
-                    this.$store.dispatch('login', { email, password, remember_me })
-                    .then((res) => {
-                        this.loading = false
-                        this.$router.push('/')
-                        this.validationErrors=null
-                    })
-                    .catch((error) => {
-                        this.validationErrors = error.response.data.errors
-                        this.loading = false
-                    });
-                }
+                this.$validator.validateAll().then(() => {
+                    if(this.$validator.errors.items.length == 0) {
+                        this.loading = true;
+                        let email = this.user.email;
+                        let password = this.user.password;
+                        let remember_me = this.user.remember_me;
+                        this.$store.dispatch('login', { email, password, remember_me })
+                        .then((res) => {
+                            this.loading = false
+                            this.$router.push('/')
+                            this.validationErrors=null
+                        })
+                        .catch((error) => {
+                            if(error.response.status == 401) {
+                                this.errors.items.push({
+                                        field: "email",
+                                        id: "1",
+                                        msg: 'Неверный e-mail',
+                                        regenerate: () => 'some string', 
+                                        rule: 'required', 
+                                        scope: null,
+                                        vmId: 4
+                                    },
+                                    {
+                                        field: "password",
+                                        id: "2",
+                                        msg: 'Неверный пароль',
+                                        rule: 'required', 
+                                        scope: null,
+                                        regenerate: () => 'some string', 
+                                        vmId: 4
+                                });
+                            }
+                            this.loading = false
+                        });
+                    }
+                });
             }
         }
     }
