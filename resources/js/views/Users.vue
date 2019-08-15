@@ -16,36 +16,28 @@ export default {
                     input: "text",
                     sortable: true,
                     value: 'name',
-                    validate: [
-                        v => !!v || 'Поле "Имя" обязательно',
-                    ],
+                    validate: 'required'
                 },
                 { 
                     text: 'Email', 
                     input: "text",
                     sortable: true,
                     value: 'email',
-                    validate: [
-                        v => !!v || 'Поле "Email" обязательно',
-                    ],
+                    validate: 'required|email'
                 },
                 { 
                     text: 'Телефон', 
                     input: "text",
                     sortable: true,
                     value: 'phone',
-                    validate: [
-                        v => !!v || 'Поле "Телефон" обязательно',
-                    ],
+                    validate: 'required'
                 },
                 { 
                     text: 'Логин', 
                     input: "text",
                     sortable: true,
                     value: 'login',
-                    validate: [
-                        v => !!v || 'Поле "Логин" обязательно',
-                    ],
+                    validate: 'required'
                 },
                 {
                     text: "Пароль",

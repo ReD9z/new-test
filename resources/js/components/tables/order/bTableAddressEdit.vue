@@ -28,6 +28,10 @@
                                         :items="item.data"
                                         v-model="editedItem[param.value]"
                                         :item-text="param.selectText"
+                                        :data-vv-as="'`'+param.text+'`'" 
+                                        :data-vv-name="param.value" 
+                                        :error-messages="errors.collect(param.value)" 
+                                        v-validate="param.validate"
                                         item-value="id"
                                         :label="param.text"
                                         >
@@ -51,11 +55,14 @@
                             <template v-slot:activator="{ on }">
                                 <v-text-field
                                     v-model="dateStartFormatted"
-                                    :rules="param.validate"
                                     hint="Формат дд.мм.гггг"
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
+                                    :data-vv-as="'`'+param.text+'`'" 
+                                    :data-vv-name="param.value" 
+                                    :error-messages="errors.collect(param.value)" 
+                                    v-validate="param.validate"
                                     v-on="on"
                                 ></v-text-field>
                             </template>
@@ -81,7 +88,10 @@
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
-                                    :rules="param.validate"
+                                    :data-vv-as="'`'+param.text+'`'" 
+                                    :data-vv-name="param.value" 
+                                    :error-messages="errors.collect(param.value)" 
+                                    v-validate="param.validate"
                                     v-on="on"
                                 ></v-text-field>
                             </template>
@@ -218,6 +228,7 @@
 <script>
 import XLSX from 'xlsx';
 export default {
+    inject: ['$validator'],
     data: vm => ({
         search: '',
         dialogImages: false,
@@ -548,13 +559,11 @@ export default {
             this.dialogImages = false
         },
         save() {
-            if (this.$refs.forms.validate() == false) {
-                this.snackbar = true;
-            } 
-            if(this.$refs.forms.validate() == true) {
-                this.loaderSaveBtn = true;
-                this.loadingSaveBtn = true;
-                axios({
+            this.$validator.validateAll().then(() => {
+                if(this.$validator.errors.items.length == 0) {
+                    this.loaderSaveBtn = true;
+                    this.loadingSaveBtn = true;
+                    axios({
                         method: 'put',
                         url: this.params.baseOrders,
                         data: {
@@ -571,8 +580,11 @@ export default {
                         this.forceRerender();  
                     }).catch(error => {
                         console.log(error);
-                });
-            }
+                    });
+                } else {
+                    this.snackbar = true
+                }
+            }); 
         },
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)

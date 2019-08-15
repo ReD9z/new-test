@@ -8,6 +8,7 @@ use App\Models\Managers;
 use Illuminate\Support\Facades\Validator;
 use App\User;
 use App\Http\Resources\Managers as ManagersResource;
+use Illuminate\Validation\Rule;
 
 class ManagersController extends Controller
 {
@@ -18,8 +19,7 @@ class ManagersController extends Controller
      */
     public function index(Request $request)
     {
-        $managers = Managers::with('users', 'cities', 'moderator.users')->get(); 
-        
+        $managers = Managers::with('users', 'cities', 'moderator.users')->get();   
         return ManagersResource::collection($managers);
     }
 
@@ -31,15 +31,23 @@ class ManagersController extends Controller
      */
     public function store(Request $request)
     {
-        $users = $request->isMethod('put') ? User::findOrFail($request->id) : new User;
+        $users = $request->isMethod('put') ? User::findOrFail($request->users_id) : new User;
 
-        $users->id = $request->input('id');
+        if($request->isMethod('post')) {
+            $users->id = $request->input('id');
+        }
+        
+        $this->validate($request, [
+            'email' => 'unique:users',
+            'email' => Rule::unique('users')->ignore($request->users_id),
+        ]);
+
         $users->name = $request->input('name');
         $users->email = $request->input('email');
         $users->phone = $request->input('phone');
         $users->login = $request->input('login');
         $users->role = 'manager';
-        
+
         if ($request->isMethod('post')) {
             $users->password = bcrypt($request->input('password'));
             $token = $users->createToken('Laravel Password Grant Client')->accessToken;
@@ -47,6 +55,9 @@ class ManagersController extends Controller
     
         if($users->save()) { 
             $managers = $request->isMethod('put') ? Managers::findOrFail($request->id) : new Managers;
+            if($request->isMethod('post')) {
+                $managers->id = $request->input('id');
+            }
             $managers->id = $request->input('id');
             $managers->users_id = $users->id;
             $managers->city_id = $request->input('city_id');

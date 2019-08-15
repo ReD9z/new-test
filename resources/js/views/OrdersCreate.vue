@@ -21,9 +21,7 @@ export default {
                     TableGetIdName: 'name',
                     selectApi: 'api/clients',
                     input: "select",
-                    validate: [
-                        v => !!v || 'Поле "Клиент" обязательно',
-                    ],
+                    validate: 'required'
                 },
                 { 
                     text: 'Дата начала размещения', 
@@ -31,9 +29,7 @@ export default {
                     sortable: true,
                     close: false,
                     value: 'order_start_date',
-                    validate: [
-                        v => !!v || 'Поле "Дата начала размещения" обязательно',
-                    ],
+                    validate: 'required'
                 },
                 { 
                     text: 'Дата конца размещения', 
@@ -41,15 +37,13 @@ export default {
                     sortable: true,
                     close: false,
                     value: 'order_end_date',
-                    validate: [
-                        v => !!v || 'Поле "Дата конца размещения" обязательно',
-                    ],
+                    validate: 'required'
                 }
             ],
             searchValue: ['city', 'street', 'management_company', 'number_entrances', 'area', 'house_number', 'result'],
             filter: [
                 {
-                    title: 'Адреса',
+                    title: 'Адрес',
                     api: '/api/cities_to_works',
                     value: 'name',
                     input: 'city'

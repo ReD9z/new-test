@@ -38,7 +38,7 @@
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
                         <div v-if="param.input == 'text'">
-                            <v-text-field :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                            <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
                             <v-text-field v-model="editedItem[param.value]" :value="param.show" type="hidden" :label="param.text" xs12 required></v-text-field>
@@ -55,6 +55,7 @@
                                         v-validate="param.validate"
                                         item-value="id"
                                         :label="param.text"
+                                        :data-vv-as="'`'+param.text+'`'"
                                         >
                                     </v-autocomplete>
                                 </div>
@@ -97,6 +98,7 @@
                                 :data-vv-name="param.value" 
                                 :error-messages="errors.collect(param.value)" 
                                 :label="param.text"
+                                :data-vv-as="'`'+param.text+'`'"
                                 >
                             </v-combobox>
                         </div>
@@ -157,8 +159,7 @@
     </v-navigation-drawer>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
-            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details>
-            </v-text-field>
+            <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
         <!-- <v-icon>filter_list</v-icon>
@@ -270,9 +271,9 @@ export default {
             this.initialize()
         }, 400)
     },
-    created () {
-        this.initialize();
-        this.selectStatus();
+    async created () {
+        await this.initialize();
+        await this.selectStatus();
     },
     methods: {
         filteredItems(data) {
@@ -321,7 +322,7 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
-                    this.filteredItems(response.data);
+                    this.filteredItems(this.desserts);
                     this.loading = false;
                 }
             ).catch(error => {
@@ -493,7 +494,6 @@ export default {
         },
         save () {
             this.$validator.validateAll().then(() => {
-                console.log(this.errors.items);
                 if(this.$validator.errors.items.length == 0) {
                     this.loaderSaveBtn = true;
                     this.loadingSaveBtn = true;
@@ -504,9 +504,9 @@ export default {
                         method = 'post'
                     }
                     axios({
-                        method: method,
                         url: this.params.baseUrl,
-                        data: this.editedItem
+                        method: method,
+                        data: this.editedItem,
                     })
                     .then(
                         response => {
@@ -521,59 +521,26 @@ export default {
                             this.$refs.forms.reset();
                         }
                     ).catch(error => {
-                        if(error.response.status == 500) {
-                            const error = {
-                                field: "email",
-                                msg: 'Такой email уже есть.',
-                                rule: 'required', 
-                                scope: null,
-                                regenerate: () => 'some string', 
-                                vmId: 4,
-                                id: "2"
-                            };
-                            // this.$setLaravelValidationErrorsFromResponse(error.response.data);
-                            this.errors.items.push(error);
-                            this.loaderSaveBtn = null;
-                            this.loadingSaveBtn = false;
-                            console.log(this.errors.items);
+                        if(error.response.status == 422) {
+                            if(error.response.data.errors.email) {
+                                const error = {
+                                    field: "email",
+                                    msg: 'Такой email уже есть.',
+                                    rule: 'required', 
+                                    scope: null,
+                                    regenerate: () => 'some string', 
+                                    vmId: 4,
+                                    id: "2"
+                                };
+                                this.errors.items.push(error);
+                                this.loaderSaveBtn = null;
+                                this.loadingSaveBtn = false;
+                            }
                         }
                     })  
                 } else {
                     this.snackbar = true
                 }
-                // this.loaderSaveBtn = true;
-                // this.loadingSaveBtn = true;
-                // let method = null;
-                // if (this.editedIndex > -1) {
-                //     method = 'put'
-                // } else {
-                //     method = 'post'
-                // }
-                // axios({
-                //     method: method,
-                //     url: this.params.baseUrl,
-                //     data: this.editedItem
-                // })
-                // .then(
-                //     response => {
-                //         if (this.editedIndex > -1) {
-                //             Object.assign(this.desserts[this.editedIndex], this.editedItem);
-                //         } else {
-                //             this.desserts.push(response.data);
-                //         }
-                //         this.loaderSaveBtn = null;
-                //         this.loadingSaveBtn = false;
-                //         this.close();
-                //         this.$refs.forms.reset();
-                //     }
-                // ).catch(error => {
-                //     if(error.response.status == 500) {
-                //         // this.$setLaravelValidationErrorsFromResponse(error.response.data);
-                //         this.errors.first('email')
-                //     }
-                // })  
-            // }).catch(error => {
-            //     this.snackbar = true
             });
         },
         remove(item) {

@@ -38,7 +38,7 @@
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
                         <div v-if="param.input == 'text'">
-                            <v-text-field :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                            <v-text-field :data-vv-name="param.value" :data-vv-as="'`'+param.text+'`'"  :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
                             <v-text-field v-model="editedItem[param.value] = param.show"  type="hidden" :label="param.text" xs12></v-text-field>
@@ -50,6 +50,7 @@
                                         :items="item.data"
                                         v-model="editedItem[param.value]"
                                         :item-text="param.selectText"
+                                        :data-vv-as="'`'+param.text+'`'" 
                                         item-value="id"
                                         :label="param.text"
                                         :data-vv-name="param.value" 
@@ -95,6 +96,7 @@
                                 :items="param.status"
                                 :label="param.text"
                                 :data-vv-name="param.value" 
+                                :data-vv-as="'`'+param.text+'`'" 
                                 :error-messages="errors.collect(param.value)" 
                                 v-validate="param.validate"
                                 >

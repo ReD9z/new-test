@@ -153,6 +153,7 @@ export default {
                 TableGetIdName: 'city',
                 selectApi: '/api/cities_to_works',
                 input: "select",
+                validate: 'required',
             });
         }
     }

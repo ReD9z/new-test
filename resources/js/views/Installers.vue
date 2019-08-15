@@ -62,7 +62,7 @@ export default {
     created () {
         if(this.isLoggedUser.role == "moderator") {
             this.params.user = this.isLoggedUser.moderators.id;
-            this.params.headers.push(
+            this.params.headers.unshift(
                 {
                     text: 'Город',
                     align: 'left',
@@ -83,7 +83,7 @@ export default {
                 }
             );
         } else {
-            this.params.headers.push({
+            this.params.headers.unshift({
                 text: 'Город',
                 align: 'left',
                 sortable: true,
@@ -91,6 +91,7 @@ export default {
                 selectText: 'name',
                 TableGetIdName: 'city',
                 selectApi: '/api/cities_to_works',
+                validate: 'required',
                 input: "select",
             },
             {
@@ -100,6 +101,7 @@ export default {
                 value: 'moderator_id',
                 selectText: 'name',
                 TableGetIdName: 'moderator',
+                validate: 'required',
                 selectApi: '/api/moderators',
                 input: "select",
             });

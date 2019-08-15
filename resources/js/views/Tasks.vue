@@ -20,6 +20,7 @@ export default {
                     TableGetIdName: 'orderClient',
                     selectApi: 'api/orders',
                     input: "select",
+                    validate: 'required'
                 },
                 {
                     text: 'Монтажник',
@@ -30,13 +31,15 @@ export default {
                     TableGetIdName: 'installers',
                     selectApi: 'api/installers',
                     input: "select",
+                    validate: 'required'
                 },
                 { 
                     text: 'Дата выполнения', 
                     input: "date",
                     sortable: true,
                     close: false,
-                    value: 'task_date_completion' 
+                    value: 'task_date_completion',
+                    validate: 'required'
                 },
                 {
                     text: 'Тип работы',
@@ -47,6 +50,7 @@ export default {
                     TableGetIdName: 'types',
                     selectApi: 'api/types_to_work',
                     input: "select",
+                    validate: 'required'
                 },
                 {
                     data: [
@@ -57,6 +61,7 @@ export default {
                     value: "status",
                     title: "statusName",
                     text: 'Статус',
+                    validate: 'required',
                     sortable: true,
                 },
                 { 
@@ -64,6 +69,7 @@ export default {
                     input: "text",
                     sortable: true,
                     value: 'comment',
+                    validate: 'required'
                 }
             ],
             searchValue: ['orderClient', 'installers', 'types', 'task_date_completion', 'comment', 'statusName'],

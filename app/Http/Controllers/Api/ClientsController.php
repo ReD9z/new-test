@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Clients;
 use App\Http\Resources\Clients as ClientsResource;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use App\User;
 
 class ClientsController extends Controller
@@ -46,9 +48,15 @@ class ClientsController extends Controller
     {
         $users = $request->isMethod('put') ? User::findOrFail($request->users_id) : new User;
 
-        if(!$request->isMethod('put')) {
+        if($request->isMethod('post')) {
             $users->id = $request->input('id');
         }
+
+        $this->validate($request, [
+            'email' => 'unique:users',
+            'email' => Rule::unique('users')->ignore($request->users_id),
+        ]);
+
         $users->name = $request->input('name');
         $users->email = $request->input('email');
         $users->phone = $request->input('phone');
@@ -62,8 +70,8 @@ class ClientsController extends Controller
     
         if($users->save()) { 
             $clients = $request->isMethod('put') ? Clients::findOrFail($request->id) : new Clients;
-            if(!$request->isMethod('put')) {
-                $clients->id = $request->input('id');
+             if($request->isMethod('post')) {
+                $moderators->id = $request->input('id');
             }
             $clients->users_id = $users->id;
             $clients->city_id = $request->input('city_id');

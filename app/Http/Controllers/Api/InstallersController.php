@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Installers;
 use App\Http\Resources\Installers as InstallersResource;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use App\User;
 
 class InstallersController extends Controller
@@ -34,9 +36,17 @@ class InstallersController extends Controller
      */
     public function store(Request $request)
     {
-        $users = $request->isMethod('put') ? User::findOrFail($request->id) : new User;
+        $users = $request->isMethod('put') ? User::findOrFail($request->users_id) : new User;
 
-        $users->id = $request->input('id');
+        if($request->isMethod('post')) {
+            $users->id = $request->input('id');
+        }
+        
+        $this->validate($request, [
+            'email' => 'unique:users',
+            'email' => Rule::unique('users')->ignore($request->users_id),
+        ]);
+
         $users->name = $request->input('name');
         $users->email = $request->input('email');
         $users->phone = $request->input('phone');
@@ -50,7 +60,9 @@ class InstallersController extends Controller
     
         if($users->save()) { 
             $installers = $request->isMethod('put') ? Installers::findOrFail($request->id) : new Installers;
-            $installers->id = $request->input('id');
+            if($request->isMethod('post')) {
+                $installers->id = $request->input('id');
+            }
             $installers->users_id = $users->id;
             $installers->city_id = $request->input('city_id');
             $installers->moderator_id = $request->input('moderator_id');

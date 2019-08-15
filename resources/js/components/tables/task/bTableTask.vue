@@ -30,102 +30,103 @@
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
                         <div v-if="param.input == 'text'">
-                            <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                            <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
-                            <v-text-field v-model="editedItem[param.value]" :value="param.show" :rules="param.validate" type="hidden" :label="param.text" xs12 required></v-text-field>
+                            <v-text-field v-model="editedItem[param.value]" :value="param.show" type="hidden" :label="param.text" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
                             <div v-if="param.selectText == 'orderClient'">
                                 <v-layout justify-space-around row>
-                                    <v-flex
-                                        grow
-                                        pa-1
+                                    <v-autocomplete
+                                        :items="orderDate"
+                                        v-model="editedItem[param.value]"
+                                        :item-text="param.selectText"
+                                        item-value="id"
+                                        :label="param.text"
+                                        :data-vv-as="'`'+param.text+'`'" 
+                                        :data-vv-name="param.value" 
+                                        :error-messages="errors.collect(param.value)" 
+                                        v-validate="param.validate"
                                     >
-                                        <v-autocomplete
-                                            :items="orderDate"
-                                            v-model="editedItem[param.value]"
-                                            :item-text="param.selectText"
-                                            item-value="id"
-                                            :label="param.text"
+                                        <template v-slot:append-outer>
+                                            <v-menu
+                                                v-model="menu"
+                                                :close-on-content-click="false"
+                                                offset-x
                                             >
-                                        </v-autocomplete>
-                                    </v-flex>
-                                    <v-flex
-                                        pa-1
-                                    >
-                                        <v-menu
-                                            v-model="menu"
-                                            :close-on-content-click="false"
-                                            offset-x
-                                        >
-                                            <template v-slot:activator="{ on }">
-                                                <v-btn flat icon v-on="on">
-                                                    <v-icon>date_range</v-icon>
-                                                </v-btn>
-                                            </template>
-                                            <v-card>
-                                            <v-layout pa-4 row wrap>
-                                                <v-flex xs12 lg6>
-                                                    <v-menu
-                                                        v-model="menu1"
-                                                        :close-on-content-click="false"
-                                                        :nudge-right="40"
-                                                        lazy
-                                                        transition="scale-transition"
-                                                        offset-y
-                                                        full-width
-                                                        max-width="290px"
-                                                        min-width="290px"
-                                                    >
-                                                        <template v-slot:activator="{ on }">
-                                                            <v-text-field
-                                                                v-model="dateStartFormatted"
-                                                                :rules="param.validate"
-                                                                hint="Формат дд.мм.гггг"
-                                                                persistent-hint
-                                                                prepend-icon="event"
-                                                                label="Начало"
-                                                                v-on="on"
-                                                            ></v-text-field>
-                                                        </template>
-                                                        <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateStart" no-title @input="menu1 = false"></v-date-picker>
-                                                    </v-menu>
-                                                </v-flex>
-                                                <v-flex xs12 lg6>
-                                                    <v-menu
-                                                        v-model="menu2"
-                                                        :close-on-content-click="false"
-                                                        :nudge-right="40"
-                                                        lazy
-                                                        transition="scale-transition"
-                                                        offset-y
-                                                        full-width
-                                                        max-width="290px"
-                                                        min-width="290px"
-                                                    >
-                                                        <template v-slot:activator="{ on }">
-                                                            <v-text-field
-                                                                v-model="dateEndFormatted"
-                                                                hint="Формат дд.мм.гггг"
-                                                                persistent-hint
-                                                                prepend-icon="event"
-                                                                label="Конец"
-                                                                v-on="on"
-                                                            ></v-text-field>
-                                                        </template>
-                                                        <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateEnd" no-title @input="menu2 = false"></v-date-picker>
-                                                    </v-menu>
-                                                </v-flex>
-                                                </v-layout>
-                                                <v-card-actions>
-                                                    <v-spacer></v-spacer>
-                                                    <v-btn flat @click="menu = false">Закрыть</v-btn>
-                                                    <v-btn color="primary" flat @click="dateFilter()">Применить</v-btn>
-                                                </v-card-actions>
-                                            </v-card>
-                                        </v-menu>
-                                    </v-flex>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon v-on="on">
+                                                        <v-icon>date_range</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <v-card>
+                                                    <v-layout pa-4 row wrap>
+                                                        <v-flex xs12 lg5>
+                                                            <v-menu
+                                                                v-model="menu1"
+                                                                :close-on-content-click="false"
+                                                                :nudge-right="40"
+                                                                lazy
+                                                                transition="scale-transition"
+                                                                offset-y
+                                                                full-width
+                                                                max-width="290px"
+                                                                min-width="290px"
+                                                            >
+                                                                <template v-slot:activator="{ on }">
+                                                                    <v-text-field
+                                                                        v-model="dateStartFormatted"
+                                                                        hint="Формат дд.мм.гггг"
+                                                                        persistent-hint
+                                                                        prepend-icon="event"
+                                                                        label="Начало"
+                                                                        v-on="on"
+                                                                    ></v-text-field>
+                                                                </template>
+                                                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateStart" no-title @input="menu1 = false"></v-date-picker>
+                                                            </v-menu>
+                                                        </v-flex>
+                                                        <v-flex xs12 lg5>
+                                                            <v-menu
+                                                                v-model="menu2"
+                                                                :close-on-content-click="false"
+                                                                :nudge-right="40"
+                                                                lazy
+                                                                transition="scale-transition"
+                                                                offset-y
+                                                                full-width
+                                                                max-width="290px"
+                                                                min-width="290px"
+                                                            >
+                                                                <template v-slot:activator="{ on }">
+                                                                    <v-text-field
+                                                                        v-model="dateEndFormatted"
+                                                                        hint="Формат дд.мм.гггг"
+                                                                        persistent-hint
+                                                                        prepend-icon="event"
+                                                                        label="Конец"
+                                                                        v-on="on"
+                                                                    ></v-text-field>
+                                                                </template>
+                                                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateEnd" no-title @input="menu2 = false"></v-date-picker>
+                                                            </v-menu>
+                                                        </v-flex>
+                                                        <v-flex xs12 lg2>
+                                                            <v-btn flat icon @click="resetDate()">
+                                                                <v-icon>close</v-icon>
+                                                            </v-btn>                
+                                                        </v-flex>
+                                                    </v-layout>
+                                                    <v-card-actions>
+                                                        <v-spacer></v-spacer>
+                                                        <v-btn flat @click="menu = false">Закрыть</v-btn>
+                                                        <v-btn color="primary" flat @click="dateFilter()">Применить</v-btn>
+                                                    </v-card-actions>
+                                                </v-card>
+                                            </v-menu> 
+                                        </template>
+                                    </v-autocomplete>
                                 </v-layout>
                             </div>
                             <div v-else>
@@ -142,7 +143,11 @@
                                                     :item-text="param.selectText"
                                                     item-value="id"
                                                     :label="param.text"
-                                                    >
+                                                    :data-vv-as="'`'+param.text+'`'" 
+                                                    :data-vv-name="param.value" 
+                                                    :error-messages="errors.collect(param.value)" 
+                                                    v-validate="param.validate"
+                                                >
                                                 </v-autocomplete>
                                             </v-flex>
                                         </v-layout>
@@ -170,6 +175,10 @@
                                         @blur="editedItem[param.value] = parseDate(picker)"
                                         prepend-icon="event"
                                         :label="param.text"
+                                        :data-vv-as="'`'+param.text+'`'" 
+                                        :data-vv-name="param.value" 
+                                        :error-messages="errors.collect(param.value)" 
+                                        v-validate="param.validate"
                                         v-on="on"
                                     ></v-text-field>
                                 </template>
@@ -186,6 +195,10 @@
                                 item-text="text"
                                 item-value="status"
                                 :label="param.text"
+                                :data-vv-as="'`'+param.text+'`'" 
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate"
                             >
                             </v-autocomplete>
                         </div>
@@ -315,6 +328,7 @@
 <script>
 import XLSX from 'xlsx';
 export default {
+    inject: ['$validator'],
     data: (vm) => ({
         search: '',
         dialog: false,
@@ -387,24 +401,32 @@ export default {
             return `${day}-${month}-${year}`
         },
         dateFilter () {
-            this.menu = false;
             let vm = this;
             this.orderDate = this.orderFull;
-            // this.orderDate = Object.assign({}, this.orderDate[0]);
-            // console.log(Object.assign({}, this.orderDate[0]['data']));
+            this.menu = false;
             let orderData = [];
-            this.orderDate.map(function (item) {
-                let itemDateStart = vm.$moment(item.order_start_date, 'DD-MM-YYYY').unix() * 1000;
-                let itemDateEnd = vm.$moment(item.order_start_date, 'DD-MM-YYYY').unix() * 1000;
-                let dateStart = vm.$moment(vm.formatDate(vm.dateStart), 'DD-MM-YYYY').unix() * 1000;
-                let dateEnd = vm.$moment(vm.formatDate(vm.dateEnd), 'DD-MM-YYYY').unix() * 1000;
-                if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
-                    orderData .push(item);
-                } else {
-                    
-                }
-            });
-            this.orderDate = orderData;
+            if(this.dateStart == null || this.dateEnd == null) {
+                this.orderDate = this.orderFull;
+            } else {
+                this.orderDate.map(function (item) {
+                    let itemDateStart = vm.$moment(item.order_start_date, 'DD-MM-YYYY').unix() * 1000;
+                    let itemDateEnd = vm.$moment(item.order_start_date, 'DD-MM-YYYY').unix() * 1000;
+                    let dateStart = vm.$moment(vm.formatDate(vm.dateStart), 'DD-MM-YYYY').unix() * 1000;
+                    let dateEnd = vm.$moment(vm.formatDate(vm.dateEnd), 'DD-MM-YYYY').unix() * 1000;
+            
+                    if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
+                        orderData.push(item);
+                    } 
+                });
+                this.orderDate = orderData;
+              
+            } 
+        },
+        resetDate() {
+            this.dateStart = null;
+            this.dateEnd = null;
+            this.initialize();
+            this.orderDate = this.orderFull;
         },
         filteredItems(data) {
             this.desserts = data;
@@ -632,39 +654,40 @@ export default {
             this.formData.delete('file[]');
         },
         save () {
-            if (this.$refs.forms.validate() == false) {
-                this.snackbar = true
-            } 
-            else {
-                this.loaderSaveBtn = true;
-                this.loadingSaveBtn = true;
-                let method = null;
-                if (this.editedIndex > -1) {
-                    method = 'put'
-                } else {
-                    method = 'post'
-                }
-                axios({
-                    method: method,
-                    url: this.params.baseUrl,
-                    data: this.editedItem
-                })
-                .then(
-                    response => {
-                        if (this.editedIndex > -1) {
-                            Object.assign(this.desserts[this.editedIndex], this.editedItem);
-                        } else {
-                            this.desserts.push(response.data);
-                        }
-                        this.loaderSaveBtn = null;
-                        this.loadingSaveBtn = false;
-                        this.close();
-                        this.$refs.forms.reset();
+            this.$validator.validateAll().then(() => {
+                if(this.$validator.errors.items.length == 0) {
+                    this.loaderSaveBtn = true;
+                    this.loadingSaveBtn = true;
+                    let method = null;
+                    if (this.editedIndex > -1) {
+                        method = 'put'
+                    } else {
+                        method = 'post'
                     }
-                ).catch(error => {
-                    console.log(error);
-                })  
-            }
+                    axios({
+                        method: method,
+                        url: this.params.baseUrl,
+                        data: this.editedItem
+                    })
+                    .then(
+                        response => {
+                            if (this.editedIndex > -1) {
+                                Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                            } else {
+                                this.desserts.push(response.data);
+                            }
+                            this.loaderSaveBtn = null;
+                            this.loadingSaveBtn = false;
+                            this.close();
+                            this.$refs.forms.reset();
+                        }
+                    ).catch(error => {
+                        console.log(error);
+                    })  
+                } else {
+                    this.snackbar = true
+                }
+            });
         },
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)

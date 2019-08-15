@@ -19,7 +19,7 @@
                 <v-layout row wrap>
                     <v-flex v-for="(param, key) in params.headerOrders" :key="`Y-${key}`" xs12>
                         <div v-if="param.input == 'text'" xs12>
-                            <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                            <v-text-field v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'" xs12>
                             <div v-for="item in select" :key="item[0]">
@@ -28,6 +28,10 @@
                                         :items="item.data"
                                         v-model="editedItem[param.value]"
                                         :item-text="param.selectText"
+                                        :data-vv-as="'`'+param.text+'`'" 
+                                        :data-vv-name="param.value" 
+                                        :error-messages="errors.collect(param.value)" 
+                                        v-validate="param.validate"
                                         item-value="id"
                                         :label="param.text"
                                         >
@@ -51,15 +55,18 @@
                             <template v-slot:activator="{ on }">
                                 <v-text-field
                                     v-model="dateStartFormatted"
-                                    :rules="param.validate"
                                     hint="Формат дд.мм.гггг"
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
+                                    :data-vv-as="'`'+param.text+'`'" 
+                                    :data-vv-name="param.value" 
+                                    :error-messages="errors.collect(param.value)"
+                                    v-validate="param.validate" 
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker  locale="ru" :first-day-of-week="1" v-model="dateStart" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </v-flex>
                     <v-flex v-for="(param, key) in params.headerOrders" v-if="param.input == 'dateEnd'" :key="`B-${key}`" xs12 lg6>
@@ -81,11 +88,14 @@
                                     persistent-hint
                                     prepend-icon="event"
                                     :label="param.text"
-                                    :rules="param.validate"
                                     v-on="on"
+                                    :data-vv-as="'`'+param.text+'`'" 
+                                    :data-vv-name="param.value" 
+                                    :error-messages="errors.collect(param.value)" 
+                                    v-validate="param.validate"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
+                            <v-date-picker  locale="ru" :first-day-of-week="1" v-model="dateEnd" no-title @input="param.close = false"></v-date-picker>
                         </v-menu>
                     </v-flex>
                 </v-layout>
@@ -166,15 +176,6 @@
                 По запросу "{{ search }}" ничего не найдено.
             </v-alert>
         </template>
-        <template v-if="selectedStatus" v-slot:footer>
-            <td :colspan="params.headers.length">
-                <div class="v-messages theme--light error--text">
-                    <div class="v-messages__wrapper">
-                        <div class="v-messages__message" style="">Выберите адрес!</div>
-                    </div>
-                </div>
-            </td>
-        </template>
     </v-data-table>
     <!-- <v-flex class="text-xs-center" mt-4>
         <v-btn color="info" large @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
@@ -192,6 +193,7 @@
 import XLSX from 'xlsx';
 
 export default {
+    inject: ['$validator'],
     data: vm => ({
         search: '',
         loading: true,
@@ -454,18 +456,13 @@ export default {
             }, 300)
         },
         save () {
-            if (this.$refs.forms.validate() == false) {
-                this.snackbar = true;
-            } 
-            if(this.selected.length <= 0) {
-                this.selectedStatus = true;
-            }     
-            if(this.$refs.forms.validate() == true && this.selected.length > 0) {
-                this.selectedStatus = false;
-                this.loaderSaveBtn = true;
-                this.loadingSaveBtn = true;
-                axios({
-                    method: 'post',
+            this.$validator.validateAll().then(() => {
+                if(this.$validator.errors.items.length == 0) {
+                    this.loaderSaveBtn = true;
+                    this.loadingSaveBtn = true;
+                  
+                    axios({
+                        method: 'post',
                         url: this.params.baseOrders,
                         data: {
                             order: this.editedItem,
@@ -474,21 +471,17 @@ export default {
                             dateEnd: this.dateEnd
                         }
                     })
-                    .then(response => {
-                        // this.$route.router.go('/orders-address/' + this.editedItem.id);
-                        // console.log(response);
-                        // router.push({ name: 'orders-address', params: { id: response.data.id }});
-                        this.$router.push(`orders-address/${response.data.id}`);
-                        // router.push({ path: `/orders-address/${response.data.id}`});
-                        // window.location.href = '/orders-address/' + response.data.id;
-                        // this.editedItem = [];
-                        // this.selected = [];
-                        // this.loaderSaveBtn=null;
-                        // this.loadingSaveBtn=false;
-                    }).catch(error => {
+                    .then(
+                        response => {
+                            this.$router.push(`orders-address/${response.data.id}`);
+                        }
+                    ).catch(error => {
                         console.log(error);
-                });
-            }
+                    })  
+                } else {
+                    this.snackbar = true
+                }
+            });  
         },
         refreshSearch() {
             this.chips = [];
@@ -502,7 +495,7 @@ export default {
         }
     },
     mounted() {
-    //    this.$router.push('orders-address/3');
+   
     }
 }
 </script>

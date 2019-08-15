@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Admins;
 use App\Http\Resources\Admins as AdminsResource;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use App\User;
 
 class AdminsController extends Controller
 {
@@ -29,14 +32,24 @@ class AdminsController extends Controller
      */
     public function store(Request $request)
     {
-        $users = $request->isMethod('put') ? User::findOrFail($request->id) : new User;
+        $users = $request->isMethod('put') ? User::findOrFail($request->users_id) : new User;
 
-        $users->id = $request->input('id');
+        if($request->isMethod('post')) {
+            $users->id = $request->input('id');
+        }
+     
+        
+        
         $users->name = $request->input('name');
         $users->email = $request->input('email');
         $users->phone = $request->input('phone');
         $users->login = $request->input('login');
         $users->role = 'admin';
+        
+        $this->validate($request, [
+            'email' => 'unique:users',
+            'email' => Rule::unique('users')->ignore($request->users_id),
+        ]);
         
         if ($request->isMethod('post')) {
             $users->password = bcrypt($request->input('password'));
@@ -45,7 +58,10 @@ class AdminsController extends Controller
     
         if($users->save()) { 
             $admin = $request->isMethod('put') ? Admins::findOrFail($request->id) : new Admins;
-            $admin->id = $request->input('id');
+
+            if($request->isMethod('post')) {
+                $admin->id = $request->input('id');
+            }
             $admin->users_id = $users->id;
 
             if($admin->save()) {

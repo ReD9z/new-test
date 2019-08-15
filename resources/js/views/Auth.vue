@@ -15,6 +15,7 @@
                         v-validate="'required|email'"
                         data-vv-name="email"
                         :error-messages="errors.collect('email')"
+                        :data-vv-as="'`Логин`'" 
                         required 
                     ></v-text-field>
                     <v-text-field
@@ -26,12 +27,10 @@
                         v-model="user.password"
                         v-validate="'required'"
                         data-vv-name="password"
+                        :data-vv-as="'`Пароль`'"       
                         :error-messages="errors.collect('password')"
                         required
                     ></v-text-field>
-                    <div class="text-xs-center">
-                        <span class="red--text" v-if="validationErrors == 'errors'">Неверный логин или пароль!</span>
-                    </div>
                     <v-checkbox class="pl-4 pr-4" v-model="user.remember_me"  label="Запомнить?" :value="isActive" @click="remember()"></v-checkbox>
                     <v-btn class="mb-4 ml-4 mr-4" color="success" @click="login" :loading="loading" :disabled="loading">
                         Войти
@@ -66,14 +65,25 @@
                 this.isActive = !this.isActive;
             },
             login() {
+                // todo авторизация-валидация и запомнить меня, 
+                // генерация excel файла с переходпами строк в адресе, 
+                // валидация добавления excel и обновлния адресов и тд, 
+                // доделать права пользователя на категории 
                 if (this.$validator.validateAll()) {
                     this.loading = true;
                     let email = this.user.email;
                     let password = this.user.password;
                     let remember_me = this.user.remember_me;
                     this.$store.dispatch('login', { email, password, remember_me })
-                        .then((res) => {this.loading = false, this.$router.push('/'), this.validationErrors=null})
-                        .catch((error) => this.validationErrors = error.response.data.errors) 
+                    .then((res) => {
+                        this.loading = false
+                        this.$router.push('/')
+                        this.validationErrors=null
+                    })
+                    .catch((error) => {
+                        this.validationErrors = error.response.data.errors
+                        this.loading = false
+                    });
                 }
             }
         }

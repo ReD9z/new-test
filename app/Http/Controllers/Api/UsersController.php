@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use App\Http\Resources\Users as UsersResource;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class UsersController extends Controller
 {
@@ -29,12 +31,22 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         $users = $request->isMethod('put') ? User::findOrFail($request->id) : new User;
-        $users->id = $request->input('id');
+
+        if($request->isMethod('post')) {
+            $users->id = $request->input('id');
+        }
+     
+        $this->validate($request, [
+            'email' => 'unique:users',
+            'email' => Rule::unique('users')->ignore($request->id),
+        ]);
+
         $users->name = $request->input('name');
         $users->email = $request->input('email');
         $users->phone = $request->input('phone');
         $users->login = $request->input('login');
         $users->role = 'admin';
+        
         if ($request->isMethod('post')) {
             $users->password = bcrypt($request->input('password'));
             $token = $users->createToken('Laravel Password Grant Client')->accessToken;

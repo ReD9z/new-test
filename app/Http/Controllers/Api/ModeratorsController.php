@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Moderators;
 use App\Http\Resources\Moderators as ModeratorsResource;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use App\User;
 
 class ModeratorsController extends Controller
@@ -31,9 +33,17 @@ class ModeratorsController extends Controller
      */
     public function store(Request $request)
     {
-        $users = $request->isMethod('put') ? User::findOrFail($request->id) : new User;
+        $users = $request->isMethod('put') ? User::findOrFail($request->users_id) : new User;
 
-        $users->id = $request->input('id');
+        if($request->isMethod('post')) {
+            $users->id = $request->input('id');
+        }
+        
+        $this->validate($request, [
+            'email' => 'unique:users',
+            'email' => Rule::unique('users')->ignore($request->users_id),
+        ]);
+
         $users->name = $request->input('name');
         $users->email = $request->input('email');
         $users->phone = $request->input('phone');
@@ -47,7 +57,9 @@ class ModeratorsController extends Controller
     
         if($users->save()) { 
             $moderators = $request->isMethod('put') ? Moderators::findOrFail($request->id) : new Moderators;
-            $moderators->id = $request->input('id');
+            if($request->isMethod('post')) {
+                $moderators->id = $request->input('id');
+            }
             $moderators->users_id = $users->id;
             $moderators->city_id = $request->input('city_id');
         }

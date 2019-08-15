@@ -250,10 +250,10 @@ export default {
             this.initialize();
         }
     },
-    created () {
-        this.initialize();
-        this.selectStatus();
-        this.getFiltered();
+    async created () {
+        await this.initialize();
+        await this.selectStatus();
+        await this.getFiltered();
     },
     methods: {
         editAddress(data) {
@@ -344,8 +344,8 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
-                    this.filteredItems(response.data);
-                    this.filtered(response.data);
+                    this.filteredItems(this.desserts);
+                    this.filtered(this.desserts);
                     this.loading = false;
                 }
             ).catch(error => {

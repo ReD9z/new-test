@@ -9,7 +9,7 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/managers',
+            baseUrl: '/api/managers',
             headers: [
                 { 
                     text: 'Имя', 
