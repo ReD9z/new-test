@@ -557,6 +557,7 @@ export default {
         close () {
             this.dialog = false
             this.dialogImages = false
+            this.$validator.reset()
         },
         save() {
             this.$validator.validateAll().then(() => {

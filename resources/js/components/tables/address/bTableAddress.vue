@@ -38,7 +38,7 @@
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
                         <div v-if="param.input == 'text'">
-                            <v-text-field :data-vv-name="param.value" :data-vv-as="'`'+param.text+'`'"  :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                            <v-text-field :data-vv-name="param.value" :data-vv-as="'`'+param.text+'`'" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
                             <v-text-field v-model="editedItem[param.value] = param.show"  type="hidden" :label="param.text" xs12></v-text-field>
@@ -61,47 +61,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-if="param.input == 'date'">
-                            <v-menu
-                                v-model="param.close"
-                                :close-on-content-click="false"
-                                :nudge-right="40"
-                                lazy
-                                transition="scale-transition"
-                                offset-y
-                                full-width
-                                max-width="290px"
-                                min-width="290px"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        v-model="editedItem[param.value]"
-                                        hint="DD-MM-YYYY формат"
-                                        persistent-hint
-                                        @blur="editedItem[param.value] = parseDate(picker)"
-                                        prepend-icon="event"
-                                        :label="param.text"
-                                        v-on="on"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" :first-day-of-week="1" v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
-                            </v-menu>
-                        </div>
-                        <div v-if="param.input == 'password'">
-                            <v-text-field :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
-                        </div>
-                        <div v-if="param.value == 'status'">
-                            <v-combobox
-                                v-model="editedItem[param.value]"
-                                :items="param.status"
-                                :label="param.text"
-                                :data-vv-name="param.value" 
-                                :data-vv-as="'`'+param.text+'`'" 
-                                :error-messages="errors.collect(param.value)" 
-                                v-validate="param.validate"
-                                >
-                            </v-combobox>
-                        </div>
+                        
                     </v-flex>
                     <div class="text-xs-center">
                         <v-btn color="info" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
@@ -291,7 +251,8 @@ export default {
         this.getFiltered();
     },
     methods: {
-          async getFiltered() {
+        async getFiltered() {
+            this.chipsItem = [];
             await this.params.filter.forEach((item) => {
                 if(item.api) {
                     axios({
@@ -375,7 +336,7 @@ export default {
                 this.pagination.descending = false
             }
         },
-        initialize () {
+        initialize() {
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
@@ -403,6 +364,7 @@ export default {
             return `${month}-${day}-${year}`
         },
         selectStatus() {
+            this.select = [];
             this.params.headers.forEach(element => {
                 if(element.selectApi != undefined) {
                     axios.get(element.selectApi)
@@ -414,7 +376,7 @@ export default {
                                         data: res.data,
                                         url: element.selectApi
                                     }
-                                );
+                                ); 
                             }
                         }
                     ).catch(
@@ -470,7 +432,6 @@ export default {
                 })
                 .then(
                     response => {
-                        // Обновлять при сохранении select с адресами
                         let array = response.data.data;
                         if(array != undefined) {
                             vm.desserts.push(array);
@@ -482,6 +443,8 @@ export default {
                     console.log(error);
                 });
             })
+            await this.getFiltered();
+            await this.selectStatus();
         },
         elementLoadToFile() {
             this.loadingExcel = true;
@@ -497,7 +460,6 @@ export default {
                 let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
 
                 vm.loadExecel(excelRows);
-                
                 file.value = '';
             };
         },
@@ -551,6 +513,7 @@ export default {
                 this.editedItem = Object.assign({}, this.defaultItem)
                 this.editedIndex = -1
             }, 300)
+            this.$validator.reset()
         },
         resetFilesLoad() {
             this.files = [];
@@ -558,39 +521,40 @@ export default {
             this.formData.delete('file[]');
         },
         save () {
-            if (this.$validator.validateAll()) {
-                this.snackbar = true
-            } 
-            else {
-                this.loaderSaveBtn = true;
-                this.loadingSaveBtn = true;
-                let method = null;
-                if (this.editedIndex > -1) {
-                    method = 'put'
-                } else {
-                    method = 'post'
-                }
-                axios({
-                    method: method,
-                    url: this.params.baseUrl,
-                    data: this.editedItem
-                })
-                .then(
-                    response => {
-                        if (this.editedIndex > -1) {
-                            Object.assign(this.desserts[this.editedIndex], this.editedItem);
-                        } else {
-                            this.desserts.push(response.data);
-                        }
-                        this.loaderSaveBtn = null;
-                        this.loadingSaveBtn = false;
-                        this.close();
-                        this.$refs.forms.reset();
+            this.$validator.validateAll().then(() => {
+                if(this.$validator.errors.items.length == 0) {
+                    this.loaderSaveBtn = true;
+                    this.loadingSaveBtn = true;
+                    let method = null;
+                    if (this.editedIndex > -1) {
+                        method = 'put'
+                    } else {
+                        method = 'post'
                     }
-                ).catch(error => {
-                    console.log(error);
-                })  
-            }
+                    axios({
+                        method: method,
+                        url: this.params.baseUrl,
+                        data: this.editedItem
+                    })
+                    .then(
+                        response => {
+                            if (this.editedIndex > -1) {
+                                Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                            } else {
+                                this.desserts.push(response.data);
+                            }
+                            this.loaderSaveBtn = null;
+                            this.loadingSaveBtn = false;
+                            this.close();
+                            this.$refs.forms.reset();
+                        }
+                    ).catch(error => {
+                        console.log(error);
+                    }) 
+                } else {
+                    this.snackbar = true
+                }
+            });
         },
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)

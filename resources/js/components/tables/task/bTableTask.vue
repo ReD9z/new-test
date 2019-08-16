@@ -562,8 +562,7 @@ export default {
                         + " ул. " + item2.address.street + ","
                         + " дом " + item2.address.house_number + ","
                         + " количество подъездов " + item2.address.number_entrances + ","
-                        + " управляющая компания " + item2.address.management_company + " "
-                        +'\n';
+                        + " управляющая компания " + item2.address.management_company + "\n";
                     });
                     return {
                         "Название организации клиента" : item.orders,
@@ -647,6 +646,7 @@ export default {
                 this.editedItem = Object.assign({}, this.defaultItem)
                 this.editedIndex = -1
             }, 300)
+            this.$validator.reset()
         },
         resetFilesLoad() {
             this.files = [];

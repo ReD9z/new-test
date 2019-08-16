@@ -52,7 +52,6 @@ class AddressController extends Controller
 
     public function addExcelData(Request $request)
     {
-        //TODO уведомлять пользователя о незаполненых пустых полях - валидация
         //TODO создать метод в модели и вызвать
 
         function mb_ucfirst($word)
@@ -67,24 +66,21 @@ class AddressController extends Controller
             $address = new Address;
             if (!empty($citywork)) {
                 $address->city_id = $citywork->id;
-            }
-            if (empty($citywork)) {
+            } else {
                 $toWorks = new CitiesToWorks;
                 $toWorks->name = mb_ucfirst(array_values($request->input())[0]);
                 $toWorks->save();
                 $address->city_id = $toWorks->id;
-            }       
-
+            }
+     
             if (!empty($area)) {
                 $address->area_id = $area->id;
-            }
-
-            if (empty($area)) {
+            } else {
                 $areas = new Areas;
                 $areas->name = mb_ucfirst(array_values($request->input())[1]);
                 $areas->save();
                 $address->area_id = $areas->id;
-            } 
+            }
 
             $address->street = array_values($request->input())[2];
             $address->house_number = array_values($request->input())[3];

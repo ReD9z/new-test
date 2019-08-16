@@ -429,6 +429,7 @@ export default {
                 this.editedItem = Object.assign({}, this.defaultItem)
                 this.editedIndex = -1
             }, 300)
+            this.$validator.reset()
         },
         resetFilesLoad() {
             this.files = [];
