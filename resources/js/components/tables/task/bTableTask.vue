@@ -555,15 +555,16 @@ export default {
         downloadExcel() {
             if(this.desserts.length > 0) {
                 let map = this.desserts.map((item)=> {
-                    let address = '';
+                    let address = [];
                     item.orderAddresses.map((item2) => {
                         address += "г." + item2.address.cities.name 
-                        + ", " + item2.address.areas.name + ","
-                        + " ул. " + item2.address.street + ","
-                        + " дом " + item2.address.house_number + ","
-                        + " количество подъездов " + item2.address.number_entrances + ","
-                        + " управляющая компания " + item2.address.management_company + "\n";
+                        address += ", " + item2.address.areas.name + ","
+                        address += " ул. " + item2.address.street + ","
+                        address += " дом " + item2.address.house_number + ","
+                        address += " количество подъездов " + item2.address.number_entrances + ","
+                        address += " управляющая компания " + item2.address.management_company + "\n";
                     });
+                    console.log(address);
                     return {
                         "Название организации клиента" : item.orders,
                         "Дата выполнения задачи"  : item.task_date_completion,
@@ -572,8 +573,16 @@ export default {
                         "Адреса": address
                     }
                 });
+
                 let ws = XLSX.utils.json_to_sheet(map);
+                if(!ws['!cols']) ws['!cols'] = [];
+                // if(!ws['!rows']) ws['!rows'] = [];
+                for (let i = 0; i < 5; i++) {
+                    ws['!cols'][i] = { wch: 28 };
+                }
+                // ws['!rows'][2] = {hpt:23}
                 let wb = XLSX.utils.book_new();
+              
                 XLSX.utils.book_append_sheet(wb, ws, "Address");
                 XLSX.writeFile(wb, "Задачи.xlsx");
             }

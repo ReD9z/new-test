@@ -133,7 +133,7 @@ Route::group(['middleware' => ['json.response']], function () {
 
         // Tasks   
         Route::post('tasks', 'Api\TasksController@store'); // Add one item
-        Route::get('tasks', 'Api\TasksController@show'); // Show one item
+        // Route::get('tasks', 'Api\TasksController@show'); // Show one item
         Route::put('tasks', 'Api\TasksController@store');  // Edit one item
         Route::delete('tasks/{id}', 'Api\TasksController@destroy'); // Delete one item
         Route::get('tasks', 'Api\TasksController@index'); // Show list
