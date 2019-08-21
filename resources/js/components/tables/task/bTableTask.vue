@@ -33,7 +33,7 @@
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
-                            <v-text-field v-model="editedItem[param.value]" :value="param.show" type="hidden" :label="param.text" xs12 required></v-text-field>
+                            <v-text-field v-model="editedItem[param.value] = param.show" :value="param.show" type="hidden" :label="param.text" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
                             <div v-if="param.selectText == 'orderClient'">
@@ -495,6 +495,7 @@ export default {
                     axios.get(element.selectApi)
                     .then(
                         res => {
+                            console.log(res);
                             if(res) {
                                 if(element.selectText == 'orderClient') {
                                     this.orderDate = res.data;
@@ -564,7 +565,6 @@ export default {
                         address += " количество подъездов " + item2.address.number_entrances + ","
                         address += " управляющая компания " + item2.address.management_company + "\n";
                     });
-                    console.log(address);
                     return {
                         "Название организации клиента" : item.orders,
                         "Дата выполнения задачи"  : item.task_date_completion,
@@ -573,14 +573,12 @@ export default {
                         "Адреса": address
                     }
                 });
-
+                // TODO добавить отступы к списку адресов
                 let ws = XLSX.utils.json_to_sheet(map);
                 if(!ws['!cols']) ws['!cols'] = [];
-                // if(!ws['!rows']) ws['!rows'] = [];
                 for (let i = 0; i < 5; i++) {
                     ws['!cols'][i] = { wch: 28 };
                 }
-                // ws['!rows'][2] = {hpt:23}
                 let wb = XLSX.utils.book_new();
               
                 XLSX.utils.book_append_sheet(wb, ws, "Address");

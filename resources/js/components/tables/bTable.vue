@@ -41,7 +41,7 @@
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
-                            <v-text-field v-model="editedItem[param.value]" :value="param.show" type="hidden" :label="param.text" xs12 required></v-text-field>
+                            <v-text-field v-model="editedItem[param.value] = param.show" :value="param.show" type="hidden" :label="param.text" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
                             <div v-for="item in select" :key="item[0]">

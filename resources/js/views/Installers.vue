@@ -63,8 +63,12 @@ export default {
         if(this.isLoggedUser.role == "moderator") {
             this.params.user = this.isLoggedUser.moderators.id;
             this.params.headers.unshift(
+                { 
+                    text: 'Город', 
+                    value: 'city' 
+                },  
                 {
-                    text: 'Город',
+                    // text: 'Город',
                     align: 'left',
                     sortable: true,
                     value: 'city_id',

@@ -18,7 +18,7 @@ export default {
                     value: 'orders_id',
                     selectText: 'orderClient',
                     TableGetIdName: 'orderClient',
-                    selectApi: 'api/orders',
+                    selectApi: '/api/orders',
                     input: "select",
                     validate: 'required'
                 },
@@ -29,7 +29,7 @@ export default {
                     value: 'installer_id',
                     selectText: 'name',
                     TableGetIdName: 'installers',
-                    selectApi: 'api/installers',
+                    selectApi: '/api/installers',
                     input: "select",
                     validate: 'required'
                 },
@@ -48,7 +48,7 @@ export default {
                     value: 'types_to_works_id',
                     selectText: 'title',
                     TableGetIdName: 'types',
-                    selectApi: 'api/types_to_work',
+                    selectApi: '/api/types_to_work',
                     input: "select",
                     validate: 'required'
                 },

@@ -87,7 +87,7 @@ export default {
                     value: 'city' 
                 },   
                 {
-                    text: 'Город',
+                    // text: 'Город',
                     align: 'left',
                     sortable: true,
                     value: 'city_id',
