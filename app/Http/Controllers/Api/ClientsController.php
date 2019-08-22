@@ -19,8 +19,8 @@ class ClientsController extends Controller
     */
     public function index(Request $request)
     {
-        if($request->user) {
-            $clients = Clients::with('cities', 'users')->where('city_id', $request->user)->get();
+        if($request->city) {
+            $clients = Clients::with('cities', 'users')->where('city_id', $request->city)->get();
         }
         else {
             $clients = Clients::with('cities', 'users')->get();
@@ -70,8 +70,8 @@ class ClientsController extends Controller
     
         if($users->save()) { 
             $clients = $request->isMethod('put') ? Clients::findOrFail($request->id) : new Clients;
-             if($request->isMethod('post')) {
-                $moderators->id = $request->input('id');
+            if($request->isMethod('post')) {
+                $clients->id = $request->input('id');
             }
             $clients->users_id = $users->id;
             $clients->city_id = $request->input('city_id');
@@ -112,6 +112,10 @@ class ClientsController extends Controller
     public function destroy($id)
     {
         $clients = Clients::findOrFail($id);
+
+        // $users = User::findOrFail($clients->users_id);
+        // $users->delete();
+        // TODO удалять из таблицы user
 
         if($clients->delete()) {
             return new ClientsResource($clients);

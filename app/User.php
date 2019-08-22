@@ -47,4 +47,9 @@ class User extends Authenticatable
     {
         return $this->hasOne('App\Models\Moderators', 'users_id', 'id');
     }
+
+    public function installers()
+    {
+        return $this->hasOne('App\Models\Installers', 'users_id', 'id');
+    }
 }

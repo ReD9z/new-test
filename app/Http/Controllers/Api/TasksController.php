@@ -16,7 +16,12 @@ class TasksController extends Controller
      */
     public function index(Request $request)
     {
-        $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.areas', 'installers.users', 'types')->get(); 
+        if($request->city) {
+            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.areas', 'installers.users', 'types')->where('installers.city_id', $request->city)->get(); 
+        }
+        else {
+            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.areas', 'installers.users', 'types')->get(); 
+        }
         
         return TasksResource::collection($tasks);
     }

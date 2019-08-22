@@ -9,7 +9,7 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/clients',
+            baseUrl: '/api/clients',
             headers: [
                 { 
                     text: 'Имя', 
@@ -23,7 +23,7 @@ export default {
                     input: "text",
                     sortable: true,
                     value: 'email',
-                    validate: 'required:email'
+                    validate: 'required|email'
                 },
                 { 
                     text: 'Телефон', 
@@ -37,7 +37,7 @@ export default {
                     input: "text",
                     sortable: true,
                     validate: 'required',
-                    value: 'login' 
+                    value: 'login'
                 },
                 {
                     text: "Пароль",
@@ -46,16 +46,16 @@ export default {
                     value: 'password',
                     visibility: 'd-none',
                 },
-                // {
-                //     text: 'Город',
-                //     align: 'left',
-                //     sortable: true,
-                //     value: 'city_id',
-                //     selectText: 'name',
-                //     TableGetIdName: 'city',
-                //     selectApi: 'api/cities_to_works',
-                //     input: "select",
-                // },
+                {
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city_id',
+                    selectText: 'name',
+                    TableGetIdName: 'city',
+                    selectApi: '/api/cities_to_works',
+                    input: "select",
+                },
                 { 
                     text: 'Юридическое название', 
                     input: "text",
@@ -118,44 +118,6 @@ export default {
             pagination: true,
             excel: false
         }
-    }),
-     computed: {
-        isLoggedUser: function(){ 
-            return this.$store.getters.isLoggedUser;
-        }
-    },
-    created () { 
-        if(this.isLoggedUser.role == "manager") {
-            this.params.user = this.isLoggedUser.managers.city_id;
-            this.params.headers.unshift(
-                { 
-                    text: 'Город', 
-                    value: 'city' 
-                }, 
-                {
-                    // text: 'Город',
-                    align: 'left',
-                    sortable: true,
-                    value: 'city_id',
-                    show: this.isLoggedUser.managers.city_id,
-                    input: "hidden",
-                    visibility: 'd-none'
-                }
-               
-            );
-        } else {
-            this.params.headers.unshift({
-                text: 'Город',
-                align: 'left',
-                sortable: true,
-                value: 'city_id',
-                selectText: 'name',
-                TableGetIdName: 'city',
-                selectApi: '/api/cities_to_works',
-                input: "select",
-                validate: 'required',
-            });
-        }
-    }
+    })
 }
 </script>

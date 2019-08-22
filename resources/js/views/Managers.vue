@@ -46,7 +46,7 @@ export default {
                     value: 'city_id',
                     selectText: 'name',
                     TableGetIdName: 'city',
-                    selectApi: 'api/cities_to_works',
+                    selectApi: '/api/cities_to_works',
                     validate: 'required',
                     input: "select",
                 },
@@ -58,7 +58,7 @@ export default {
                     selectText: 'name',
                     TableGetIdName: 'moderator',
                     validate: 'required',
-                    selectApi: 'api/moderators',
+                    selectApi: '/api/moderators',
                     input: "select",
                 },
                 {

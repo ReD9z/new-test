@@ -12,6 +12,28 @@ export default {
             baseUrl: '/api/installers',
             user: null,
             headers: [
+                {
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city_id',
+                    selectText: 'name',
+                    TableGetIdName: 'city',
+                    selectApi: '/api/cities_to_works',
+                    validate: 'required',
+                    input: "select",
+                },
+                {
+                    text: 'Модератор',
+                    align: 'left',
+                    sortable: true,
+                    value: 'moderator_id',
+                    selectText: 'name',
+                    TableGetIdName: 'moderator',
+                    validate: 'required',
+                    selectApi: '/api/moderators',
+                    input: "select",
+                },
                 { 
                     text: 'Имя', 
                     input: "text",
@@ -60,56 +82,56 @@ export default {
         }
     },
     created () {
-        if(this.isLoggedUser.role == "moderator") {
-            this.params.user = this.isLoggedUser.moderators.id;
-            this.params.headers.unshift(
-                { 
-                    text: 'Город', 
-                    value: 'city' 
-                },  
-                {
-                    // text: 'Город',
-                    align: 'left',
-                    sortable: true,
-                    value: 'city_id',
-                    show: this.isLoggedUser.moderators.city_id,
-                    input: "hidden",
-                    visibility: 'd-none'
-                },
-                {
-                    text: 'Модератор',
-                    align: 'left',
-                    sortable: true,
-                    value: 'moderator_id',
-                    show: this.isLoggedUser.moderators.id,
-                    input: "hidden",
-                    visibility: 'd-none'
-                }
-            );
-        } else {
-            this.params.headers.unshift({
-                text: 'Город',
-                align: 'left',
-                sortable: true,
-                value: 'city_id',
-                selectText: 'name',
-                TableGetIdName: 'city',
-                selectApi: '/api/cities_to_works',
-                validate: 'required',
-                input: "select",
-            },
-            {
-                text: 'Модератор',
-                align: 'left',
-                sortable: true,
-                value: 'moderator_id',
-                selectText: 'name',
-                TableGetIdName: 'moderator',
-                validate: 'required',
-                selectApi: '/api/moderators',
-                input: "select",
-            });
-        }
+        // if(this.isLoggedUser.role == "moderator") {
+        //     this.params.user = this.isLoggedUser.moderators.id;
+        //     this.params.headers.unshift(
+        //         { 
+        //             text: 'Город', 
+        //             value: 'city' 
+        //         },  
+        //         {
+        //             // text: 'Город',
+        //             align: 'left',
+        //             sortable: true,
+        //             value: 'city_id',
+        //             show: this.isLoggedUser.moderators.city_id,
+        //             input: "hidden",
+        //             visibility: 'd-none'
+        //         },
+        //         {
+        //             text: 'Модератор',
+        //             align: 'left',
+        //             sortable: true,
+        //             value: 'moderator_id',
+        //             show: this.isLoggedUser.moderators.id,
+        //             input: "hidden",
+        //             visibility: 'd-none'
+        //         }
+        //     );
+        // } else {
+        //     this.params.headers.unshift({
+        //         text: 'Город',
+        //         align: 'left',
+        //         sortable: true,
+        //         value: 'city_id',
+        //         selectText: 'name',
+        //         TableGetIdName: 'city',
+        //         selectApi: '/api/cities_to_works',
+        //         validate: 'required',
+        //         input: "select",
+        //     },
+        //     {
+        //         text: 'Модератор',
+        //         align: 'left',
+        //         sortable: true,
+        //         value: 'moderator_id',
+        //         selectText: 'name',
+        //         TableGetIdName: 'moderator',
+        //         validate: 'required',
+        //         selectApi: '/api/moderators',
+        //         input: "select",
+        //     });
+        // }
     }
 }
 </script>

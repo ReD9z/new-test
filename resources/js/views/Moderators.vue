@@ -9,7 +9,7 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/moderators',
+            baseUrl: '/api/moderators',
             headers: [
                 { 
                     text: 'Имя', 
@@ -47,7 +47,7 @@ export default {
                     value: 'city_id',
                     selectText: 'name',
                     TableGetIdName: 'city',
-                    selectApi: 'api/cities_to_works',
+                    selectApi: '/api/cities_to_works',
                     input: "select",
                 },
                 {

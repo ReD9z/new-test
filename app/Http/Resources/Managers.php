@@ -23,6 +23,7 @@ class Managers extends JsonResource
             'login' => $this->users->phone,
             'city_id' => $this->city_id,
             'city' => $this->cities->name,
+            'cityUser' => $this->cities,
             'moderator_id' => $this->moderator_id,
             'moderator' => $this->moderator->users->name
         ];

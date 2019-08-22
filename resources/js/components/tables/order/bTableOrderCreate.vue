@@ -474,7 +474,7 @@ export default {
                     })
                     .then(
                         response => {
-                            this.$router.push(`orders-address/${response.data.id}`);
+                            this.$router.push(`/orders-address/${response.data.id}`);
                         }
                     ).catch(error => {
                         console.log(error);

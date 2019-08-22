@@ -18,7 +18,6 @@ Vue.use(Vuetify, {
     }
 });
 
-
 require('./bootstrap');
 
 Vue.use(require('vue-moment'));
@@ -39,7 +38,6 @@ if (token) {
 */
 
 Vue.component('auth-component', require('./views/Auth.vue').default);
-Vue.component('home-component', require('./views/Home.vue').default);
 Vue.component('home-layout', require('./views/Layout.vue').default);
 Vue.component('home-address', require('./views/Address.vue').default);
 Vue.component('b-table', require('./components/tables/bTable.vue').default);
@@ -77,7 +75,7 @@ router.beforeEach((to, from, next) => {
             }
             if (to.meta.installerAuth) {
                 if (store.getters.isUserRole === 'installer') {
-                    next()
+                    next('tasks')
                     return
                 }
             }

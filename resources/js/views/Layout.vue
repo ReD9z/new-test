@@ -77,18 +77,18 @@ export default {
                     },
                     { 
                         title: 'Адреса', icon: 'question_answer', src: 'address',
-                        role: {admin: 'admin', moderator: 'moderator'}
+                        role: {admin: 'admin', moderator: 'moderator', manager: 'manager'}
                     },
                     { 
                         title: 'Задачи', icon: 'question_answer', src: 'tasks',
-                        role: {admin: 'admin', installer: 'installer'}
+                        role: {admin: 'admin', installer: 'installer', moderator: 'moderator',}
                     },
                     { 
                         title: 'Клиенты', icon: 'question_answer', src: 'clients',
-                        role: {manager: 'manager', admin: 'admin'}
+                        role: {admin: 'admin', manager: 'manager'}
                     },
                 ],
-                role: {admin: 'admin', moderator: 'moderator', client: 'client', manager: 'manager'}
+                role: {admin: 'admin', manager: 'manager', moderator: 'moderator', installer: 'installer', client: 'client'}
             },
             { 
                 title: 'Пользователи', icon: 'people', wrapLink:
@@ -150,7 +150,8 @@ export default {
     },
     methods: {
         roleUser(role, roleList) {
-            if (role === roleList.admin || role === roleList.client || role === roleList.installer || role === roleList.manager || role === roleList.moderator) {
+            const {admin, client, installer, moderator, manager} = roleList;
+            if (role === admin || role === client || role === installer || role === manager || role === moderator) {
                 return true;
             } else {
                 return false;

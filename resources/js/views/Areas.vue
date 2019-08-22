@@ -9,7 +9,7 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/areas',
+            baseUrl: '/api/areas',
             headers: [
                 {
                     text: 'Название',

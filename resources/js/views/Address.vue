@@ -11,18 +11,17 @@ export default {
     data: () => ({
         params: {
             baseUrl: '/api/address',
-            user: null,
             headers: [
-                // {
-                //     text: 'Город',
-                //     align: 'left',
-                //     sortable: true,
-                //     value: 'city_id',
-                //     selectText: 'name',
-                //     TableGetIdName: 'city',
-                //     selectApi: '/api/cities_to_works',
-                //     input: "select",
-                // },                                                                                                                
+                {
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city_id',
+                    selectText: 'name',
+                    TableGetIdName: 'city',
+                    selectApi: '/api/cities_to_works',
+                    input: "select",
+                },                                                                                                                
                 {
                     text: 'Район',
                     align: 'left',
@@ -73,43 +72,43 @@ export default {
             ],
         }
     }),
-    computed: {
-        isLoggedUser: function(){ 
-            return this.$store.getters.isLoggedUser;
-        }
-    },
-    created () { 
-        if(this.isLoggedUser.role == "moderator") {
-            this.params.user = this.isLoggedUser.moderators.city_id;
-            this.params.headers.unshift(
-                { 
-                    text: 'Город', 
-                    value: 'city' 
-                },   
-                {
-                    // text: 'Город',
-                    align: 'left',
-                    sortable: true,
-                    value: 'city_id',
-                    show: this.isLoggedUser.moderators.city_id,
-                    input: "hidden",
-                    visibility: 'd-none'
-                }
+    // computed: {
+    //     isLoggedUser: function(){ 
+    //         return this.$store.getters.isLoggedUser;
+    //     }
+    // },
+    // created () { 
+        // if(this.isLoggedUser.role == "moderator") {
+        //     this.params.user = this.isLoggedUser.moderators.city_id;
+        //     this.params.headers.unshift(
+        //         { 
+        //             text: 'Город', 
+        //             value: 'city' 
+        //         },   
+        //         {
+        //             // text: 'Город',
+        //             align: 'left',
+        //             sortable: true,
+        //             value: 'city_id',
+        //             show: this.isLoggedUser.moderators.city_id,
+        //             input: "hidden",
+        //             visibility: 'd-none'
+        //         }
                
-            );
-        } else {
-            this.params.headers.unshift({
-                text: 'Город',
-                align: 'left',
-                sortable: true,
-                value: 'city_id',
-                selectText: 'name',
-                validate: 'required',
-                TableGetIdName: 'city',
-                selectApi: '/api/cities_to_works',
-                input: "select"
-            });
-        }
-    }
+        //     );
+        // } else {
+        //     this.params.headers.unshift({
+        //         text: 'Город',
+        //         align: 'left',
+        //         sortable: true,
+        //         value: 'city_id',
+        //         selectText: 'name',
+        //         validate: 'required',
+        //         TableGetIdName: 'city',
+        //         selectApi: '/api/cities_to_works',
+        //         input: "select"
+        //     });
+        // }
+    // }
 }
 </script>

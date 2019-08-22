@@ -40,28 +40,40 @@
                         <div v-if="param.input == 'text'">
                             <v-text-field :data-vv-name="param.value" :data-vv-as="'`'+param.text+'`'" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
-                        <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
-                            <v-text-field v-model="editedItem[param.value] = param.show"  type="hidden" :label="param.text" xs12></v-text-field>
-                        </div>
                         <div v-if="param.input == 'select'">
                             <div v-for="item in select" :key="item[0]">
                                 <div v-if="item.url == param.selectApi">
-                                    <v-autocomplete
-                                        :items="item.data"
-                                        v-model="editedItem[param.value]"
-                                        :item-text="param.selectText"
-                                        :data-vv-as="'`'+param.text+'`'" 
-                                        item-value="id"
-                                        :label="param.text"
-                                        :data-vv-name="param.value" 
-                                        :error-messages="errors.collect(param.value)" 
-                                        v-validate="param.validate"
-                                        >
-                                    </v-autocomplete>
+                                    <div v-if="!isLoggedUser.managers || param.value == 'city_id'">
+                                        <v-autocomplete
+                                            :items="item.data"
+                                            v-model="editedItem[param.value]"
+                                            :item-text="param.selectText"
+                                            :data-vv-as="'`'+param.text+'`'" 
+                                            item-value="id"
+                                            :label="param.text"
+                                            :data-vv-name="param.value" 
+                                            :error-messages="errors.collect(param.value)" 
+                                            v-validate="param.validate"
+                                            >
+                                        </v-autocomplete>
+                                    </div>
+                                    <div v-else>
+                                        <v-autocomplete
+                                            :items="item.data"
+                                            v-model="editedItem[param.value]"
+                                            :item-text="param.selectText"
+                                            :data-vv-as="'`'+param.text+'`'" 
+                                            item-value="id"
+                                            :label="param.text"
+                                            :data-vv-name="param.value" 
+                                            :error-messages="errors.collect(param.value)" 
+                                            v-validate="param.validate"
+                                            >
+                                        </v-autocomplete>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        
                     </v-flex>
                     <div class="text-xs-center">
                         <v-btn color="info" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
@@ -77,46 +89,6 @@
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
-    <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
-        <v-card height="100%">
-            <v-toolbar color="pink" dark>
-                <v-toolbar-title>Изображения</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-icon right dark @click='pickImages'>control_point</v-icon>
-                <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
-                <v-btn icon @click="close">
-                    <v-icon>close</v-icon>
-                </v-btn>
-            </v-toolbar>
-            <v-progress-linear value="15" :indeterminate="true" v-show="loadImages" color="blue" class="ma-0"></v-progress-linear>
-            <v-card-text>
-                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                    <v-flex xs12 v-if="param.input == 'images'">
-                        <v-layout row wrap>
-                            <v-flex v-for="(file, key) in editedItem.files" :key="key" xs4 d-flex>
-                                <v-card flat tile class="d-flex pr-1 pb-1">
-                                    <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
-                                        <template v-slot:placeholder>
-                                            <v-layout fill-height align-center justify-center ma-0 >
-                                                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
-                                            </v-layout>
-                                        </template>
-                                        <template>
-                                            <v-layout fill-height right top ma-0 >
-                                                <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
-                                                    <v-icon>close</v-icon>
-                                                </v-btn>
-                                            </v-layout>
-                                        </template>
-                                    </v-img>
-                                </v-card>
-                            </v-flex>
-                        </v-layout>
-                    </v-flex>
-                </v-flex>
-            </v-card-text>
-        </v-card>
-    </v-navigation-drawer>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details>
@@ -126,8 +98,8 @@
         <div>
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item.data}}</v-chip>
         </div>
-        <v-icon>filter_list</v-icon>
-        <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
+        <v-icon v-if="!isLoggedUser.managers">filter_list</v-icon>
+        <v-menu v-if="!isLoggedUser.managers" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
             <template v-slot:activator="{ on }">
                 <v-btn icon v-on="on">
                     <v-icon>more_vert</v-icon>
@@ -197,14 +169,12 @@ export default {
     data: () => ({
         search: '',
         dialog: false,
-        dialogImages: false,
         loading: true,
         loadingExcel: false,
         files: [],
         deleteImage: false,
         desserts: [],
         editedIndex: -1,
-        loadImages: false,
         editedItem: {},
         defaultItem: {},
         select: [],
@@ -309,7 +279,6 @@ export default {
             regExExpression = useOr ? OR_RegEx : AND_RegEx,
             searchTest = new RegExp(regExExpression, "ig");
             let thisSearch = this.params.searchValue;
-            // if( searchTerm.length < 2 || !this.desserts.length ) return this.desserts;
             return this.desserts = this.desserts.filter(function(item) {
                 let arr = [];
                 thisSearch.forEach(function(val) {
@@ -341,7 +310,7 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    user: this.params.user
+                    city: this.isLoggedUser.managers.city_id
                 }
             })
             .then(
@@ -463,20 +432,6 @@ export default {
                 file.value = '';
             };
         },
-        removeImg(data) {
-            this.loadImages = true;
-            axios.post('api/files/remove', data)
-            .then(
-                res => {
-                    this.editedItem.files.splice(this.editedItem.files.indexOf(data.id), 1);
-                    this.loadImages = false;
-                }
-            ).catch(
-                error => {
-                    console.log(error);
-                }
-            );
-        },
         pickExcel () {
             this.$refs.excel.click();
         },
@@ -484,11 +439,6 @@ export default {
             this.editedIndex = this.desserts.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
-        },
-        editPhotos(item) {
-            this.editedIndex = this.desserts.indexOf(item);
-            this.editedItem = Object.assign({}, item);
-            this.dialogImages = true;
         },
         deleteItem (item) {
             const index = this.desserts.indexOf(item);
@@ -506,6 +456,11 @@ export default {
                 })
             }
         },
+        resetFilesLoad() {
+            this.files = [];
+            this.$refs.images.value = '';
+            this.formData.delete('file[]');
+        },
         close () {
             this.dialog = false
             this.dialogImages = false
@@ -514,11 +469,6 @@ export default {
                 this.editedIndex = -1
             }, 300)
             this.$validator.reset()
-        },
-        resetFilesLoad() {
-            this.files = [];
-            this.$refs.images.value = '';
-            this.formData.delete('file[]');
         },
         save () {
             this.$validator.validateAll().then(() => {
@@ -539,7 +489,7 @@ export default {
                     .then(
                         response => {
                             if (this.editedIndex > -1) {
-                                Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                                Object.assign(this.desserts[this.editedIndex], response.data);
                             } else {
                                 this.desserts.push(response.data);
                             }
@@ -559,6 +509,11 @@ export default {
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)
             this.chips = [...this.chips]
+        }
+    },
+    mounted() {
+        if(this.isLoggedUser.managers) {
+            this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
         }
     }
 }

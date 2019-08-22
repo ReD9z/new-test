@@ -21,7 +21,8 @@ class Users extends JsonResource
             'phone' => $this->phone,
             'login' => $this->login,
             'managers' => $this->managers,
-            'moderators' => $this->moderators
+            'moderators' => $this->moderators,
+            'installers' => $this->installers
         ];
     }
 }

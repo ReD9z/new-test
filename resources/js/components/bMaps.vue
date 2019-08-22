@@ -1,12 +1,12 @@
 <template>
     <div class="maps-wrap">
         <v-progress-linear height="5" v-show="mapLoader" indeterminate class="maps-loader"></v-progress-linear>
-        <div id="OrderMaps" v-show="mapsShow"></div>
+        <div id="orderMaps" v-show="mapsShow"></div>
         <!-- <v-progress-circular indeterminate class="maps-loader" v-show="mapLoader"></v-progress-circular> -->
     </div>
 </template>
 <style type="text/css">
-    #OrderMaps {
+    #orderMaps {
         width: 100%;
         height: 400px;
         padding: 5px 0;
@@ -34,7 +34,7 @@ export default {
         initializeYandexMap() { 
             let vm = this;
             ymaps.ready().done(function (ym) {
-                const myMap = new ym.Map('OrderMaps', {
+                const myMap = new ym.Map('orderMaps', {
                     center: [51.551407, 46.036561],
                     zoom: 11
                 }, {

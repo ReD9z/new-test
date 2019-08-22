@@ -32,9 +32,6 @@
                         <div v-if="param.input == 'text'">
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
-                        <div v-if="param.input == 'hidden'" v-show="!param.input == 'hidden'">
-                            <v-text-field v-model="editedItem[param.value] = param.show" :value="param.show" type="hidden" :label="param.text" xs12 required></v-text-field>
-                        </div>
                         <div v-if="param.input == 'select'">
                             <div v-if="param.selectText == 'orderClient'">
                                 <v-layout justify-space-around row>
@@ -373,6 +370,9 @@ export default {
         },
         isLoggedUser: function(){ 
             return this.$store.getters.isLoggedUser;
+        },
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
         }
     },
     watch: {
@@ -495,7 +495,7 @@ export default {
                     axios.get(element.selectApi)
                     .then(
                         res => {
-                            console.log(res);
+                            // console.log(res);
                             if(res) {
                                 if(element.selectText == 'orderClient') {
                                     this.orderDate = res.data;
@@ -534,7 +534,8 @@ export default {
                         url: this.params.baseUrl,
                         data: this.editedItem,
                         params: {
-                            images: res.data.files
+                            images: res.data.files,
+                            city: this.isLoggedUser.installers.city_id
                         }
                     })
                     .then(
@@ -605,7 +606,7 @@ export default {
         },
         removeImg(data) {
             this.loadImages = true;
-            axios.post('api/files/remove', data)
+            axios.post('/api/files/remove', data)
             .then(
                 res => {
                     this.editedItem.files.splice(this.editedItem.files.indexOf(data.id), 1);
@@ -700,6 +701,14 @@ export default {
             this.chips.splice(this.chips.indexOf(item), 1)
             this.chips = [...this.chips]
         }
+    },
+    mounted() {
+        // if(this.isLoggedUser.installers.city_id) {
+        //     this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
+        // }
+
+        // console.log(this.isLoggedUser);
+        
     }
 }
 </script>
