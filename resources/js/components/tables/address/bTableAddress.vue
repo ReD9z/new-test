@@ -310,7 +310,7 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: this.isLoggedUser.managers.city_id
+                    city: !this.isLoggedUser.managers ? null : this.isLoggedUser.managers.city_id
                 }
             })
             .then(
