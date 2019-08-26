@@ -48,11 +48,11 @@ class ManagersController extends Controller
         $users->login = $request->input('login');
         $users->role = 'manager';
 
-        if ($request->isMethod('post')) {
+        if(!empty($request->input('password'))) {
             $users->password = bcrypt($request->input('password'));
             $token = $users->createToken('Laravel Password Grant Client')->accessToken;
         }
-    
+        
         if($users->save()) { 
             $managers = $request->isMethod('put') ? Managers::findOrFail($request->id) : new Managers;
             if($request->isMethod('post')) {

@@ -509,6 +509,14 @@ export default {
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)
             this.chips = [...this.chips]
+        },
+        roleUser(role, roleList) {
+            const {admin, client, installer, moderator, manager} = roleList;
+            if (role === admin || role === client || role === installer || role === manager || role === moderator) {
+                return true;
+            } else {
+                return false;
+            }
         }
     },
     mounted() {

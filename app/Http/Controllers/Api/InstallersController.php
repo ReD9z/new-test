@@ -53,7 +53,7 @@ class InstallersController extends Controller
         $users->login = $request->input('login');
         $users->role = 'installer';
         
-        if ($request->isMethod('post')) {
+        if(!empty($request->input('password'))) {
             $users->password = bcrypt($request->input('password'));
             $token = $users->createToken('Laravel Password Grant Client')->accessToken;
         }

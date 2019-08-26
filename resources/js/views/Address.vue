@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-4 mt-4">
         <div class="col-md-12 mb-4 mt-4">
-            <b-table-address :params="params"></b-table-address>
+            <b-table-address :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator', manager: 'manager'})"></b-table-address>
         </div>
     </div>
 </template>
@@ -70,45 +70,23 @@ export default {
                     input: 'city'
                 }
             ],
+        },
+        computed: {
+            isLoggedUser: function(){ 
+                return this.$store.getters.isLoggedUser;
+            }
+        },
+        methods: {
+            roleUser(role, roleList) {
+                const {admin, client, installer, moderator, manager} = roleList;
+                if (role === admin || role === client || role === installer || role === manager || role === moderator) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
     }),
-    // computed: {
-    //     isLoggedUser: function(){ 
-    //         return this.$store.getters.isLoggedUser;
-    //     }
-    // },
-    // created () { 
-        // if(this.isLoggedUser.role == "moderator") {
-        //     this.params.user = this.isLoggedUser.moderators.city_id;
-        //     this.params.headers.unshift(
-        //         { 
-        //             text: 'Город', 
-        //             value: 'city' 
-        //         },   
-        //         {
-        //             // text: 'Город',
-        //             align: 'left',
-        //             sortable: true,
-        //             value: 'city_id',
-        //             show: this.isLoggedUser.moderators.city_id,
-        //             input: "hidden",
-        //             visibility: 'd-none'
-        //         }
-               
-        //     );
-        // } else {
-        //     this.params.headers.unshift({
-        //         text: 'Город',
-        //         align: 'left',
-        //         sortable: true,
-        //         value: 'city_id',
-        //         selectText: 'name',
-        //         validate: 'required',
-        //         TableGetIdName: 'city',
-        //         selectApi: '/api/cities_to_works',
-        //         input: "select"
-        //     });
-        // }
-    // }
+    
 }
 </script>

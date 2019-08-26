@@ -38,8 +38,6 @@ class AdminsController extends Controller
             $users->id = $request->input('id');
         }
      
-        
-        
         $users->name = $request->input('name');
         $users->email = $request->input('email');
         $users->phone = $request->input('phone');
@@ -51,7 +49,7 @@ class AdminsController extends Controller
             'email' => Rule::unique('users')->ignore($request->users_id),
         ]);
         
-        if ($request->isMethod('post')) {
+        if(!empty($request->input('password'))) {
             $users->password = bcrypt($request->input('password'));
             $token = $users->createToken('Laravel Password Grant Client')->accessToken;
         }

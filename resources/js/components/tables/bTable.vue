@@ -41,7 +41,16 @@
                             </div>
                         </div>
                         <div v-if="param.input == 'password'">
-                            <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
+                            <v-text-field 
+                                :type="param.value" 
+                                v-model="editedItem[param.value]" 
+                                :label="param.text" 
+                                v-validate="editedItem[param.value] ? {required:true, regex:/^\S*$/ , min:6} : ''"
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                :data-vv-as="'`'+param.text+'`'"
+                                xs12>
+                            </v-text-field>
                         </div>
                     </v-flex>
                     <div class="text-xs-center">
@@ -118,6 +127,7 @@ export default {
         loaderSaveBtn: null,
         formData: new FormData(),
         valid: true,
+        dialogPass: false,
         pagination: {
             sortBy: 'id'
         },
@@ -314,6 +324,14 @@ export default {
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)
             this.chips = [...this.chips]
+        },
+        roleUser(role, roleList) {
+            const {admin, client, installer, moderator, manager} = roleList;
+            if (role === admin || role === client || role === installer || role === manager || role === moderator) {
+                return true;
+            } else {
+                return false;
+            }
         }
     },
     mounted() {

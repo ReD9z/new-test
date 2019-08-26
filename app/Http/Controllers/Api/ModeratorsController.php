@@ -19,7 +19,6 @@ class ModeratorsController extends Controller
     */
     public function index(Request $request)
     {
- 
         $moderators = Moderators::with('users', 'cities')->get();
     
         return ModeratorsResource::collection($moderators);
@@ -50,7 +49,7 @@ class ModeratorsController extends Controller
         $users->login = $request->input('login');
         $users->role = 'moderator';
         
-        if ($request->isMethod('post')) {
+        if(!empty($request->input('password'))) {
             $users->password = bcrypt($request->input('password'));
             $token = $users->createToken('Laravel Password Grant Client')->accessToken;
         }

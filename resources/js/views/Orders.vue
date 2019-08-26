@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-4 mt-4">
         <div class="col-md-12 mb-4 mt-4">
-            <b-table-order :params="params"></b-table-order>
+            <b-table-order :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator', client:'client'})"></b-table-order>
         </div>
     </div>
 </template>
@@ -92,6 +92,21 @@ export default {
             search: true,
             pagination: true,
             excel: false
+        },
+        computed: {
+            isLoggedUser: function(){ 
+                return this.$store.getters.isLoggedUser;
+            }
+        },
+        methods: {
+            roleUser(role, roleList) {
+                const {admin, client, installer, moderator, manager} = roleList;
+                if (role === admin || role === client || role === installer || role === manager || role === moderator) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
     })
 }
