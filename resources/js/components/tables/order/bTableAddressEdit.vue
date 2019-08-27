@@ -103,7 +103,7 @@
         </v-card-text>
     </v-card>
     <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
-        <v-card height="100%">
+        <v-card>
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>Изображения</v-toolbar-title>
                 <v-spacer></v-spacer>
@@ -341,15 +341,32 @@ export default {
         filtered(data) {
             if(this.chips.length > 0) {
                 let vm = this;
-                let array = [];
                 this.chips.forEach((chip) => {
-                    vm.desserts.filter(function(item) {
-                        if(chip.data === item[chip.input]) {
-                            array.push(item);
-                        }
+                    // vm.desserts.filter(function(item) {
+                    //     console.log(chip.data === item[chip.input]);
+                    //     if(chip.data === item[chip.input]) {
+                    //         console.log(item)
+                    //         array.push(item);
+                    //     }
+                    // });
+                    this.desserts = data;
+                    let searchTerm = chip.data.trim().toLowerCase(),
+                    useOr = chip.data == "&&",
+                    AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                    OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                    regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                    searchTest = new RegExp(regExExpression, "ig");
+                    let thisSearch = this.params.searchValue;
+                    return this.desserts = this.desserts.filter(function(item) {
+                        let arr = [];
+                        thisSearch.forEach(function(val) {
+                            arr.push(item[val]);
+                        })
+                        return searchTest.test(arr.join(" ")); 
                     });
                 });
-                return this.desserts = array;
+                // console.log(array)
+                // return this.desserts = array;
             } else {
                 return this.desserts = data;
             }

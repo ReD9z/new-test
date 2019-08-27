@@ -113,26 +113,26 @@ export default {
                     value: 'settlement_account' 
                 }
             ],
-            searchValue: ['name', 'email', 'phone', 'login', 'legal_name', 'actual_title', 'legal_address', 'actual_address', 'bank_name', 'bik', 'cor_score', 'settlement_account'],
+            searchValue: ['name', 'email', 'phone', 'city', 'login', 'legal_name', 'actual_title', 'legal_address', 'actual_address', 'bank_name', 'bik', 'cor_score', 'settlement_account'],
             search: true,
             pagination: true,
             excel: false
-        },
-        computed: {
-            isLoggedUser: function(){ 
-                return this.$store.getters.isLoggedUser;
-            }
-        },
-        methods: {
-            roleUser(role, roleList) {
-                const {admin, client, installer, moderator, manager} = roleList;
-                if (role === admin || role === client || role === installer || role === manager || role === moderator) {
-                    return true;
-                } else {
-                    return false;
-                }
+        }
+    }),
+    computed: {
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
+        }
+    },
+    methods: {
+        roleUser(role, roleList) {
+            const {admin, client, installer, moderator, manager} = roleList;
+            if (role === admin || role === client || role === installer || role === manager || role === moderator) {
+                return true;
+            } else {
+                return false;
             }
         }
-    })
+    }
 }
 </script>

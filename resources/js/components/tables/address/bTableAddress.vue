@@ -26,7 +26,7 @@
         <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Добавить адрес</v-btn>
     </v-toolbar>
     <v-navigation-drawer v-model="dialog" right temporary fixed>
-        <v-card height="100%">
+        <v-card>
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
                 <v-spacer></v-spacer>
@@ -43,34 +43,18 @@
                         <div v-if="param.input == 'select'">
                             <div v-for="item in select" :key="item[0]">
                                 <div v-if="item.url == param.selectApi">
-                                    <div v-if="!isLoggedUser.managers || param.value == 'city_id'">
-                                        <v-autocomplete
-                                            :items="item.data"
-                                            v-model="editedItem[param.value]"
-                                            :item-text="param.selectText"
-                                            :data-vv-as="'`'+param.text+'`'" 
-                                            item-value="id"
-                                            :label="param.text"
-                                            :data-vv-name="param.value" 
-                                            :error-messages="errors.collect(param.value)" 
-                                            v-validate="param.validate"
-                                            >
-                                        </v-autocomplete>
-                                    </div>
-                                    <div v-else>
-                                        <v-autocomplete
-                                            :items="item.data"
-                                            v-model="editedItem[param.value]"
-                                            :item-text="param.selectText"
-                                            :data-vv-as="'`'+param.text+'`'" 
-                                            item-value="id"
-                                            :label="param.text"
-                                            :data-vv-name="param.value" 
-                                            :error-messages="errors.collect(param.value)" 
-                                            v-validate="param.validate"
-                                            >
-                                        </v-autocomplete>
-                                    </div>
+                                    <v-autocomplete
+                                        :items="item.data"
+                                        v-model="editedItem[param.value]"
+                                        :item-text="param.selectText"
+                                        :data-vv-as="'`'+param.text+'`'" 
+                                        item-value="id"
+                                        :label="param.text"
+                                        :data-vv-name="param.value" 
+                                        :error-messages="errors.collect(param.value)" 
+                                        v-validate="param.validate"
+                                        >
+                                    </v-autocomplete>
                                 </div>
                             </div>
                         </div>
@@ -189,6 +173,7 @@ export default {
             sortBy: 'id'
         },
         selected: [],
+        cityUser: null
     }),
     props: {
         params: Object
@@ -221,6 +206,9 @@ export default {
         this.getFiltered();
     },
     methods: {
+        roleUserCity() {
+            return !this.isLoggedUser.managers ? this.cityUser = null : this.cityUser = this.isLoggedUser.managers.city_id
+        },
         async getFiltered() {
             this.chipsItem = [];
             await this.params.filter.forEach((item) => {
@@ -310,14 +298,14 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: !this.isLoggedUser.managers ? null : this.isLoggedUser.managers.city_id
+                    city: this.roleUserCity()
                 }
             })
             .then(
                 response => {
                     this.desserts = response.data;
-                    this.filteredItems(response.data);
-                    this.filtered(response.data);
+                    this.filteredItems(this.desserts);
+                    this.filtered(this.desserts);
                     this.loading = false;
                 }
             ).catch(error => {

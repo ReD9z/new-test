@@ -58,7 +58,7 @@ export default {
                     value: 'management_company' 
                 }
             ],
-            searchValue: ['area', 'street', 'house_number', 'number_entrances', 'management_company'],
+            searchValue: ['area', 'street', 'house_number', 'number_entrances', 'management_company', 'city'],
             search: true,
             pagination: true,
             excel: true,
@@ -70,23 +70,23 @@ export default {
                     input: 'city'
                 }
             ],
-        },
-        computed: {
-            isLoggedUser: function(){ 
-                return this.$store.getters.isLoggedUser;
-            }
-        },
-        methods: {
-            roleUser(role, roleList) {
-                const {admin, client, installer, moderator, manager} = roleList;
-                if (role === admin || role === client || role === installer || role === manager || role === moderator) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
         }
     }),
+    computed: {
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
+        }
+    },
+    methods: {
+        roleUser(role, roleList) {
+            const {admin, client, installer, moderator, manager} = roleList;
+            if (role === admin || role === client || role === installer || role === manager || role === moderator) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
     
 }
 </script>

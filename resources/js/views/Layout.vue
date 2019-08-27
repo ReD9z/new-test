@@ -72,27 +72,35 @@ export default {
                 title: 'Продажи', icon: 'account_balance_wallet', wrapLink:
                 [
                     { 
-                        title: 'Заказы', icon: 'question_answer', src: 'orders',
-                        role: {admin: 'admin', moderator: 'moderator', client: 'client'}
+                        title: 'Клиенты', icon: 'question_answer', src: 'clients',
+                        role: {admin: 'admin', manager: 'manager'}
                     },
                     { 
                         title: 'Адреса', icon: 'question_answer', src: 'address',
                         role: {admin: 'admin', moderator: 'moderator', manager: 'manager'}
                     },
                     { 
-                        title: 'Задачи', icon: 'question_answer', src: 'tasks',
-                        role: {admin: 'admin', installer: 'installer', moderator: 'moderator',}
+                        title: 'Заказы', icon: 'question_answer', src: 'orders',
+                        role: {admin: 'admin', moderator: 'moderator', client: 'client'}
                     },
                     { 
-                        title: 'Клиенты', icon: 'question_answer', src: 'clients',
-                        role: {admin: 'admin', manager: 'manager'}
-                    },
+                        title: 'Задачи монтажникам', icon: 'question_answer', src: 'tasks',
+                        role: {admin: 'admin', installer: 'installer', moderator: 'moderator',}
+                    }
                 ],
                 role: {admin: 'admin', manager: 'manager', moderator: 'moderator', installer: 'installer', client: 'client'}
             },
             { 
                 title: 'Пользователи', icon: 'people', wrapLink:
                 [
+                    { 
+                        title: 'Администраторы', icon: 'question_answer', src: 'users',
+                        role: {admin: 'admin'}
+                    },
+                    { 
+                        title: 'Модераторы', icon: 'question_answer', src: 'moderators',
+                        role: {admin: 'admin'}
+                    },
                     { 
                         title: 'Менеджеры', icon: 'question_answer', src: 'managers', 
                         role: {admin: 'admin'}
@@ -101,14 +109,6 @@ export default {
                         title: 'Монтажники', icon: 'question_answer', src: 'installers',
                         role: {admin: 'admin', moderator: 'moderator'}
                     },
-                    { 
-                        title: 'Модераторы', icon: 'question_answer', src: 'moderators',
-                        role: {admin: 'admin'}
-                    },
-                    { 
-                        title: 'Администраторы', icon: 'question_answer', src: 'users',
-                        role: {admin: 'admin'}
-                    }
                 ],
                 role: {admin: 'admin', moderator: 'moderator'}
             },
@@ -116,7 +116,7 @@ export default {
                 title: 'Настройки', icon: 'settings', wrapLink:
                 [
                     { 
-                        title: 'Типы работы', icon: 'question_answer', src: 'typestoworks',
+                        title: 'Города', icon: 'question_answer', src: 'citiestoworks',
                         role: {admin: 'admin'}
                     },
                     { 
@@ -124,7 +124,7 @@ export default {
                         role: {admin: 'admin'}
                     },
                     { 
-                        title: 'Города работы', icon: 'question_answer', src: 'citiestoworks',
+                        title: 'Типы работы', icon: 'question_answer', src: 'typestoworks',
                         role: {admin: 'admin'}
                     }
                 ],

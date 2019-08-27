@@ -215,7 +215,7 @@
         </v-card>
     </v-navigation-drawer>
     <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
-        <v-card height="100%">
+        <v-card>
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>Изображения</v-toolbar-title>
                 <v-spacer></v-spacer>

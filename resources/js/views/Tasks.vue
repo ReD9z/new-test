@@ -76,22 +76,22 @@ export default {
             search: true,
             pagination: true,
             excel: true
-        },
-        computed: {
-            isLoggedUser: function(){ 
-                return this.$store.getters.isLoggedUser;
-            }
-        },
-        methods: {
-            roleUser(role, roleList) {
-                const {admin, client, installer, moderator, manager} = roleList;
-                if (role === admin || role === client || role === installer || role === manager || role === moderator) {
-                    return true;
-                } else {
-                    return false;
-                }
+        }
+    }),
+    computed: {
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
+        }
+    },
+    methods: {
+        roleUser(role, roleList) {
+            const {admin, client, installer, moderator, manager} = roleList;
+            if (role === admin || role === client || role === installer || role === manager || role === moderator) {
+                return true;
+            } else {
+                return false;
             }
         }
-    })
+    }
 }
 </script>
