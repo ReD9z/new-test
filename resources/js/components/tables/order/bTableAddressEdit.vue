@@ -342,28 +342,28 @@ export default {
             if(this.chips.length > 0) {
                 let vm = this;
                 this.chips.forEach((chip) => {
-                    // vm.desserts.filter(function(item) {
-                    //     console.log(chip.data === item[chip.input]);
-                    //     if(chip.data === item[chip.input]) {
-                    //         console.log(item)
-                    //         array.push(item);
-                    //     }
-                    // });
-                    this.desserts = data;
-                    let searchTerm = chip.data.trim().toLowerCase(),
-                    useOr = chip.data == "&&",
-                    AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
-                    OR_RegEx = searchTerm.replace(/ +/g,"|"),
-                    regExExpression = useOr ? OR_RegEx : AND_RegEx,
-                    searchTest = new RegExp(regExExpression, "ig");
-                    let thisSearch = this.params.searchValue;
-                    return this.desserts = this.desserts.filter(function(item) {
-                        let arr = [];
-                        thisSearch.forEach(function(val) {
-                            arr.push(item[val]);
-                        })
-                        return searchTest.test(arr.join(" ")); 
+                    vm.desserts.filter(function(item) {
+                        // console.log(chip.data === item[chip.input]);
+                        if(chip.data === item['city'] || chip.data === item['result']) {
+                            console.log(item)
+                            // array.push(item);
+                        }
                     });
+                    // this.desserts = data;
+                    // let searchTerm = chip.data.trim().toLowerCase(),
+                    // useOr = chip.data == "&&",
+                    // AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                    // OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                    // regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                    // searchTest = new RegExp(regExExpression, "ig");
+                    // let thisSearch = this.params.searchValue;
+                    // return this.desserts = this.desserts.filter(function(item) {
+                    //     let arr = [];
+                    //     thisSearch.forEach(function(val) {
+                    //         arr.push(item[val]);
+                    //     })
+                    //     return searchTest.test(arr.join(" ")); 
+                    // });
                 });
                 // console.log(array)
                 // return this.desserts = array;
