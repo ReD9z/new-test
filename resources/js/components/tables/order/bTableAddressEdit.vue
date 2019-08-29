@@ -307,6 +307,7 @@ export default {
             return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`
         },
         async getFiltered() {
+            this.chipsItem = [];
             await this.params.filter.forEach((item) => {
                 if(item.api) {
                     axios({
@@ -327,54 +328,65 @@ export default {
                     ).catch(error => {
                         console.log(error);
                     })
-                } else {
-                    item.data.filter((items) => {
-                        this.chipsItem.push({
-                            data: items[item.value],
-                            text: item.text,
-                            input: item.input
-                        });
-                    });
-                }
+                } 
+                // else {
+                //     item.data.filter((items) => {
+                //         this.chipsItem.push({
+                //             data: items[item.value],
+                //             text: item.text,
+                //             input: item.input
+                //         });
+                //     });
+                // }
             });
         },
         filtered(data) {
+            this.desserts = data;
             if(this.chips.length > 0) {
-                let vm = this;
+                let arr = [];
                 this.chips.forEach((chip) => {
-                    vm.desserts.filter(function(item) {
-                        // console.log(chip.data === item[chip.input]);
-                        if(chip.data === item['city'] || chip.data === item['result']) {
-                            console.log(item)
-                            // array.push(item);
-                        }
-                    });
-                    // this.desserts = data;
-                    // let searchTerm = chip.data.trim().toLowerCase(),
-                    // useOr = chip.data == "&&",
-                    // AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
-                    // OR_RegEx = searchTerm.replace(/ +/g,"|"),
-                    // regExExpression = useOr ? OR_RegEx : AND_RegEx,
-                    // searchTest = new RegExp(regExExpression, "ig");
-                    // let thisSearch = this.params.searchValue;
-                    // return this.desserts = this.desserts.filter(function(item) {
-                    //     let arr = [];
-                    //     thisSearch.forEach(function(val) {
-                    //         arr.push(item[val]);
-                    //     })
-                    //     return searchTest.test(arr.join(" ")); 
-                    // });
+                    arr.push(chip.data);
                 });
-                // console.log(array)
-                // return this.desserts = array;
-            } else {
-                return this.desserts = data;
+                var searchTerm = arr.join(' ').trim().toLowerCase(),
+                searchTest = new RegExp(searchTerm, "ig");
+                let array = [];
+                // console.log(searchTerm);
+                this.desserts = this.desserts.filter(function(item) {
+                    // console.log(arr.join('||').trim().toLowerCase());
+                    // searchTest.test([item.city, item.result].join('||').trim().toLowerCase());
+                    // console.log(searchTest.test([item.city, item.result].join('||').trim().toLowerCase()));
+                    // console.log([item.city, item.result].join(' ').trim().toLowerCase());
+                    // console.log("12");
+                    // console.log(arr.join(' ').trim().toLowerCase());
+                    // if(searchTest.test([item.city].join(' ').trim().toLowerCase())) {
+                        // array.push(item);
+                        // console.log(item);
+                    // }
+                    // console.log(searchTest.test([item.result, item.city].join(' ').trim().toLowerCase()));
+                    return searchTest.test([item.city].join(' ').trim().toLowerCase()); 
+                });
+                // console.log(array);
+                // this.desserts = array;
             }
+            // // if(this.chips.length > 0) {
+            //     let vm = this;
+            //     let array = [];
+            //     this.chips.forEach((chip) => {
+            //         vm.desserts.filter(function(item) {
+            //             if(chip.data == item['result']) {
+            //                 array.push(item);
+            //             }
+            //         });
+            //     });
+            //     return this.desserts = array;
+            // else {
+            //     return this.desserts = data;
+            // }
         },
         filteredItems(data) {
             this.desserts = data;
             let searchTerm = this.search.trim().toLowerCase(),
-            useOr = this.search == "or",
+            useOr = 'and' == "or",
             AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
             OR_RegEx = searchTerm.replace(/ +/g,"|"),
             regExExpression = useOr ? OR_RegEx : AND_RegEx,
@@ -494,7 +506,7 @@ export default {
                                     let dateStart = vm.$moment(vm.dateStartFormatted, 'DD-MM-YYYY').unix() * 1000;
                                     let dateEnd = vm.$moment(vm.dateEndFormatted, 'DD-MM-YYYY').unix() * 1000;
     
-                                    if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
+                                    if(itemDateStart >= dateStart && itemDateEnd <= dateEnd || itemDateStart <= dateStart && itemDateEnd >= dateEnd) {
                                         item.result = 'Занято';
                                         item.data = stats;
                                         item.files = stats.files;

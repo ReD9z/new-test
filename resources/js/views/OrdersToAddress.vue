@@ -96,7 +96,7 @@ export default {
             ],
             filter: [
                 {
-                    title: 'Адреса',
+                    title: 'Город',
                     api: '/api/cities_to_works',
                     value: 'name',
                     input: 'city'
