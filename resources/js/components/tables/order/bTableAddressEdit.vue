@@ -333,9 +333,32 @@ export default {
                 })
             });
         },
-        filteredStatus(data) {
-            if(this.chipsStatus.length > 0) {
+        // filteredStatus(data) {
+        //     if(this.chipsStatus.length > 0) {
+        //         let arr = [];
+        //         this.chipsStatus.forEach((chip) => {
+        //             arr.push(chip);
+        //         });
+        //         var searchTerm = arr.join('||').trim().toLowerCase(),
+        //         useOr = 'and' == "or",
+        //         AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+        //         OR_RegEx = searchTerm.replace(/ +/g,"|"),
+        //         regExExpression = useOr ? OR_RegEx : AND_RegEx,
+        //         searchTest = new RegExp(regExExpression, "ig");
+        //         let array = [];
+           
+        //         this.desserts = this.desserts.map(function(item) {
+        //             return searchTest.test([item.result]); 
+        //         });
+        //     }
+        // },
+        filtered(data) {
+            // this.desserts = data;
+            if(this.chips.length > 0 || this.chipsStatus.length > 0) {
                 let arr = [];
+                this.chips.forEach((chip) => {
+                    arr.push(chip);
+                });
                 this.chipsStatus.forEach((chip) => {
                     arr.push(chip);
                 });
@@ -348,27 +371,7 @@ export default {
                 let array = [];
            
                 this.desserts = this.desserts.filter(function(item) {
-                    return searchTest.test([item.result]); 
-                });
-            }
-        },
-        filtered(data) {
-            // this.desserts = data;
-            if(this.chips.length > 0) {
-                let arr = [];
-                this.chips.forEach((chip) => {
-                    arr.push(chip);
-                });
-                var searchTerm = arr.join('||').trim().toLowerCase(),
-                useOr = 'and' == "or",
-                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
-                OR_RegEx = searchTerm.replace(/ +/g,"|"),
-                regExExpression = useOr ? OR_RegEx : AND_RegEx,
-                searchTest = new RegExp(regExExpression, "ig");
-                let array = [];
-           
-                this.desserts = this.desserts.filter(function(item) {
-                    return searchTest.test([item.city]); 
+                    return searchTest.test([item.city, item.result]); 
                 });
             }
         },
@@ -507,7 +510,7 @@ export default {
                         });
                         this.filteredItems(this.desserts);
                         this.filtered(this.desserts);
-                        this.filteredStatus(this.desserts); 
+                        // this.filteredStatus(this.desserts); 
                         this.loading = false;
                     }
                 }
