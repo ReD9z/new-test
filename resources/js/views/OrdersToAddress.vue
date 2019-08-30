@@ -100,14 +100,17 @@ export default {
                     api: '/api/cities_to_works',
                     value: 'name',
                     input: 'city'
-                },
-                {
-                    data: [{ result: 'Занято' },{ result: 'Свободен' }],
-                    title: 'Статус',
-                    value: 'result',
-                    text: 'status',
-                    input: 'result'
                 }
+                // {
+                //     data: [
+                //         { result: 'Занято' },
+                //         { result: 'Свободен' }
+                //     ],
+                //     title: 'Статус',
+                //     value: 'result',
+                //     text: 'status',
+                //     input: 'result'
+                // }
             ],
             search: true,
             pagination: true,
