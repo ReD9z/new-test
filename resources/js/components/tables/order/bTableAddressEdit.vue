@@ -347,11 +347,21 @@ export default {
                 this.chips.forEach((chip) => {
                     arr.push(chip.data);
                 });
-                var searchTerm = arr.join(' ').trim().toLowerCase(),
-                searchTest = new RegExp(searchTerm, "ig");
+                var searchTerm = arr.join('||').trim().toLowerCase(),
+                useOr = 'and' == "or",
+                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                searchTest = new RegExp(regExExpression, "ig");
                 let array = [];
                 // console.log(searchTerm);
                 this.desserts = this.desserts.filter(function(item) {
+                    // console.log(item.city.trim().toLowerCase() == searchTest);
+                    // console.log(item.city.trim().toLowerCase());
+                    // console.log(item.city.trim().toLowerCase() == arr.join('||').trim().toLowerCase());
+                    // if(arr.join('||').trim().toLowerCase()) {
+                    //     array.push(item);
+                    // }
                     // console.log(arr.join('||').trim().toLowerCase());
                     // searchTest.test([item.city, item.result].join('||').trim().toLowerCase());
                     // console.log(searchTest.test([item.city, item.result].join('||').trim().toLowerCase()));
@@ -363,9 +373,9 @@ export default {
                         // console.log(item);
                     // }
                     // console.log(searchTest.test([item.result, item.city].join(' ').trim().toLowerCase()));
-                    return searchTest.test([item.city].join(' ').trim().toLowerCase()); 
+                    return searchTest.test([item.city]); 
+                // console.log(searchTest.test([item.city]));
                 });
-                // console.log(array);
                 // this.desserts = array;
             }
             // // if(this.chips.length > 0) {
