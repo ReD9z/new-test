@@ -35,8 +35,8 @@ export default {
             let vm = this;
             ymaps.ready().done(function (ym) {
                 const myMap = new ym.Map('orderMaps', {
-                    center: [51.551407, 46.036561],
-                    zoom: 11
+                    center: [64.25926230053398,108.11586741406248],
+                    zoom: 3
                 }, {
                     searchControlProvider: 'yandex#search'
                 });

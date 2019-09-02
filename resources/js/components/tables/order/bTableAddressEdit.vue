@@ -148,8 +148,8 @@
         </v-flex>
         <v-spacer></v-spacer>
         <div>
-            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
-            <v-chip :items="chipsStatus" v-for="(item, key) in chipsStatus" :key="key" close @input="remove(item)">{{item}}</v-chip>
+            <v-chip v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
+            <v-chip v-for="(item, key) in chipsStatus" :key="'K'+ key" close @input="removeStatus(item)">{{item}}</v-chip>
         </div>
         <v-icon>filter_list</v-icon>
         <v-menu :close-on-content-click="false" :nudge-width="500" offset-y bottom left>
@@ -158,7 +158,11 @@
                     <v-icon>more_vert</v-icon>
                 </v-btn>
             </template>
-            <v-card>
+            <v-card height="200px">
+                <v-toolbar color="indigo" dark>
+                    <v-toolbar-title>Фильтры</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                </v-toolbar>
                 <v-layout row wrap>
                     <v-flex class="px-3" xs6>
                         <v-combobox
@@ -286,10 +290,10 @@ export default {
         search : _.debounce(function () {
             this.initialize();
         }, 300),
-        chips(val) {
+        chips() {
             this.initialize();
         },
-        chipsStatus(val) {
+        chipsStatus() {
             this.initialize();
         }
     },
@@ -333,32 +337,9 @@ export default {
                 })
             });
         },
-        // filteredStatus(data) {
-        //     if(this.chipsStatus.length > 0) {
-        //         let arr = [];
-        //         this.chipsStatus.forEach((chip) => {
-        //             arr.push(chip);
-        //         });
-        //         var searchTerm = arr.join('||').trim().toLowerCase(),
-        //         useOr = 'and' == "or",
-        //         AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
-        //         OR_RegEx = searchTerm.replace(/ +/g,"|"),
-        //         regExExpression = useOr ? OR_RegEx : AND_RegEx,
-        //         searchTest = new RegExp(regExExpression, "ig");
-        //         let array = [];
-           
-        //         this.desserts = this.desserts.map(function(item) {
-        //             return searchTest.test([item.result]); 
-        //         });
-        //     }
-        // },
-        filtered(data) {
-            // this.desserts = data;
-            if(this.chips.length > 0 || this.chipsStatus.length > 0) {
+        filteredStatus(data) {
+            if(this.chipsStatus.length > 0) {
                 let arr = [];
-                this.chips.forEach((chip) => {
-                    arr.push(chip);
-                });
                 this.chipsStatus.forEach((chip) => {
                     arr.push(chip);
                 });
@@ -371,7 +352,25 @@ export default {
                 let array = [];
            
                 this.desserts = this.desserts.filter(function(item) {
-                    return searchTest.test([item.city, item.result]); 
+                    return searchTest.test([item.result]); 
+                });
+            }
+        },
+        filtered(data) {
+            if(this.chips.length > 0) {
+                let arr = [];
+                this.chips.forEach((chip) => {
+                    arr.push(chip);
+                });
+                var searchTerm = arr.join('||').trim().toLowerCase(),
+                useOr = 'and' == "or",
+                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                searchTest = new RegExp(regExExpression, "ig");
+           
+                this.desserts = this.desserts.filter(function(item) {
+                    return searchTest.test([item.city]);
                 });
             }
         },
@@ -490,15 +489,14 @@ export default {
                     if(!this.dateStartFormatted && !this.dateEndFormatted) {
                         this.initialize();
                     } else {
-                        this.desserts.map(function (item) {
+                        this.desserts.forEach(function (item) {
                             if(item.status.length > 0) {
-                                return item.status.map(function (stats) {
+                                return item.status.filter(function (stats) {
                                     let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
                                     let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
                                     let dateStart = vm.$moment(vm.dateStartFormatted, 'DD-MM-YYYY').unix() * 1000;
                                     let dateEnd = vm.$moment(vm.dateEndFormatted, 'DD-MM-YYYY').unix() * 1000;
-    
-                                    if(itemDateStart >= dateStart && itemDateEnd <= dateEnd || itemDateStart <= dateStart && itemDateEnd >= dateEnd) {
+                                    if((itemDateStart >= dateStart) && (itemDateStart <= dateEnd) || (itemDateEnd >= dateStart) && (itemDateEnd <= dateEnd)) {
                                         item.result = 'Занят';
                                         item.data = stats;
                                         item.files = stats.files;
@@ -510,7 +508,7 @@ export default {
                         });
                         this.filteredItems(this.desserts);
                         this.filtered(this.desserts);
-                        // this.filteredStatus(this.desserts); 
+                        this.filteredStatus(this.desserts); 
                         this.loading = false;
                     }
                 }
@@ -612,6 +610,10 @@ export default {
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)
             this.chips = [...this.chips]
+        },
+        removeStatus(item) {
+            this.chipsStatus.splice(this.chipsStatus.indexOf(item), 1)
+            this.chipsStatus = [...this.chipsStatus]
         },
         roleUser(role, roleList) {
             const {admin, client, installer, moderator, manager} = roleList;
