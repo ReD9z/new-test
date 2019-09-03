@@ -397,8 +397,8 @@ export default {
         formatDate (date) {
             if (!date) return null
 
-            const [year, month, day] = date.split('-')
-            return `${day}-${month}-${year}`
+            const [year, month, day] = date.split('.')
+            return `${day}.${month}.${year}`
         },
         dateFilter () {
             let vm = this;
@@ -409,10 +409,10 @@ export default {
                 this.orderDate = this.orderFull;
             } else {
                 this.orderDate.map(function (item) {
-                    let itemDateStart = vm.$moment(item.order_start_date, 'DD-MM-YYYY').unix() * 1000;
-                    let itemDateEnd = vm.$moment(item.order_start_date, 'DD-MM-YYYY').unix() * 1000;
-                    let dateStart = vm.$moment(vm.formatDate(vm.dateStart), 'DD-MM-YYYY').unix() * 1000;
-                    let dateEnd = vm.$moment(vm.formatDate(vm.dateEnd), 'DD-MM-YYYY').unix() * 1000;
+                    let itemDateStart = vm.$moment(item.order_start_date, 'DD.MM.YYYY').unix() * 1000;
+                    let itemDateEnd = vm.$moment(item.order_start_date, 'DD.MM.YYYY').unix() * 1000;
+                    let dateStart = vm.$moment(vm.formatDate(vm.dateStart), 'DD.MM.YYYY').unix() * 1000;
+                    let dateEnd = vm.$moment(vm.formatDate(vm.dateEnd), 'DD.MM.YYYY').unix() * 1000;
             
                     if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
                         orderData.push(item);
