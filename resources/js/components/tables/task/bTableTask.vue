@@ -259,27 +259,6 @@
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
-        <!-- <v-icon>filter_list</v-icon>
-        <div>
-            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
-        </div>
-        <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
-            <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on">
-                    <v-icon>more_vert</v-icon>
-                </v-btn>
-            </template>
-            <v-card>
-                <v-divider></v-divider>
-                <v-list>
-                    <v-list-tile v-for="(item, key) in chipsItem" :key="key">
-                        <v-list-tile-action>
-                            <v-checkbox v-model="chips" :label="item" :value="item"></v-checkbox>
-                        </v-list-tile-action>
-                    </v-list-tile>
-                </v-list>
-            </v-card>
-        </v-menu> -->
     </v-toolbar>
     <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
@@ -487,7 +466,7 @@ export default {
         parseDate (date) {
             if (!date) return null
             const [year, month, day] = date.split('-')
-            return `${month}-${day}-${year}`
+            return `${month}.${day}.${year}`
         },
         selectStatus() {
             this.params.headers.forEach(element => {

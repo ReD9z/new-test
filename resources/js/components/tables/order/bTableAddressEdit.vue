@@ -133,6 +133,18 @@
                                                 </v-btn>
                                             </v-layout>
                                         </template>
+                                        <template>
+                                            <v-layout fill-height left top ma-0 >
+                                                <v-dialog v-model="dialogImg" width="600px">
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-btn icon class="white--text" v-on="on" @click='filesImg(file)'><v-icon>search</v-icon></v-btn>
+                                                    </template>
+                                                    <v-card>
+                                                        <v-img :src="'/storage/' + imgBig" :lazy-src="'/storage/' + imgBig" aspect-ratio="1" class="grey lighten-2"></v-img>
+                                                    </v-card>
+                                                </v-dialog>
+                                            </v-layout>
+                                        </template>
                                     </v-img>
                                 </v-card>
                             </v-flex>
@@ -235,8 +247,10 @@ import XLSX from 'xlsx';
 export default {
     inject: ['$validator'],
     data: vm => ({
+        imgBig: '',
         statusFilter: ['Занят', 'Свободен'],
         chipsStatus: [],
+        dialogImg: false,
         search: '',
         dialogImages: false,
         files: [],
@@ -304,11 +318,17 @@ export default {
         await this.getFiltered();
     },
     methods: {
+        filesImg(file) {
+            this.imgBig = '';
+            this.imgBig = file.url;
+            console.log(file);
+            // this.dialogImg = true;
+        },
         formatDate (date) {
             if (!date) return null
 
             const [year, month, day] = date.split('-')
-            return `${day}-${month}-${year}`
+            return `${day}.${month}.${year}`
         },
         parseDate (date) {
             if (!date) return null
@@ -327,9 +347,7 @@ export default {
                     response => {
                         let data = response.data;
                         data.filter((items) => {
-                            this.chipsItem.push(
-                                items[item.value]
-                            );
+                            this.chipsItem.push(items[item.value]);
                         });
                     }
                 ).catch(error => {

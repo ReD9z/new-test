@@ -80,7 +80,7 @@
         </v-flex>
         <v-spacer></v-spacer>
         <div>
-            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item.data}}</v-chip>
+            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
         </div>
         <v-icon v-if="!isLoggedUser.managers">filter_list</v-icon>
         <v-menu v-if="!isLoggedUser.managers" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
@@ -89,25 +89,21 @@
                     <v-icon>more_vert</v-icon>
                 </v-btn>
             </template>
-            <v-card>
-                <v-divider></v-divider>
-                <v-list v-for="(items, keys) in params.filter" :key="`A-${keys}`">
-                    <v-subheader>
-                        {{items.title}}
-                    </v-subheader>
-                    <div v-for="(item, key) in chipsItem" :key="`A-${key}`">
-                        <v-list-tile v-if="item.api && items.api == item.api">
-                            <v-list-tile-action>
-                                <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
-                            </v-list-tile-action>
-                        </v-list-tile>
-                        <v-list-tile v-if="item.text && items.text == item.text">
-                            <v-list-tile-action>
-                                <v-checkbox v-model="chips" :label="item.data" :value="item"></v-checkbox>
-                            </v-list-tile-action>
-                        </v-list-tile>
-                      </div>
-                </v-list>
+            <v-card height="200px">
+                <v-toolbar color="indigo" dark>
+                    <v-toolbar-title>Клиенты</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                </v-toolbar>
+                <v-layout row wrap>
+                    <v-flex class="px-3" xs12>
+                        <v-combobox
+                            v-model="chips"
+                            :items="chipsItem"
+                            multiple
+                            label="Клиенты"
+                        ></v-combobox>
+                    </v-flex>
+                </v-layout>
             </v-card>
         </v-menu>
     </v-toolbar>
@@ -221,11 +217,7 @@ export default {
                         response => {
                             let data = response.data;
                             data.filter((items) => {
-                                this.chipsItem.push({
-                                    data: items[item.value],
-                                    api: item.api,
-                                    input: item.input
-                                });
+                                this.chipsItem.push(items[item.value]);
                             });
                         }
                     ).catch(error => {
@@ -233,29 +225,27 @@ export default {
                     })
                 } else {
                     item.data.filter((items) => {
-                        this.chipsItem.push({
-                            data: items[item.value],
-                            text: item.text,
-                            input: item.input
-                        });
+                        this.chipsItem.push(items[item.value]);
                     });
                 }
             });
         },
         filtered(data) {
             if(this.chips.length > 0) {
-                let vm = this;
-                let array = [];
+                let arr = [];
                 this.chips.forEach((chip) => {
-                    vm.desserts.filter(function(item) {
-                        if(chip.data === item[chip.input]) {
-                            array.push(item);
-                        }
-                    });
+                    arr.push(chip);
                 });
-                return this.desserts = array;
-            } else {
-                return this.desserts = data;
+                var searchTerm = arr.join('||').trim().toLowerCase(),
+                useOr = 'and' == "or",
+                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                searchTest = new RegExp(regExExpression, "ig");
+           
+                this.desserts = this.desserts.filter(function(item) {
+                    return searchTest.test([item.city]);
+                });
             }
         },
         filteredItems(data) {

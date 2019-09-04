@@ -21,8 +21,8 @@ class Orders extends JsonResource
             'clients_name' => $this->clients->users->name,
             'clients_id' => $this->clients_id,
             'address' => $this->orderAddress ? $this->orderAddress : [],
-            'order_start_date' => date("d-m-Y", strtotime($this->order_start_date)),
-            'order_end_date' => date("d-m-Y", strtotime($this->order_end_date))
+            'order_start_date' => date("d.m.Y", strtotime($this->order_start_date)),
+            'order_end_date' => date("d.m.Y", strtotime($this->order_end_date))
         ];
     }
 }

@@ -72,7 +72,7 @@ export default {
                 title: 'Продажи', icon: 'account_balance_wallet', wrapLink:
                 [
                     { 
-                        title: 'Клиенты', icon: 'question_answer', src: 'clients',
+                        title: 'Клиенты', icon: 'how_to_reg', src: 'clients',
                         role: {admin: 'admin', manager: 'manager'}
                     },
                     { 
@@ -85,7 +85,7 @@ export default {
                     },
                     { 
                         title: 'Задачи монтажникам', icon: 'question_answer', src: 'tasks',
-                        role: {admin: 'admin', installer: 'installer', moderator: 'moderator',}
+                        role: {admin: 'admin', installer: 'installer', moderator: 'moderator'}
                     }
                 ],
                 role: {admin: 'admin', manager: 'manager', moderator: 'moderator', installer: 'installer', client: 'client'}
@@ -106,7 +106,7 @@ export default {
                         role: {admin: 'admin'}
                     },
                     { 
-                        title: 'Монтажники', icon: 'question_answer', src: 'installers',
+                        title: 'Монтажники', icon: 'build', src: 'installers',
                         role: {admin: 'admin', moderator: 'moderator'}
                     },
                 ],
@@ -116,15 +116,15 @@ export default {
                 title: 'Настройки', icon: 'settings', wrapLink:
                 [
                     { 
-                        title: 'Города', icon: 'question_answer', src: 'citiestoworks',
+                        title: 'Города', icon: 'location_city', src: 'citiestoworks',
                         role: {admin: 'admin'}
                     },
                     { 
-                        title: 'Районы', icon: 'question_answer', src: 'areas',
+                        title: 'Районы', icon: 'home', src: 'areas',
                         role: {admin: 'admin'}
                     },
                     { 
-                        title: 'Типы работы', icon: 'question_answer', src: 'typestoworks',
+                        title: 'Типы работы', icon: 'work', src: 'typestoworks',
                         role: {admin: 'admin'}
                     }
                 ],
