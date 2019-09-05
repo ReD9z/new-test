@@ -27,7 +27,7 @@
                             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>    -->
-                    <v-list-group v-show="roleUser(isUserRole, item.role)" :prepend-icon="item.icon" slot="prependIcon" large color="primary" :value="hide">
+                    <v-list-group v-show="roleUser(isUserRole, item.role)" :prepend-icon="item.icon" :value="hide">
                         <template v-slot:activator>
                             <v-list-tile>
                                 <v-list-tile-title>{{item.title}}</v-list-tile-title>
