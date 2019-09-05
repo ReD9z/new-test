@@ -1,33 +1,33 @@
 <template>
     <v-app id="inspire">
-        <v-navigation-drawer v-model="drawer" :mini-variant.sync="mini" hide-overlay stateless fixed app v-if="isLoggedIn">
+        <v-navigation-drawer class="blue darken-3" v-model="drawer" :mini-variant.sync="mini" hide-overlay stateless fixed app v-if="isLoggedIn">
             <v-toolbar flat class="transparent">
                 <v-list class="pa-0">
                     <v-list-tile avatar>
                         <v-list-tile-avatar>
-                           <v-icon size="38px">account_circle</v-icon>
+                           <v-icon size="38px" class="white--text">account_circle</v-icon>
                         </v-list-tile-avatar>
                         <v-list-tile-content>
                             <v-list-tile-title></v-list-tile-title>
                         </v-list-tile-content>
                         <v-list-tile-action>
                             <v-btn icon @click.stop="mini = !mini" >
-                                <v-icon>chevron_left</v-icon>
+                                <v-icon class="white--text">chevron_left</v-icon>
                             </v-btn>
                         </v-list-tile-action>
                     </v-list-tile>
                 </v-list>
             </v-toolbar>
-            <v-list class="pt-0" dense>
+            <v-list class="white--text pt-0" dense>
                 <v-divider></v-divider>
                 <div v-for="(item, key) in items" :key="key">
-                    <v-list-tile v-show="roleUser(isUserRole, item.role)" :to="{ name: item.src }" active-class="active" v-if="!item.wrapLink">
+                    <!-- <v-list-tile v-show="roleUser(isUserRole, item.role)" :to="{ name: item.src }" active-class="active">
                         <v-list-tile-action><v-icon>{{ item.icon }}</v-icon></v-list-tile-action>
                         <v-list-tile-content>
                             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                         </v-list-tile-content>
-                    </v-list-tile>   
-                    <v-list-group v-show="roleUser(isUserRole, item.role)" :prepend-icon="item.icon" :value="hide" v-else>
+                    </v-list-tile>    -->
+                    <v-list-group v-show="roleUser(isUserRole, item.role)" :prepend-icon="item.icon" slot="prependIcon" large color="primary" :value="hide">
                         <template v-slot:activator>
                             <v-list-tile>
                                 <v-list-tile-title>{{item.title}}</v-list-tile-title>
@@ -36,7 +36,7 @@
                         <div v-for="(wrapLink, key) in item.wrapLink" :key="key">
                             <v-list-tile v-show="roleUser(isUserRole, wrapLink.role)" active-class="active" :to="{ name: wrapLink.src }">
                                 <v-list-tile-action>
-                                    <v-icon>{{ wrapLink.icon }}</v-icon>
+                                    <v-icon class="white--text">{{ wrapLink.icon }}</v-icon>
                                 </v-list-tile-action>
                                 <v-list-tile-title>{{wrapLink.title}}</v-list-tile-title>
                             </v-list-tile>
@@ -44,7 +44,7 @@
                     </v-list-group>
                 </div>
                 <v-list-tile @click="exit()">
-                    <v-list-tile-action><v-icon>exit_to_app</v-icon></v-list-tile-action>
+                    <v-list-tile-action><v-icon class="white--text">exit_to_app</v-icon></v-list-tile-action>
                     <v-list-tile-content>
                         <v-list-tile-title>Выход</v-list-tile-title>
                     </v-list-tile-content>
@@ -76,15 +76,15 @@ export default {
                         role: {admin: 'admin', manager: 'manager'}
                     },
                     { 
-                        title: 'Адреса', icon: 'question_answer', src: 'address',
+                        title: 'Адреса', icon: 'room', src: 'address',
                         role: {admin: 'admin', moderator: 'moderator', manager: 'manager'}
                     },
                     { 
-                        title: 'Заказы', icon: 'question_answer', src: 'orders',
+                        title: 'Заказы', icon: 'credit_card', src: 'orders',
                         role: {admin: 'admin', moderator: 'moderator', client: 'client'}
                     },
                     { 
-                        title: 'Задачи монтажникам', icon: 'question_answer', src: 'tasks',
+                        title: 'Задачи монтажникам', icon: 'list', src: 'tasks',
                         role: {admin: 'admin', installer: 'installer', moderator: 'moderator'}
                     }
                 ],
@@ -94,15 +94,15 @@ export default {
                 title: 'Пользователи', icon: 'people', wrapLink:
                 [
                     { 
-                        title: 'Администраторы', icon: 'question_answer', src: 'users',
+                        title: 'Администраторы', icon: 'contacts', src: 'users',
                         role: {admin: 'admin'}
                     },
                     { 
-                        title: 'Модераторы', icon: 'question_answer', src: 'moderators',
+                        title: 'Модераторы', icon: 'security', src: 'moderators',
                         role: {admin: 'admin'}
                     },
                     { 
-                        title: 'Менеджеры', icon: 'question_answer', src: 'managers', 
+                        title: 'Менеджеры', icon: 'record_voice_over', src: 'managers', 
                         role: {admin: 'admin'}
                     },
                     { 
