@@ -91,7 +91,7 @@
             </template>
             <v-card height="200px">
                 <v-toolbar color="indigo" dark>
-                    <v-toolbar-title>Клиенты</v-toolbar-title>
+                    <v-toolbar-title>Города</v-toolbar-title>
                     <v-spacer></v-spacer>
                 </v-toolbar>
                 <v-layout row wrap>
@@ -100,7 +100,7 @@
                             v-model="chips"
                             :items="chipsItem"
                             multiple
-                            label="Клиенты"
+                            label="Города"
                         ></v-combobox>
                     </v-flex>
                 </v-layout>
@@ -500,6 +500,9 @@ export default {
     mounted() {
         if(this.isLoggedUser.managers) {
             this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
+        }
+        if(this.isLoggedUser.moderator) {
+            this.editedItem['city_id'] = this.isLoggedUser.moderator.city_id;
         }
     }
 }

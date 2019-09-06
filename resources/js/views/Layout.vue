@@ -5,7 +5,8 @@
                 <v-list class="pa-0">
                     <v-list-tile avatar>
                         <v-list-tile-avatar>
-                           <v-icon size="38px" class="white--text">account_circle</v-icon>
+                            <v-img src="/images/atom-logo.png" lazy-src="/images/atom-logo.png"></v-img>
+                           <!-- <v-icon size="38px" class="white--text">account_circle</v-icon> -->
                         </v-list-tile-avatar>
                         <v-list-tile-content>
                             <v-list-tile-title></v-list-tile-title>
@@ -21,12 +22,6 @@
             <v-list class="white--text pt-0" dense>
                 <v-divider></v-divider>
                 <div v-for="(item, key) in items" :key="key">
-                    <!-- <v-list-tile v-show="roleUser(isUserRole, item.role)" :to="{ name: item.src }" active-class="active">
-                        <v-list-tile-action><v-icon>{{ item.icon }}</v-icon></v-list-tile-action>
-                        <v-list-tile-content>
-                            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-                        </v-list-tile-content>
-                    </v-list-tile>    -->
                     <v-list-group v-show="roleUser(isUserRole, item.role)" :prepend-icon="item.icon" :value="hide">
                         <template v-slot:activator>
                             <v-list-tile>
