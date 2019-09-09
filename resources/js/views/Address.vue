@@ -8,7 +8,7 @@
 
 <script>
 export default {
-    data: () => ({
+    data: (vm) => ({
         params: {
             baseUrl: '/api/address',
             headers: [
@@ -20,7 +20,7 @@ export default {
                     selectText: 'name',
                     TableGetIdName: 'city',
                     selectApi: '/api/cities_to_works',
-                    input: "select",
+                    input: "select"
                 },                                                                                                                
                 {
                     text: 'Район',

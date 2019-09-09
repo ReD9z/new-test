@@ -349,9 +349,6 @@ export default {
         },
         isLoggedUser: function(){ 
             return this.$store.getters.isLoggedUser;
-        },
-        isLoggedUser: function(){ 
-            return this.$store.getters.isLoggedUser;
         }
     },
     watch: {

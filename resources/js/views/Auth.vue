@@ -82,7 +82,8 @@
                         })
                         .catch((error) => {
                             if(error.response.status == 401) {
-                                this.errors.items.push({
+                                this.errors.items.push(
+                                    {
                                         field: "email",
                                         id: "1",
                                         msg: 'Неверный e-mail',
@@ -99,7 +100,8 @@
                                         scope: null,
                                         regenerate: () => 'some string', 
                                         vmId: 4
-                                });
+                                    }
+                                );
                             }
                             this.loading = false
                         });

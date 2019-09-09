@@ -26,7 +26,7 @@
         <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Добавить адрес</v-btn>
     </v-toolbar>
     <v-navigation-drawer v-model="dialog" right temporary fixed>
-        <v-card>
+        <v-card class="borderNone">
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
                 <v-spacer></v-spacer>
@@ -53,7 +53,7 @@
                                         :data-vv-name="param.value" 
                                         :error-messages="errors.collect(param.value)" 
                                         v-validate="param.validate"
-                                        >
+                                    >
                                     </v-autocomplete>
                                 </div>
                             </div>
@@ -82,8 +82,8 @@
         <div>
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
         </div>
-        <v-icon v-if="!isLoggedUser.managers">filter_list</v-icon>
-        <v-menu v-if="!isLoggedUser.managers" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
+        <v-icon v-if="showRoles()">filter_list</v-icon>
+        <v-menu v-if="showRoles()" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
             <template v-slot:activator="{ on }">
                 <v-btn icon v-on="on">
                     <v-icon>more_vert</v-icon>
@@ -203,7 +203,20 @@ export default {
     },
     methods: {
         roleUserCity() {
-            return !this.isLoggedUser.managers ? this.cityUser = null : this.cityUser = this.isLoggedUser.managers.city_id
+            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
+                return this.cityUser = this.isLoggedUser.moderators.city_id;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return this.cityUser = null;
+            }
+        },
+        showRoles() {
+            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
+                return false;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return true;
+            }
         },
         async getFiltered() {
             this.chipsItem = [];
@@ -318,12 +331,7 @@ export default {
                     .then(
                         res => {
                             if(res) {
-                                this.select.push(
-                                    {
-                                        data: res.data,
-                                        url: element.selectApi
-                                    }
-                                ); 
+                                this.select.push({data: res.data,url: element.selectApi}); 
                             }
                         }
                     ).catch(
@@ -444,6 +452,13 @@ export default {
             this.dialogImages = false
             setTimeout(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
+                // В функцию
+                if(this.isLoggedUser.managers) {
+                    this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
+                }
+                if(this.isLoggedUser.moderators) {
+                    this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
+                }
                 this.editedIndex = -1
             }, 300)
             this.$validator.reset()
@@ -498,11 +513,12 @@ export default {
         }
     },
     mounted() {
+        // В функцию
         if(this.isLoggedUser.managers) {
             this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
         }
-        if(this.isLoggedUser.moderator) {
-            this.editedItem['city_id'] = this.isLoggedUser.moderator.city_id;
+        if(this.isLoggedUser.moderators) {
+            this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
         }
     }
 }
