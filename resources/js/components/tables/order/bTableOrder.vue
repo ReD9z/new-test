@@ -126,9 +126,6 @@
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
-    <v-navigation-drawer v-model="listAddressOrder" right temporary fixed width="1200px">
-       <b-table-address-order :params="params.orderAddress" :idOrder="idOrder"></b-table-address-order>
-    </v-navigation-drawer>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
@@ -228,6 +225,7 @@ export default {
             sortBy: 'id'
         },
         selected: [],
+        cityUser: null
     }),
     props: {
         params: Object
@@ -239,6 +237,9 @@ export default {
         computedDateFormatted () {
             return this.formatDate(this.date)
         },
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
+        }
     },
     watch: {
         dialog (val) {
@@ -257,6 +258,22 @@ export default {
         await this.getFiltered();
     },
     methods: {
+        roleUserCity() {
+            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
+                return this.cityUser = this.isLoggedUser.moderators.city_id;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return this.cityUser = null;
+            }
+        },
+        showRoles() {
+            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
+                return false;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return true;
+            }
+        },
         editAddress(data) {
             this.listAddressOrder = true;
             this.idOrder = data.id;
@@ -337,7 +354,7 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    user: this.params.user
+                    city: this.roleUserCity()
                 }
             })
             .then(

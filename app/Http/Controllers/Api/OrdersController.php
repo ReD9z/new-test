@@ -18,8 +18,8 @@ class OrdersController extends Controller
      */
     public function index(Request $request)
     {
-        if($request->user) {
-            $orders = Orders::with('clients', 'orderAddress', 'clients.users')->get()->where('clients.city_id', $request->user); 
+        if($request->city) {
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users')->get()->where('clients.city_id', $request->city); 
         }
         else {
             $orders = Orders::with('clients', 'orderAddress', 'clients.users')->get(); 

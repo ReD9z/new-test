@@ -224,7 +224,7 @@ export default {
                 if(item.api) {
                     axios({
                         method: 'get',
-                        url: item.api,
+                        url: item.api
                     })
                     .then(
                         response => {
@@ -321,17 +321,23 @@ export default {
         parseDate (date) {
             if (!date) return null
             const [year, month, day] = date.split('-')
-            return `${month}-${day}-${year}`
+            return `${day}-${month}-${year}`
         },
         selectStatus() {
             this.select = [];
             this.params.headers.forEach(element => {
                 if(element.selectApi != undefined) {
-                    axios.get(element.selectApi)
+                    axios({
+                        method: 'get',
+                        url: element.selectApi,
+                        params: {
+                            city: this.roleUserCity()
+                        }
+                    })
                     .then(
                         res => {
                             if(res) {
-                                this.select.push({data: res.data,url: element.selectApi}); 
+                                this.select.push({data: res.data, url: element.selectApi}); 
                             }
                         }
                     ).catch(
@@ -447,18 +453,20 @@ export default {
             this.$refs.images.value = '';
             this.formData.delete('file[]');
         },
+        dataAdd() {
+            if(this.isLoggedUser.managers) {
+                this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
+            }
+            if(this.isLoggedUser.moderators) {
+                this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
+            }
+        },
         close () {
             this.dialog = false
             this.dialogImages = false
             setTimeout(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
-                // В функцию
-                if(this.isLoggedUser.managers) {
-                    this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
-                }
-                if(this.isLoggedUser.moderators) {
-                    this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
-                }
+                this.dataAdd();
                 this.editedIndex = -1
             }, 300)
             this.$validator.reset()
@@ -513,13 +521,7 @@ export default {
         }
     },
     mounted() {
-        // В функцию
-        if(this.isLoggedUser.managers) {
-            this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
-        }
-        if(this.isLoggedUser.moderators) {
-            this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
-        }
+        this.dataAdd();
     }
 }
 </script>

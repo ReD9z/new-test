@@ -16,7 +16,12 @@ class CitiesToWorksController extends Controller
      */
     public function index(Request $request)
     {
-        $toWorks = CitiesToWorks::get();
+        if($request->city) {
+            $toWorks = CitiesToWorks::where('id', $request->city)->get();
+        }
+        else {
+            $toWorks = CitiesToWorks::get();
+        }
         return CitiesToWorksResource::collection($toWorks);
     }
 

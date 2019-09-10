@@ -132,6 +132,8 @@ export default {
             sortBy: 'id'
         },
         selected: [],
+        cityUser: null,
+        userId: null
     }),
     props: {
         params: Object
@@ -160,6 +162,33 @@ export default {
         await this.selectStatus();
     },
     methods: {
+        roleUserCity() {
+            if(this.isLoggedUser.moderators) {
+                return this.cityUser = this.isLoggedUser.moderators.city_id;
+            }
+            if(this.isLoggedUser.managers) {
+                return this.cityUser = this.isLoggedUser.managers.city_id;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return this.cityUser = null;
+            }
+        },
+        roleUserId() {
+            if(this.isLoggedUser.moderators) {
+                return this.userId = this.isLoggedUser.moderators.id;
+            }
+            if(!this.isLoggedUser.moderators) {
+                return this.userId = null;
+            }
+        },
+        showRoles() {
+            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
+                return false;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return true;
+            }
+        },
         filteredItems(data) {
             this.desserts = data;
             let searchTerm = this.search.trim().toLowerCase(),
@@ -199,7 +228,8 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: !this.isLoggedUser.managers ? null : this.isLoggedUser.managers.city_id
+                    user: this.roleUserId(),
+                    city: this.roleUserCity()
                 }
             })
             .then(
@@ -215,7 +245,14 @@ export default {
         selectStatus() {
             this.params.headers.forEach(element => {
                 if(element.selectApi != undefined) {
-                    axios.get(element.selectApi)
+                    axios({
+                        method: 'get',
+                        url: element.selectApi,
+                        params: {
+                            user: this.roleUserId(),
+                            city: this.roleUserCity()
+                        }
+                    })
                     .then(
                         res => {
                             if(res) {
@@ -266,6 +303,7 @@ export default {
             this.dialogImages = false
             setTimeout(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
+                this.dataAdd()
                 this.editedIndex = -1
             }, 300)
             this.$validator.reset()
@@ -332,12 +370,19 @@ export default {
             } else {
                 return false;
             }
-        }
+        },
+        dataAdd() {
+            if(this.isLoggedUser.managers) {
+                this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
+            }
+            if(this.isLoggedUser.moderators) {
+                this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
+                this.editedItem['moderator_id'] = this.isLoggedUser.moderators.id;
+            }
+        },
     },
     mounted() {
-        if(this.isLoggedUser.managers) {
-            this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
-        }
+        this.dataAdd();
     }
 }
 </script>

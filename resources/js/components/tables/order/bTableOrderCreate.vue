@@ -3,15 +3,15 @@
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn color="info" large @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
-            Сохранить
+        <v-btn color="green" large class="mb-2 white--text" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
+            <v-icon left>add</v-icon> Сохранить
             <template v-slot:loaderSaveBtn>
                 <span class="custom-loader">
                 <v-icon light>cached</v-icon>
                 </span>
             </template>
         </v-btn>
-        <v-btn color="green" large class="mb-2 white--text" to="orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
+        <v-btn color="info" large class="mb-2 white--text" to="orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
     </v-toolbar>
     <v-card>
         <v-card-text>
@@ -182,16 +182,6 @@
             </v-alert>
         </template>
     </v-data-table>
-    <!-- <v-flex class="text-xs-center" mt-4>
-        <v-btn color="info" large @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
-            Сохранить
-            <template v-slot:loaderSaveBtn>
-                <span class="custom-loader">
-                <v-icon light>cached</v-icon>
-                </span>
-            </template>
-        </v-btn>
-    </v-flex> -->
 </div>
 </template>
 <script>
@@ -222,7 +212,8 @@ export default {
         chipsItem: [],
         valid: true,
         order: [],
-        selected: []
+        selected: [],
+        cityUser: null
     }),
     props: {
         params: Object
@@ -230,6 +221,9 @@ export default {
     computed: {
         formTitle () {
             return this.editedIndex === -1 ? 'Добавить' : 'Редактировать'
+        },
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
         }
     },
     watch: {
@@ -263,6 +257,22 @@ export default {
         this.getFiltered();
     },
     methods: {
+        roleUserCity() {
+            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
+                return this.cityUser = this.isLoggedUser.moderators.city_id;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return this.cityUser = null;
+            }
+        },
+        showRoles() {
+            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
+                return false;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return true;
+            }
+        },
         getDate() {
             let next_week_start = this.$moment().isoWeekday(1);
             return next_week_start.format("YYYY-MM-DD");
@@ -291,6 +301,9 @@ export default {
                     axios({
                         method: 'get',
                         url: item.api,
+                        params: {
+                            city: this.roleUserCity()
+                        }
                     })
                     .then(
                         response => {
@@ -369,7 +382,7 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    user: this.params.user
+                    city: this.roleUserCity()
                 }
             })
             .then(
@@ -428,7 +441,13 @@ export default {
         selectStatus() {
             this.params.headerOrders.forEach(element => {
                 if(element.selectApi != undefined) {
-                    axios.get(element.selectApi)
+                    axios({
+                        method: 'get',
+                        url: element.selectApi,
+                        params: {
+                            city: this.roleUserCity()
+                        }
+                    })
                     .then(
                         res => {
                             if(res) {
