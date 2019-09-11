@@ -203,8 +203,11 @@ export default {
     },
     methods: {
         roleUserCity() {
-            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
+            if(this.isLoggedUser.moderators) {
                 return this.cityUser = this.isLoggedUser.moderators.city_id;
+            }
+            if(this.isLoggedUser.managers) {
+                return this.cityUser = this.isLoggedUser.managers.city_id;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
                 return this.cityUser = null;

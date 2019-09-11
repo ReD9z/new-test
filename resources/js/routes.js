@@ -4,7 +4,13 @@ let routers =  [
         name: 'home',
         component: require('./views/Address.vue').default,
         meta: { 
-            title: 'Рабочий стол',     
+            title: 'Рабочий стол',  
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: true,
+            managerAuth: true,
+            clientAuth: true      
         }
     },
     {
@@ -17,6 +23,12 @@ let routers =  [
         name: 'address',
         meta: {
             title: 'Адреса', 
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: false,
+            managerAuth: true,
+            clientAuth: false  
         },
         component: require('./views/Address.vue').default
     },
@@ -25,14 +37,43 @@ let routers =  [
         name: 'tasks',
         meta: {
             title: 'Задачи',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: true,
+            managerAuth: false,
+            clientAuth: false 
         },
         component: require('./views/Tasks.vue').default
+    },
+    {
+        path: '/error',
+        name: 'error',
+        meta: {
+            title: 'Ошибка',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: true,
+            managerAuth: true,
+            clientAuth: true 
+        },
+        component: require('./views/Error.vue').default
+    },
+    {
+        path: "*",  component: require('./views/Error404.vue').default
     },
     {
         path: '/users',
         name: 'users',
         meta: {
             title: 'Администраторы',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: false,
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: false     
         },
         component: require('./views/Users.vue').default
     },
@@ -41,6 +82,12 @@ let routers =  [
         name: 'moderators',
         meta: {
             title: 'Модераторы',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: false,
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: false     
         },
         component: require('./views/Moderators.vue').default
     },
@@ -49,6 +96,12 @@ let routers =  [
         name: 'citiestoworks',
         meta: {
             title: 'Города работы',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: false,
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: false 
         },
         component: require('./views/CitiesToWorks.vue').default
     },
@@ -57,6 +110,12 @@ let routers =  [
         name: 'areas',
         meta: {
             title: 'Районы',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: false,
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: false  
         },
         component: require('./views/Areas.vue').default
     },
@@ -65,6 +124,12 @@ let routers =  [
         name: 'clients',
         meta: {
             title: 'Клиенты',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: false,
+            installerAuth: false,
+            managerAuth: true,
+            clientAuth: true   
         },
         component: require('./views/Clients.vue').default
     },
@@ -73,6 +138,12 @@ let routers =  [
         name: 'installers',
         meta: {
             title: 'Монтажники',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: false  
         },
         component: require('./views/Installers.vue').default
     },
@@ -81,6 +152,12 @@ let routers =  [
         name: 'managers',
         meta: {
             title: 'Менеджеры',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: false,
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: false   
         },
         component: require('./views/Managers.vue').default
     },
@@ -89,6 +166,12 @@ let routers =  [
         name: 'orders',
         meta: {
             title: 'Заказы',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: true 
         },
         component: require('./views/Orders.vue').default
     },
@@ -97,6 +180,12 @@ let routers =  [
         name: 'orders-create',
         meta: {
             title: 'Создать заказ',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: false 
         },
         component: require('./views/OrdersCreate.vue').default
     },
@@ -106,6 +195,12 @@ let routers =  [
         props: true,
         meta: {
             title: 'Адреса заказов',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: false 
         },
         component: require('./views/OrdersToAddress.vue').default
     },
@@ -114,6 +209,12 @@ let routers =  [
         name: 'typestoworks',
         meta: {
             title: 'Типы заказов',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: false,
+            installerAuth: false,
+            managerAuth: false,
+            clientAuth: false   
         },
         component: require('./views/TypesToWorks.vue').default
     },

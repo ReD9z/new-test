@@ -19,6 +19,9 @@ class TasksController extends Controller
         if($request->city) {
             $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get()->where('installers.city_id', $request->city); 
         }
+       else if($request->user) {
+            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get()->where('installer_id', $request->user); 
+        }
         else {
             $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get(); 
         }

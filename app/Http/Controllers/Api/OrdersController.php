@@ -21,6 +21,9 @@ class OrdersController extends Controller
         if($request->city) {
             $orders = Orders::with('clients', 'orderAddress', 'clients.users')->get()->where('clients.city_id', $request->city); 
         }
+        else if($request->client) {
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users')->get()->where('clients_id', $request->client); 
+        }
         else {
             $orders = Orders::with('clients', 'orderAddress', 'clients.users')->get(); 
         }

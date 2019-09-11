@@ -52,4 +52,9 @@ class User extends Authenticatable
     {
         return $this->hasOne('App\Models\Installers', 'users_id', 'id');
     }
+
+    public function clients()
+    {
+        return $this->hasOne('App\Models\Clients', 'users_id', 'id');
+    }
 }

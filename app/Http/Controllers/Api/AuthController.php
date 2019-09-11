@@ -48,7 +48,7 @@ class AuthController extends Controller
                 'errors' => 'errors'
             ], 401);
 
-        $user = User::with('managers', 'moderators', 'managers.cities', 'installers')->where('email', $request->email)->first();
+        $user = User::with('managers', 'moderators', 'managers.cities', 'installers', 'clients')->where('email', $request->email)->first();
         // $user = $request->user();
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;

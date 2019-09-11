@@ -22,7 +22,13 @@
             <v-list class="white--text pt-0" dense>
                 <v-divider></v-divider>
                 <div v-for="(item, key) in items" :key="key">
-                    <v-list-group v-show="roleUser(isUserRole, item.role)" :prepend-icon="item.icon" :value="hide">
+                    <v-list-tile v-show="roleUser(isUserRole, item.role)" :to="{ name: item.src }" active-class="active" v-if="!item.wrapLink">	
+                        <v-list-tile-action><v-icon class="white--text">{{ item.icon }}</v-icon></v-list-tile-action>	
+                        <v-list-tile-content>	
+                            <v-list-tile-title>{{ item.title }}</v-list-tile-title>	
+                        </v-list-tile-content>	
+                    </v-list-tile>   
+                    <v-list-group v-show="roleUser(isUserRole, item.role)" :prepend-icon="item.icon" :value="hide" v-else>
                         <template v-slot:activator>
                             <v-list-tile>
                                 <v-list-tile-title>{{item.title}}</v-list-tile-title>
@@ -68,22 +74,38 @@ export default {
                 [
                     { 
                         title: 'Клиенты', icon: 'how_to_reg', src: 'clients',
-                        role: {admin: 'admin', manager: 'manager'}
+                        role: {admin: 'admin'}
                     },
                     { 
                         title: 'Адреса', icon: 'room', src: 'address',
-                        role: {admin: 'admin', moderator: 'moderator', manager: 'manager'}
+                        role: {admin: 'admin', moderator: 'moderator'}
                     },
                     { 
                         title: 'Заказы', icon: 'credit_card', src: 'orders',
-                        role: {admin: 'admin', moderator: 'moderator', client: 'client'}
+                        role: {admin: 'admin', moderator: 'moderator'}
                     },
                     { 
                         title: 'Задачи монтажникам', icon: 'list', src: 'tasks',
-                        role: {admin: 'admin', installer: 'installer', moderator: 'moderator'}
+                        role: {admin: 'admin', moderator: 'moderator'}
                     }
                 ],
-                role: {admin: 'admin', manager: 'manager', moderator: 'moderator', installer: 'installer', client: 'client'}
+                role: {admin: 'admin', moderator: 'moderator'}
+            },
+            { 
+                title: 'Мои задачи', icon: 'list', src: 'tasks',
+                role: {installer: 'installer'}
+            },
+            { 
+                title: 'Мои заказы', icon: 'credit_card', src: 'orders',
+                role: {client: 'client'}
+            },
+            { 
+                title: 'Мои клиенты', icon: 'how_to_reg', src: 'clients',
+                role: {manager: 'manager'}
+            },
+            { 
+                title: 'Мои адреса', icon: 'room', src: 'address',
+                role: {manager: 'manager'}
             },
             { 
                 title: 'Пользователи', icon: 'people', wrapLink:

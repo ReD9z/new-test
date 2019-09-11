@@ -21,22 +21,20 @@
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
-                            <div v-if="!isLoggedUser.managers">
-                                <div v-for="item in select" :key="item[0]">
-                                    <div v-if="item.url == param.selectApi">
-                                        <v-autocomplete
-                                            :items="item.data"
-                                            v-model="editedItem[param.value]"
-                                            :item-text="param.selectText"
-                                            :data-vv-name="param.value" 
-                                            :error-messages="errors.collect(param.value)" 
-                                            v-validate="param.validate"
-                                            item-value="id"
-                                            :label="param.text"
-                                            :data-vv-as="'`'+param.text+'`'"
-                                            >
-                                        </v-autocomplete>
-                                    </div>
+                            <div v-for="item in select" :key="item[0]">
+                                <div v-if="item.url == param.selectApi">
+                                    <v-autocomplete
+                                        :items="item.data"
+                                        v-model="editedItem[param.value]"
+                                        :item-text="param.selectText"
+                                        :data-vv-name="param.value" 
+                                        :error-messages="errors.collect(param.value)" 
+                                        v-validate="param.validate"
+                                        item-value="id"
+                                        :label="param.text"
+                                        :data-vv-as="'`'+param.text+'`'"
+                                        >
+                                    </v-autocomplete>
                                 </div>
                             </div>
                         </div>

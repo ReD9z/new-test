@@ -13,9 +13,9 @@
             @click='downloadExcel'
         >
             <v-icon left>vertical_align_bottom</v-icon>
-            Скачать Excel
+            Скачать в Excel
         </v-btn>
-        <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
+        <v-btn v-show="hideElem()" color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
     </v-toolbar>
     <v-navigation-drawer v-model="dialog" right temporary fixed>
         <v-card height="100%">
@@ -269,7 +269,7 @@
                 :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
             >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
-            <th class="text-xs-left">
+            <th class="text-xs-left" v-show="hideElem()">
                 Действия
             </th>
         </template>
@@ -277,7 +277,10 @@
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
                 <v-flex v-if="param.input !== 'images'">
                     <v-flex v-if="param.value === 'orders_id'">
-                        <v-flex v-if="param.selectText"><a :href="'/orders-address/'+props.item['orders_id']">{{props.item[param.TableGetIdName]}}</a></v-flex>
+                        <v-flex v-if="param.selectText">
+                            <a v-if="hideElem()" :href="'/orders-address/'+props.item['orders_id']">{{props.item[param.TableGetIdName]}}</a>
+                            <span v-else>{{props.item[param.TableGetIdName]}}</span>
+                        </v-flex>
                     </v-flex>
                     <v-flex v-else>
                         <v-flex v-if="param.value === 'status'">{{props.item[param.title]}}</v-flex>
@@ -286,7 +289,7 @@
                     </v-flex>
                 </v-flex>
             </td>
-            <td class="justify-left layout">
+            <td class="justify-left layout" v-show="hideElem()">
                 <v-icon small class="mr-2" @click="editItem(props.item)">	
                     edit	
                 </v-icon>
@@ -338,8 +341,6 @@ export default {
         menu1: false,
         menu2: false,
         orderDate: [],
-        cityUser: null,
-        userId: null,
         orderFull: []
     }),
     props: {
@@ -374,21 +375,24 @@ export default {
     methods: {
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
-                return this.cityUser = this.isLoggedUser.moderators.city_id;
+                return this.isLoggedUser.moderators.city_id;
             }
             if(this.isLoggedUser.managers) {
-                return this.cityUser = this.isLoggedUser.managers.city_id;
+                return this.isLoggedUser.managers.city_id;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
-                return this.cityUser = null;
+                return null;
             }
         },
         roleUserId() {
             if(this.isLoggedUser.moderators) {
-                return this.userId = this.isLoggedUser.moderators.id;
+                return this.isLoggedUser.moderators.id;
             }
-            if(!this.isLoggedUser.moderators) {
-                return this.userId = null;
+            if(this.isLoggedUser.installers) {
+                return this.isLoggedUser.installers.id;
+            }
+            if(!this.isLoggedUser.moderators || this.isLoggedUser.installers) {
+                return null;
             }
         },
         showRoles() {
@@ -396,6 +400,14 @@ export default {
                 return false;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return true;
+            }
+        },
+        hideElem() {
+            if(this.isLoggedUser.installers) {
+                return false;
+            }
+            if(!this.isLoggedUser.installers) {
                 return true;
             }
         },
@@ -472,7 +484,8 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: this.roleUserCity()
+                    city: this.roleUserCity(),
+                    user: this.roleUserId()
                 }
             })
             .then(

@@ -58,42 +58,80 @@ let router = new VueRouter({
  */
 
 router.beforeEach((to, from, next) => {
-    if(to.matched.some(record => record.meta.requiresAuth)) {
+    if(to.meta.requiresAuth) {
         if (store.getters.isLoggedIn) {
             if(to.meta.adminAuth) {
                 if (store.getters.isUserRole === 'admin') {
                     next()
-                    return
                 }
             }
             if (to.meta.moderatorAuth) {
                 if (store.getters.isUserRole === 'moderator') {
                     next()
-                    return
                 }
-            }
+            } 
             if (to.meta.installerAuth) {
                 if (store.getters.isUserRole === 'installer') {
-                    next('tasks')
-                    return
+                    if (to.path !== '/tasks') {
+                        next('/tasks');
+                    } else {
+                        next();
+                    }
                 }
             }
             if (to.meta.managerAuth) {
                 if (store.getters.isUserRole === 'manager') {
                     next()
-                    return
                 }
             }
+
             if (to.meta.clientAuth) {
                 if (store.getters.isUserRole === 'client') {
-                    next()
-                    return
+                    if (to.path !== '/orders') {
+                        next('/orders');
+                    }
+                    else {
+                        next();
+                    }
                 }
             }
-            // next()
-            // return
+
+            if (!to.meta.managerAuth  && store.getters.isUserRole === 'manager') {
+                if (to.path !== '/error') {
+                    next('/error');
+                } else {
+                    next();
+                }
+            }
+
+            if (!to.meta.moderatorAuth && store.getters.isUserRole === 'moderator') {
+                if (to.path !== '/error') {
+                    next('/error');
+                } else {
+                    next();
+                }
+            }
+
+            if (!to.meta.installerAuth && store.getters.isUserRole === 'installer') {
+                if (to.path !== '/error') {
+                    next('/error');
+                } else {
+                    next();
+                }
+            }
+
+            if (!to.meta.clientAuth && store.getters.isUserRole === 'client') {
+                if (to.path !== '/error') {
+                    next('/error');
+                } else {
+                    next();
+                }
+            }
+            console.log(to);
+
+        } else {
+            next('/auth')
         }
-        next('/auth')
     } else {
         next()
     }

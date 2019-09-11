@@ -3,7 +3,7 @@
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn color="green" large class="mb-2 white--text" to="orders-create"><v-icon left>add</v-icon>Создать заказ</v-btn>
+        <v-btn color="green" v-show="hideElem()" large class="mb-2 white--text" to="orders-create"><v-icon left>add</v-icon>Создать заказ</v-btn>
     </v-toolbar>
     <v-navigation-drawer v-model="dialog" right temporary fixed>
         <v-card height="100%">
@@ -86,46 +86,6 @@
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
-    <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
-        <v-card>
-            <v-toolbar color="pink" dark>
-                <v-toolbar-title>Изображения</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-icon right dark @click='pickImages'>control_point</v-icon>
-                <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
-                <v-btn icon @click="close">
-                    <v-icon>close</v-icon>
-                </v-btn>
-            </v-toolbar>
-            <v-progress-linear value="15" :indeterminate="true" v-show="loadImages" color="blue" class="ma-0"></v-progress-linear>
-            <v-card-text>
-                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                    <v-flex xs12 v-if="param.input == 'images'">
-                        <v-layout row wrap>
-                            <v-flex v-for="(file, key) in editedItem.files" :key="key" xs4 d-flex>
-                                <v-card flat tile class="d-flex pr-1 pb-1">
-                                    <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
-                                        <template v-slot:placeholder>
-                                            <v-layout fill-height align-center justify-center ma-0>
-                                                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
-                                            </v-layout>
-                                        </template>
-                                        <template>
-                                            <v-layout fill-height right top ma-0>
-                                                <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
-                                                    <v-icon>close</v-icon>
-                                                </v-btn>
-                                            </v-layout>
-                                        </template>
-                                    </v-img>
-                                </v-card>
-                            </v-flex>
-                        </v-layout>
-                    </v-flex>
-                </v-flex>
-            </v-card-text>
-        </v-card>
-    </v-navigation-drawer>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
@@ -134,10 +94,10 @@
         <div>
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
         </div>
-        <v-icon>filter_list</v-icon>
+        <v-icon v-show="hideElem()">filter_list</v-icon>
         <v-menu :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
             <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on">
+                <v-btn icon v-on="on" v-show="hideElem()">
                     <v-icon>more_vert</v-icon>
                 </v-btn>
             </template>
@@ -169,7 +129,7 @@
             >
                 {{ header.text }}<v-icon small>arrow_upward</v-icon>
             </th>
-            <th class="text-xs-left">
+            <th class="text-xs-left" v-show="hideElem()">
                 Действия
             </th>
         </template>
@@ -180,7 +140,7 @@
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
             </td>
-            <td class="justify-left layout">
+            <td class="justify-left layout" v-show="hideElem()">
                 <v-icon small class="mr-2" @click="redirectEdit(props.item.id)">
                     edit
                 </v-icon>
@@ -225,7 +185,8 @@ export default {
             sortBy: 'id'
         },
         selected: [],
-        cityUser: null
+        cityUser: null,
+        userId: null
     }),
     props: {
         params: Object
@@ -259,11 +220,30 @@ export default {
     },
     methods: {
         roleUserCity() {
-            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
+            if(this.isLoggedUser.moderators) {
                 return this.cityUser = this.isLoggedUser.moderators.city_id;
+            }
+            if(this.isLoggedUser.managers) {
+                return this.cityUser = this.isLoggedUser.managers.city_id;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
                 return this.cityUser = null;
+            }
+        },
+        roleUserId() {
+            if(this.isLoggedUser.clients) {
+                return this.userId = this.isLoggedUser.clients.id;
+            }
+            if(!this.isLoggedUser.clients) {
+                return this.userId = null;
+            }
+        },
+        hideElem() {
+            if(this.isLoggedUser.clients) {
+                return false;
+            }
+            if(!this.isLoggedUser.clients) {
+                return true;
             }
         },
         showRoles() {
@@ -283,6 +263,9 @@ export default {
                 axios({
                     method: 'get',
                     url: item.api,
+                    params: {
+                        city: this.roleUserCity(),
+                    }
                 })
                 .then(
                     response => {
@@ -354,7 +337,8 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: this.roleUserCity()
+                    city: this.roleUserCity(),
+                    client: this.roleUserId()
                 }
             })
             .then(
