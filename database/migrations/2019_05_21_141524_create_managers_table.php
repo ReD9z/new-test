@@ -18,9 +18,9 @@ class CreateManagersTable extends Migration
             $table->bigInteger('users_id')->unsigned()->nullable();
             $table->bigInteger('city_id')->unsigned()->nullable();
             $table->bigInteger('moderator_id')->unsigned()->nullable();
-            $table->foreign('users_id')->references('id')->on('users');
-            $table->foreign('city_id')->references('id')->on('cities_to_works');
-            $table->foreign('moderator_id')->references('id')->on('moderators');
+            $table->foreign('users_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('city_id')->references('id')->on('cities_to_works')->onDelete('cascade');
+            $table->foreign('moderator_id')->references('id')->on('moderators')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -10,6 +10,7 @@ import 'vuetify/dist/vuetify.min.css';
 import VeeValidate, { Validator } from 'vee-validate';
 import VeeValidateLaravel from 'vee-validate-laravel';
 import ruVee from 'vee-validate/dist/locale/ru';
+import 'babel-polyfill';
 
 Vue.use(Vuetify, {
     lang: {
@@ -127,8 +128,6 @@ router.beforeEach((to, from, next) => {
                     next();
                 }
             }
-            console.log(to);
-
         } else {
             next('/auth')
         }

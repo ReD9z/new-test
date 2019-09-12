@@ -103,7 +103,7 @@
         </v-card-text>
     </v-card>
     <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
-        <v-card>
+        <v-card class="borderNone">
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>Изображения</v-toolbar-title>
                 <v-spacer></v-spacer>
@@ -139,7 +139,7 @@
                                                     <template v-slot:activator="{ on }">
                                                         <v-btn icon class="white--text" v-on="on" @click='filesImg(file)'><v-icon>search</v-icon></v-btn>
                                                     </template>
-                                                    <v-card>
+                                                    <v-card v-if="imgBig">
                                                         <v-img :src="'/storage/' + imgBig" :lazy-src="'/storage/' + imgBig" aspect-ratio="1" class="grey lighten-2"></v-img>
                                                     </v-card>
                                                 </v-dialog>

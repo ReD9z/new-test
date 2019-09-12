@@ -17,12 +17,12 @@ class Moderators extends JsonResource
         return [
             'id' => $this->id,
             'users_id' => $this->users_id,
-            'name' => $this->users->name,
-            'email' => $this->users->email,
-            'phone' => $this->users->login,
-            'login' => $this->users->phone,
+            'name' => $this->users ? $this->users->name : null,
+            'email' => $this->users ? $this->users->email : null,
+            'phone' => $this->users ? $this->users->login : null,
+            'login' => $this->users ? $this->users->phone : null,
             'city_id' => $this->city_id,
-            'city' => $this->cities->name
+            'city' => $this->users ? $this->cities->name : null
         ];
     }
 }

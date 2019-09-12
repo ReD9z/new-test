@@ -6,7 +6,6 @@
                     <v-list-tile avatar>
                         <v-list-tile-avatar>
                             <v-img src="/images/atom-logo.png" lazy-src="/images/atom-logo.png"></v-img>
-                           <!-- <v-icon size="38px" class="white--text">account_circle</v-icon> -->
                         </v-list-tile-avatar>
                         <v-list-tile-content>
                             <v-list-tile-title></v-list-tile-title>
