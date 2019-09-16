@@ -68,13 +68,13 @@ export default {
     created () {
         if(this.items.length == 0) {
             this.mapLoader = false;
-        } else {
-            let scriptYandexMap = document.createElement('script');
-            scriptYandexMap.setAttribute('src', 'https://api-maps.yandex.ru/2.1/?lang=ru_RU');
-            document.head.appendChild(scriptYandexMap);
+        } 
+        let scriptYandexMap = document.createElement('script');
+        scriptYandexMap.setAttribute('src', 'https://api-maps.yandex.ru/2.1/?lang=ru_RU');
+        document.head.appendChild(scriptYandexMap);
 
-            scriptYandexMap.addEventListener("load", this.initializeYandexMap);
-        }
+        scriptYandexMap.addEventListener("load", this.initializeYandexMap);
+    
     }
     
 }

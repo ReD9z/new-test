@@ -29,6 +29,7 @@ Validator.localize({ ru: ruVee })
 Vue.use(VeeValidate, { inject: false, locale: 'ru' })
 Vue.use(VeeValidateLaravel);
 
+
 let token = window.localStorage.getItem('token');
 if (token) {
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
@@ -136,12 +137,23 @@ router.beforeEach((to, from, next) => {
     }
 }) 
 
+
 /**
  * App config
  */
 
-const app = new Vue({
+new Vue({
     el: '#app',
+    created: function () {
+        let vm = this;
+        axios.interceptors.response.use(undefined, err => {
+            let res = err.response;
+            if (res.status === 401 && res.config && !res.config.__isRetryRequest) {
+                vm.$store.dispatch('logoutError')
+                vm.$router.push('/auth')
+            }
+        });
+    },
     store,
     router: router
 });

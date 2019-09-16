@@ -64,8 +64,8 @@ let routers =  [
         path: "*",  component: require('./views/Error404.vue').default
     },
     {
-        path: '/users',
-        name: 'users',
+        path: '/admins',
+        name: 'admins',
         meta: {
             title: 'Администраторы',
             requiresAuth: true,
@@ -75,7 +75,7 @@ let routers =  [
             managerAuth: false,
             clientAuth: false     
         },
-        component: require('./views/Users.vue').default
+        component: require('./views/Admins.vue').default
     },
     {
         path: '/moderators',

@@ -66,6 +66,14 @@ export default new Vuex.Store({
                 });
             })
         },
+        logoutError({ commit }) {
+            return new Promise((resolve, reject) => {
+                commit('logout');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                delete axios.defaults.headers.common['Authorization'];
+            })
+        },
     },
     getters : {
         isLoggedIn: state => !!state.token,

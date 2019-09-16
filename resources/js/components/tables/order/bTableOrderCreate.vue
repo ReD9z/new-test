@@ -11,7 +11,7 @@
                 </span>
             </template>
         </v-btn>
-        <v-btn color="info" large class="mb-2 white--text" to="orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
+        <v-btn color="info" large class="mb-2 white--text" to="/orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
     </v-toolbar>
     <v-card>
         <v-card-text>

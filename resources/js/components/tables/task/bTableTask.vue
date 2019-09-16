@@ -414,7 +414,7 @@ export default {
         formatDate (date) {
             if (!date) return null
 
-            const [year, month, day] = date.split('.')
+            const [year, month, day] = date.split('-')
             return `${day}.${month}.${year}`
         },
         dateFilter () {
@@ -504,7 +504,7 @@ export default {
         parseDate (date) {
             if (!date) return null
             const [year, month, day] = date.split('-')
-            return `${month}.${day}.${year}`
+            return `${day}.${month}.${year}`
         },
         selectStatus() {
             this.params.headers.forEach(element => {
@@ -704,7 +704,6 @@ export default {
                     .then(
                         response => {
                             if (this.editedIndex > -1) {
-                                // this.initialize()
                                 Object.assign(this.desserts[this.editedIndex], this.editedItem);
                             } else {
                                 this.initialize()

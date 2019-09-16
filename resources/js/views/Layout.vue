@@ -43,8 +43,18 @@
                         </div>
                     </v-list-group>
                 </div>
-                <v-list-tile @click="exit()">
-                    <v-list-tile-action><v-icon class="white--text">exit_to_app</v-icon></v-list-tile-action>
+                <v-list-tile  @click="exit()">
+                    <v-list-tile-action class="text-xs-center">
+                        <v-progress-circular
+                            v-if="exitProgress"
+                            size = "20"
+                            width = "2"
+                            indeterminate
+                            color="amber"
+                            >
+                        </v-progress-circular>
+                        <v-icon v-if="!exitProgress" class="white--text">exit_to_app</v-icon>
+                    </v-list-tile-action>
                     <v-list-tile-content>
                         <v-list-tile-title>Выход</v-list-tile-title>
                     </v-list-tile-content>
@@ -65,6 +75,7 @@
 <script>
 export default {
     data: () => ({
+        exitProgress: false,
         drawer: true,
         hide: "",
         items: [
@@ -110,7 +121,7 @@ export default {
                 title: 'Пользователи', icon: 'people', wrapLink:
                 [
                     { 
-                        title: 'Администраторы', icon: 'contacts', src: 'users',
+                        title: 'Администраторы', icon: 'contacts', src: 'admins',
                         role: {admin: 'admin'}
                     },
                     { 
@@ -174,8 +185,10 @@ export default {
             }
         },
         exit() {
+            this.exitProgress = true;
             this.$store.dispatch('logout')
             .then(() => {
+                this.exitProgress = false;
                 this.$router.push('/auth')
             })
         }

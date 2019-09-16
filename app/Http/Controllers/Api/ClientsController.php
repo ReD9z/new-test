@@ -31,10 +31,8 @@ class ClientsController extends Controller
 
     public function managersAddress($id)
     {
-        // $clients = Clients::with('cities', 'users')->get();
         $clients = Clients::with('cities', 'users')->where('city_id', $id)->get();
         return ClientsResource::collection($clients);
-        // return response()->json(['errors' => [], 'data' => $clients, 'status' => 200], 200);
     }
 
 
