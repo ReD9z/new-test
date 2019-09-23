@@ -14,6 +14,11 @@ class Areas extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'city_id' => $this->city_id,
+            'city' => $this->cities ? $this->cities->name : null,
+            'name' => $this->name,
+        ];
     }
 }

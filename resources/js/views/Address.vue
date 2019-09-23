@@ -20,7 +20,8 @@ export default {
                     selectText: 'name',
                     TableGetIdName: 'city',
                     selectApi: '/api/cities_to_works',
-                    input: "select"
+                    input: "select",
+                    validate: 'required'
                 },                                                                                                                
                 {
                     text: 'Район',

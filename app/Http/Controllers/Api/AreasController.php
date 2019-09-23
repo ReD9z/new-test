@@ -16,7 +16,7 @@ class AreasController extends Controller
      */
     public function index(Request $request)
     {
-        $areas = Areas::get();
+        $areas = Areas::with('cities')->get();
         return AreasResource::collection($areas);
     }
 
@@ -37,7 +37,8 @@ class AreasController extends Controller
 
         $areas->id = $request->input('id');
         $areas->name = mb_ucfirst($request->input('name'));
-    
+        $areas->city_id = mb_ucfirst($request->input('city_id'));
+
         if($areas->save()) {
             return new AreasResource($areas);
         }

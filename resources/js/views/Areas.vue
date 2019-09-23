@@ -7,7 +7,7 @@
 </template>
 <script>
 export default {
-    data: () => ({
+    data: (vm) => ({
         params: {
             baseUrl: '/api/areas',
             headers: [
@@ -18,9 +18,20 @@ export default {
                     value: 'name',
                     input: "text",
                     validate: 'required',
+                },
+                {
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city_id',
+                    selectText: 'name',
+                    TableGetIdName: 'city',
+                    selectApi: '/api/cities_to_works',
+                    input: "select",
+                    validate: 'required',
                 }
             ],
-            searchValue: ['name'],
+            searchValue: ['name', 'city'],
             search: true,
             pagination: true,
             excel: false

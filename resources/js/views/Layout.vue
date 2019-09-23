@@ -164,6 +164,16 @@ export default {
     props: {
         source: String
     },
+    created: function () {
+        let vm = this;
+        axios.interceptors.response.use(undefined, err => {
+            let res = err.response;
+            if (res.status === 401 && res.config && !res.config.__isRetryRequest) {
+                vm.$router.push('/auth')
+                vm.$store.dispatch('logoutError')
+            }
+        });
+    },
     computed: {
         isLoggedIn: function(){ 
             return this.$store.getters.isLoggedIn;
