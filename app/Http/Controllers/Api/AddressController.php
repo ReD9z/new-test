@@ -78,6 +78,7 @@ class AddressController extends Controller
             } else {
                 $areas = new Areas;
                 $areas->name = mb_ucfirst(array_values($request->input())[1]);
+                $areas->city_id = $address->city_id;
                 $areas->save();
                 $address->area_id = $areas->id;
             }

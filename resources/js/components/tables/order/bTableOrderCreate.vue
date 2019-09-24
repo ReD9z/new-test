@@ -160,10 +160,10 @@
                 <v-flex v-if="param.input !== 'images' && param.value !== 'params'">
                     <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
                     <v-flex v-else>
-                        <span v-if="param.value == 'result' && props.item[param.value] === 'Занят'" style="font-weight: bold; color:red">
+                        <span v-if="param.value == 'result' && props.item[param.value] === 'Занят'" class="red--text font-weight-bold">
                             {{props.item[param.value]}}
                         </span>
-                        <span v-if="param.value == 'result' && props.item[param.value] === 'Свободен'" style="font-weight: bold; color:green">
+                        <span v-if="param.value == 'result' && props.item[param.value] === 'Свободен'" class="green--text font-weight-bold">
                             {{props.item[param.value]}}
                         </span>
                         <span v-if="param.value != 'result'">

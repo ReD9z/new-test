@@ -16,7 +16,12 @@ class AreasController extends Controller
      */
     public function index(Request $request)
     {
-        $areas = Areas::with('cities')->get();
+        if($request->areaCity) {
+            $areas = Areas::with('cities')->where('city_id', $request->areaCity)->get();
+        }
+        else {
+            $areas = Areas::with('cities')->get();
+        }
         return AreasResource::collection($areas);
     }
 

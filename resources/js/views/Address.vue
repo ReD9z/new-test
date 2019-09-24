@@ -8,7 +8,7 @@
 
 <script>
 export default {
-    data: (vm) => ({
+    data: () => ({
         params: {
             baseUrl: '/api/address',
             headers: [
@@ -57,6 +57,11 @@ export default {
                     input: "text",
                     validate: 'required',
                     value: 'management_company' 
+                },
+                { 
+                    text: 'Статус', 
+                    input: "text",
+                    value: 'result' 
                 }
             ],
             searchValue: ['area', 'street', 'house_number', 'number_entrances', 'management_company', 'city'],

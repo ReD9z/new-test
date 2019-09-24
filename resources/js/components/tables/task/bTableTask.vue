@@ -518,7 +518,6 @@ export default {
                     })
                     .then(
                         res => {
-                            // console.log(res);
                             if(res) {
                                 if(element.selectText == 'orderClient') {
                                     this.orderDate = res.data;

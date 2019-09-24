@@ -4,6 +4,18 @@
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn
+            v-show="desserts.length > 0 && params.excel"
+            color="#f2994a"
+            class="white--text"
+            large
+            :loading="loadingExcel"
+            :disabled="loadingExcel"
+            @click='downloadExcel'
+        >
+            <v-icon left>vertical_align_bottom</v-icon>
+            Скачать в Excel
+        </v-btn>
+        <v-btn
             color="#f2994a"
             class="white--text"
             large
@@ -37,26 +49,36 @@
             <v-card-text>
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                        <div v-if="param.input == 'text'">
+                        <div v-if="param.input == 'text' && param.value != 'result'">
                             <v-text-field :data-vv-name="param.value" :data-vv-as="'`'+param.text+'`'" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
-                            <div v-for="item in select" :key="item[0]">
-                                <div v-if="item.url == param.selectApi">
-                                    <v-autocomplete
-                                        :items="item.data"
-                                        v-model="editedItem[param.value]"
-                                        :item-text="param.selectText"
-                                        :data-vv-as="'`'+param.text+'`'" 
-                                        item-value="id"
-                                        :label="param.text"
-                                        :data-vv-name="param.value" 
-                                        :error-messages="errors.collect(param.value)" 
-                                        v-validate="param.validate"
-                                    >
-                                    </v-autocomplete>
-                                </div>
-                            </div>
+                            <v-autocomplete
+                                v-if="param.value == 'city_id'"
+                                :items="selectCity"
+                                v-model="editedItem[param.value]"
+                                :item-text="param.selectText"
+                                :data-vv-as="'`'+param.text+'`'" 
+                                item-value="id"
+                                :label="param.text"
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate"
+                            >
+                            </v-autocomplete>
+                            <v-autocomplete
+                                v-if="param.value == 'area_id'"
+                                :items="selectArea"
+                                v-model="editedItem[param.value]"
+                                :item-text="param.selectText"
+                                :data-vv-as="'`'+param.text+'`'" 
+                                item-value="id"
+                                :label="param.text"
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate"
+                            >
+                            </v-autocomplete>
                         </div>
                     </v-flex>
                     <div class="text-xs-center">
@@ -107,7 +129,7 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
+        <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
             <th
@@ -122,9 +144,19 @@
         </template>
         <template v-slot:items="props">
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
-                <v-flex v-if="param.input !== 'images'">
+                <v-flex v-if="param.input !== 'images' && param.value !== 'params'">
                     <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
-                    <v-flex v-else>{{props.item[param.value]}}</v-flex>
+                    <v-flex v-else>
+                        <span v-if="param.value == 'result' && props.item[param.value] === 'Занят'" class="red--text font-weight-bold">
+                            {{props.item[param.value]}}
+                        </span>
+                        <span v-if="param.value == 'result' && props.item[param.value] === 'Свободен'" class="green--text font-weight-bold">
+                            {{props.item[param.value]}}
+                        </span>
+                        <span v-if="param.value != 'result'">
+                            {{props.item[param.value]}}
+                        </span>
+                    </v-flex>
                 </v-flex>
             </td>
             <td class="justify-left layout">
@@ -139,6 +171,11 @@
         <template v-slot:no-data>
             <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
+        <template v-slot:no-results>
+            <v-alert :value="true" color="error" icon="warning">
+                По запросу "{{ search }}" ничего не найдено.
+            </v-alert>
+        </template>
     </v-data-table>
 </div>
 </template>
@@ -146,7 +183,7 @@
 import XLSX from 'xlsx';
 export default {
     inject: ['$validator'],
-    data: () => ({
+    data: (vm) => ({
         search: '',
         dialog: false,
         loading: true,
@@ -157,9 +194,11 @@ export default {
         editedIndex: -1,
         editedItem: {},
         defaultItem: {},
-        select: [],
+        selectCity: [],
+        selectArea: [],
         loadingSaveBtn: false,
         loaderSaveBtn: null,
+        dateToday: vm.formatDate(new Date().toISOString().substr(0, 10)),
         formData: new FormData(),
         chips: [],
         chipsItem: [],
@@ -194,6 +233,9 @@ export default {
         }, 400),
         chips(val) {
             this.initialize();
+        },
+        'editedItem.city_id'(val) {
+            this.selectStatus()
         }
     },
     created () {
@@ -202,6 +244,12 @@ export default {
         this.getFiltered();
     },
     methods: {
+        formatDate (date) {
+            if (!date) return null
+
+            const [year, month, day] = date.split('-')
+            return `${day}.${month}.${year}`
+        },
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
                 return this.cityUser = this.isLoggedUser.moderators.city_id;
@@ -310,13 +358,65 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
-                    this.filteredItems(this.desserts);
-                    this.filtered(this.desserts);
-                    this.loading = false;
+                    let vm = this;
+                    if(!this.dateToday) {
+                        this.initialize();
+                    } else {
+                        this.desserts.forEach(function (item) {
+                            if(item.status.length > 0) {
+                                return item.status.filter(function (stats) {
+                                    let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
+                                    let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
+                                    let dateToday = vm.$moment(vm.dateToday, 'DD-MM-YYYY').unix() * 1000;
+                                    if((itemDateStart >= dateToday) && (itemDateStart <= dateToday) || (itemDateEnd >= dateToday) && (itemDateEnd <= dateToday)) {
+                                        item.result = 'Занят';
+                                        item.data = stats;
+                                        item.files = stats.files;
+                                        let index = vm.desserts.indexOf(item);
+                                        Object.assign(vm.desserts[index], item);
+                                    } 
+                                });
+                            } 
+                        });
+                        this.filteredItems(this.desserts);
+                        this.filtered(this.desserts);
+                        // this.filteredStatus(this.desserts); 
+                        this.loading = false;
+                    }
+                    // this.desserts = response.data;
+                    // this.filteredItems(this.desserts);
+                    // this.filtered(this.desserts);
+                    // this.loading = false;
                 }
             ).catch(error => {
                 console.log(error);
             })
+        },
+        downloadExcel() {
+            if(this.desserts.length > 0) {
+                let map = this.desserts.map((item)=> {
+                    console.log(item);
+                    return {
+                        "Город": item.city,
+                        "Район": item.area,
+                        "Улица": item.street,
+                        "Номер дома": item.house_number,
+                        "Количество подъездов": item.number_entrances,
+                        "Управляющая компания": item.management_company,
+                        // "Статус": item.result != "Занят" ? item.result : item.result + " до " + item.status.order_end_date
+                    }
+                });
+
+                let ws = XLSX.utils.json_to_sheet(map, {raw:true});
+                if(!ws['!cols']) ws['!cols'] = [];
+                for (let i = 0; i < 7; i++) {
+                    ws['!cols'][i] = { wch: 28 };
+                }
+                let wb = XLSX.utils.book_new();
+              
+                XLSX.utils.book_append_sheet(wb, ws, "Адреса");
+                XLSX.writeFile(wb, "Адреса.xlsx");
+            }
         },
         pickImages () {
             this.$refs.images.click();
@@ -327,20 +427,26 @@ export default {
             return `${day}-${month}-${year}`
         },
         selectStatus() {
-            this.select = [];
             this.params.headers.forEach(element => {
                 if(element.selectApi != undefined) {
                     axios({
                         method: 'get',
                         url: element.selectApi,
                         params: {
-                            city: this.roleUserCity()
+                            city: this.roleUserCity(),
+                            areaCity: this.editedItem.city_id,
                         }
                     })
                     .then(
                         res => {
                             if(res) {
-                                this.select.push({data: res.data, url: element.selectApi}); 
+                                if (element.value == 'city_id') {
+                                    this.selectCity = res.data;
+                                }
+
+                                if (element.value == 'area_id') {
+                                    this.selectArea = res.data;
+                                }
                             }
                         }
                     ).catch(

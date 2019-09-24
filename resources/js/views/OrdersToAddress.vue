@@ -101,16 +101,6 @@ export default {
                     value: 'name',
                     input: 'city'
                 }
-                // {
-                //     data: [
-                //         { result: 'Занято' },
-                //         { result: 'Свободен' }
-                //     ],
-                //     title: 'Статус',
-                //     value: 'result',
-                //     text: 'status',
-                //     input: 'result'
-                // }
             ],
             search: true,
             pagination: true,
