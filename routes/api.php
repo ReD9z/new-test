@@ -18,15 +18,12 @@ Route::group(['middleware' => ['json.response']], function () {
     /******* Public routes *******/
     Route::post('login', 'Api\AuthController@login');
     
-    Route::post('files', 'Api\FilesUploadController@add');
     
-    Route::post('files/remove', 'Api\FilesUploadController@remove');
-    
-    Route::post('users', 'Api\UsersController@store'); // Add one item
-   
     /******* Private routes *******/
     Route::middleware('auth:api')->group(function () {
         Route::get('logout', 'Api\AuthController@logout');
+        Route::post('files', 'Api\FilesUploadController@add');
+        Route::post('files/remove', 'Api\FilesUploadController@remove');
     
         // Article
         Route::post('article', 'Api\ArticleController@store'); // Add one item
@@ -102,6 +99,8 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::delete('clients/{id}', 'Api\ClientsController@destroy'); // Delete one item
         Route::get('clients', 'Api\ClientsController@index'); // Show list
         Route::get('managersAddress/{id}', 'Api\ClientsController@managersAddress'); // Show managersAddress list
+        Route::put('clientsFiles', 'Api\ClientsController@loadFiles'); // Load files
+        Route::delete('clientsFiles', 'Api\ClientsController@loadFiles'); // Delete files
        
         // Installers
         Route::post('installers', 'Api\InstallersController@store');  // Add one item

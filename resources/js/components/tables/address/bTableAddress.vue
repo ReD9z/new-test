@@ -368,7 +368,7 @@ export default {
                                     let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
                                     let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
                                     let dateToday = vm.$moment(vm.dateToday, 'DD-MM-YYYY').unix() * 1000;
-                                    if((itemDateStart >= dateToday) && (itemDateStart <= dateToday) || (itemDateEnd >= dateToday) && (itemDateEnd <= dateToday)) {
+                                    if(dateToday >= itemDateStart && dateToday <= itemDateEnd) {
                                         item.result = 'Занят';
                                         item.data = stats;
                                         item.files = stats.files;
@@ -394,8 +394,17 @@ export default {
         },
         downloadExcel() {
             if(this.desserts.length > 0) {
+                let vm = this;
                 let map = this.desserts.map((item)=> {
-                    console.log(item);
+                    let date = null;
+                    item.status.forEach(stats => {
+                        let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
+                        let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
+                        let dateToday = vm.$moment(vm.dateToday, 'DD-MM-YYYY').unix() * 1000;
+                        if(dateToday >= itemDateStart && dateToday <= itemDateEnd) {
+                            date = vm.$moment(stats.orders.order_end_date).format('DD.MM.YYYY');
+                        } 
+                    });
                     return {
                         "Город": item.city,
                         "Район": item.area,
@@ -403,7 +412,7 @@ export default {
                         "Номер дома": item.house_number,
                         "Количество подъездов": item.number_entrances,
                         "Управляющая компания": item.management_company,
-                        // "Статус": item.result != "Занят" ? item.result : item.result + " до " + item.status.order_end_date
+                        "Статус": item.result != "Занят" ? item.result : item.result + " до " + date
                     }
                 });
 

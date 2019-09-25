@@ -82,9 +82,23 @@ class ClientsController extends Controller
             $clients->settlement_account = $request->input('settlement_account');
             $clients->bank_name = $request->input('bank_name');
 
-
+           
             if($clients->save()) {
                 return new ClientsResource($clients);
+            }
+        }
+
+    }
+
+    public function loadFiles(Request $request)
+    {
+        if($request->isMethod('delete') && $request->fileClient) {
+            Clients::removeTableFiles($request->fileClient);
+        } else {
+            if ($request->isMethod('post') && is_array($request->fileClient) || $request->isMethod('put') && is_array($request->fileClient)) {
+                foreach ($request->fileClient as $key => $item) {
+                    Clients::saveTableFiles(json_decode($request->fileClient[$key])->id, $request->idClient);    
+                }
             }
         }
     }
@@ -110,10 +124,6 @@ class ClientsController extends Controller
     public function destroy($id)
     {
         $clients = Clients::findOrFail($id);
-
-        // $users = User::findOrFail($clients->users_id);
-        // $users->delete();
-        // TODO удалять из таблицы user
 
         if($clients->delete()) {
             return new ClientsResource($clients);

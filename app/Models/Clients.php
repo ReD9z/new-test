@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Clients extends Model
 {
@@ -12,5 +13,19 @@ class Clients extends Model
 
     public function users() {
         return $this->belongsTo('App\User', 'users_id');
+    }
+
+    public function files() {
+        return $this->belongsToMany('App\Models\Files', 'client_to_files',  'client_id' , 'files_id');
+    }
+
+    public static function saveTableFiles($files, $id)
+    {
+        DB::table('client_to_files')->insert(['client_id' => $id, 'files_id' => $files]);
+    }
+
+    public static function removeTableFiles($id)
+    {
+        DB::table('client_to_files')->where('files_id', '=', $id)->delete();
     }
 }
