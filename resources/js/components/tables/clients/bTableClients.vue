@@ -65,7 +65,7 @@
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
-    <v-navigation-drawer v-model="dialogFiles" right temporary fixed width="700px">
+    <v-navigation-drawer v-model="dialogFiles" right temporary fixed width="400px">
         <v-card class="borderNone">
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>Файлы с комментариями клиентов</v-toolbar-title>
@@ -78,42 +78,25 @@
             </v-toolbar>
             <v-progress-linear value="15" :indeterminate="true" v-show="loadFiles" color="blue" class="ma-0"></v-progress-linear>
             <v-card-text>
-                <!-- <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                    <v-flex xs12 v-if="param.input == 'images'">
-                        <v-layout row wrap>
-                            <v-flex v-for="(file, key) in addOrderImages.files" :key="key" xs4 d-flex>
-                                <v-card flat tile class="d-flex pr-1 pb-1">
-                                    <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
-                                        <template v-slot:placeholder>
-                                            <v-layout fill-height align-center justify-center ma-0 >
-                                                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
-                                            </v-layout>
-                                        </template>
-                                        <template>
-                                            <v-layout fill-height right top ma-0 >
-                                                <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
-                                                    <v-icon>close</v-icon>
-                                                </v-btn>
-                                            </v-layout>
-                                        </template>
-                                        <template>
-                                            <v-layout fill-height left top ma-0 >
-                                                <v-dialog v-model="dialogImg" width="600px">
-                                                    <template v-slot:activator="{ on }">
-                                                        <v-btn icon class="white--text" v-on="on" @click='filesImg(file)'><v-icon>search</v-icon></v-btn>
-                                                    </template>
-                                                    <v-card v-if="imgBig">
-                                                        <v-img :src="'/storage/' + imgBig" :lazy-src="'/storage/' + imgBig" aspect-ratio="1" class="grey lighten-2"></v-img>
-                                                    </v-card>
-                                                </v-dialog>
-                                            </v-layout>
-                                        </template>
-                                    </v-img>
-                                </v-card>
-                            </v-flex>
-                        </v-layout>
+                <v-layout row wrap>
+                    <v-flex v-for="(file, key) in addClientFiles.files" :key="key" xs12>
+                        <v-list class="pt-0">
+                            <v-list-tile avatar>
+                                <v-list-tile-avatar>
+                                    <v-icon>cloud</v-icon>
+                                </v-list-tile-avatar>
+                                <v-list-tile-content>
+                                    <v-list-tile-title><a :href="'/storage/' + file.url" download>{{file.url.replace('upload/', '')}}</a></v-list-tile-title>
+                                </v-list-tile-content>
+                                <v-list-tile-action>
+                                    <v-btn @click='removeImg(file)' :disabled="deleteFile" icon ripple>
+                                        <v-icon color="lighten-1">close</v-icon>
+                                    </v-btn> 
+                                </v-list-tile-action>
+                            </v-list-tile>
+                        </v-list>
                     </v-flex>
-                </v-flex> -->
+                </v-layout>
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
@@ -189,6 +172,7 @@ export default {
         addClientFiles: [],
         selected: [],
         cityUser: null,
+        deleteFile: false,
         userId: null
     }),
     props: {
@@ -304,8 +288,6 @@ export default {
         elementLoadToFile() {
             this.loadFiles = true;
             this.files = this.$refs.filesClient.files;
-            console.log(this.editedItem.id);
-            
             Array.from(this.files).forEach(files => {
                 this.formData.append('file[]', files);
             });
@@ -340,12 +322,12 @@ export default {
             );
         },
         removeImg(data) {
-            this.loadImages = true;
+            this.deleteFile = true;
             axios.post('/api/files/remove', data)
             .then(
                 res => {
                     this.addClientFiles.files.splice(this.addClientFiles.files.indexOf(data.id), 1);
-                    this.loadImages = false;
+                    this.deleteFile = false;
                 }
             ).catch(
                 error => {
@@ -355,7 +337,7 @@ export default {
         },
         resetFilesLoad() {
             this.files = [];
-            this.$refs.files.value = '';
+            this.$refs.filesClient.value = '';
             this.formData.delete('file[]');
         },
         selectStatus() {
@@ -394,7 +376,7 @@ export default {
             this.dialog = true;
         },
         editFiles(item) {
-            this.addClientFiles = Object.assign({}, item.data);
+            this.addClientFiles = Object.assign({}, item);
             this.editedItem = Object.assign({}, item);
             this.dialogFiles = true;
         },
@@ -416,7 +398,7 @@ export default {
         },
         close () {
             this.dialog = false
-            this.dialogImages = false
+            this.dialogFiles = false
             setTimeout(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
                 this.dataAdd()

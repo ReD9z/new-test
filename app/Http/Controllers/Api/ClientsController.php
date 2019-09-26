@@ -92,15 +92,17 @@ class ClientsController extends Controller
 
     public function loadFiles(Request $request)
     {
+        $clients = Clients::findOrFail($request->idClient);
         if($request->isMethod('delete') && $request->fileClient) {
-            Clients::removeTableFiles($request->fileClient);
+            $clients::removeTableFiles($request->fileClient);
         } else {
             if ($request->isMethod('post') && is_array($request->fileClient) || $request->isMethod('put') && is_array($request->fileClient)) {
                 foreach ($request->fileClient as $key => $item) {
-                    Clients::saveTableFiles(json_decode($request->fileClient[$key])->id, $request->idClient);    
+                    $clients::saveTableFiles(json_decode($request->fileClient[$key])->id, $request->idClient);    
                 }
             }
         }
+        return new ClientsResource($clients);
     }
 
     /**
