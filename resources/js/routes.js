@@ -47,6 +47,20 @@ let routers =  [
         component: require('./views/Tasks.vue').default
     },
     {
+        path: '/tasksManager',
+        name: 'tasksManager',
+        meta: {
+            title: 'Задачи менеджерам',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: true,
+            managerAuth: false,
+            clientAuth: false
+        },
+        component: require('./views/ManagerTask.vue').default
+    },
+    {
         path: '/error',
         name: 'error',
         meta: {

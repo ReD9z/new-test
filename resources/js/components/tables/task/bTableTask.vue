@@ -259,6 +259,33 @@
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
+        <div>
+            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
+        </div>
+        <v-icon v-if="showRoles()">filter_list</v-icon>
+        <v-menu v-if="showRoles()" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
+            <template v-slot:activator="{ on }">
+                <v-btn icon v-on="on">
+                    <v-icon>more_vert</v-icon>
+                </v-btn>
+            </template>
+            <v-card height="200px">
+                <v-toolbar color="indigo" dark>
+                    <v-toolbar-title>Клиенты</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                </v-toolbar>
+                <v-layout row wrap>
+                    <v-flex class="px-3" xs12>
+                        <v-combobox
+                            v-model="chips"
+                            :items="chipsItem"
+                            multiple
+                            label="Клиенты"
+                        ></v-combobox>
+                    </v-flex>
+                </v-layout>
+            </v-card>
+        </v-menu>
     </v-toolbar>
     <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
@@ -367,12 +394,55 @@ export default {
         dateEnd(val) {
             this.dateEndFormatted = this.formatDate(this.dateEnd);
         },
+        chips(val) {
+            this.initialize();
+        }
     },
-    created () {
-        this.initialize();
-        this.selectStatus();
+    async created () {
+        await this.initialize();
+        await this.selectStatus();
+        await this.getFiltered();
     },
     methods: {
+        async getFiltered() {
+            await this.params.filter.forEach((item) => {
+                axios({
+                    method: 'get',
+                    url: item.api,
+                    params: {
+                        city: this.roleUserCity(),
+                    }
+                })
+                .then(
+                    response => {
+                        let data = response.data;
+                        data.filter((items) => {
+                            this.chipsItem.push(items[item.value]);
+                        });
+                    }
+                ).catch(error => {
+                    console.log(error);
+                })
+            })
+        },
+        filtered(data) {
+            if(this.chips.length > 0) {
+                let arr = [];
+                this.chips.forEach((chip) => {
+                    arr.push(chip);
+                });
+                var searchTerm = arr.join('||').trim().toLowerCase(),
+                useOr = 'and' == "or",
+                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                searchTest = new RegExp(regExExpression, "ig");
+           
+                this.desserts = this.desserts.filter(function(item) {
+                    return searchTest.test([item.client]);
+                });
+            }
+        },
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
                 return this.isLoggedUser.moderators.city_id;
@@ -453,7 +523,6 @@ export default {
             regExExpression = useOr ? OR_RegEx : AND_RegEx,
             searchTest = new RegExp(regExExpression, "ig");
             let thisSearch = this.params.searchValue;
-            // if( searchTerm.length < 2 || !this.desserts.length ) return this.desserts;
             return this.desserts = this.desserts.filter(function(item) {
                 let arr = [];
                 thisSearch.forEach(function(val) {
@@ -491,7 +560,8 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
-                    this.filteredItems(response.data);
+                    this.filteredItems(this.desserts);
+                    this.filtered(this.desserts);
                     this.loading = false;
                 }
             ).catch(error => {

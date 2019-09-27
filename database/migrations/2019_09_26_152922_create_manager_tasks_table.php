@@ -22,6 +22,7 @@ class CreateManagerTasksTable extends Migration
             $table->bigInteger('status')->nullable();
             $table->datetime('task_date_completion')->nullable();
             $table->string('comment')->nullable();
+            $table->string('result')->nullable();
             $table->timestamps();
         });
     }

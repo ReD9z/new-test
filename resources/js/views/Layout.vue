@@ -97,6 +97,10 @@ export default {
                     { 
                         title: 'Задачи монтажникам', icon: 'list', src: 'tasks',
                         role: {admin: 'admin', moderator: 'moderator'}
+                    },
+                    { 
+                        title: 'Задачи менеджерам', icon: 'list', src: 'tasksManager',
+                        role: {admin: 'admin', moderator: 'moderator'}
                     }
                 ],
                 role: {admin: 'admin', moderator: 'moderator'}

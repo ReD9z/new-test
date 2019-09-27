@@ -9,7 +9,7 @@
 export default {
     data: () => ({
         params: {
-            baseUrl: 'api/tasks',
+            baseUrl: '/api/tasks',
             headers: [
                 {
                     text: 'Заказ',
