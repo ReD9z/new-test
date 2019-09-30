@@ -32,7 +32,7 @@
                         <div v-if="param.input == 'text'">
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
-                        <div v-if="param.input == 'select'">
+                        <div v-if="param.input == 'select'" v-show="hideElem()">
                             <div v-if="param.selectText == 'orderClient'">
                                 <v-layout justify-space-around row>
                                     <v-autocomplete
@@ -152,7 +152,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-if="param.input == 'date'">
+                        <div v-if="param.input == 'date'" v-show="hideElem()">
                             <v-menu
                                 v-model="param.close"
                                 :close-on-content-click="false"
@@ -259,29 +259,88 @@
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
         </v-flex>
         <v-spacer></v-spacer>
-        <div>
+        <div v-show="params.filter">
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
         </div>
-        <v-icon v-if="showRoles()">filter_list</v-icon>
-        <v-menu v-if="showRoles()" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
-            <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on">
+        <v-icon v-if="showRoles()" v-show="params.filter">filter_list</v-icon>
+        <v-menu v-if="showRoles()" v-show="params.filter" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
+            <template v-slot:activator="{ on }" >
+                <v-btn icon v-on="on" v-show="params.filter">
                     <v-icon>more_vert</v-icon>
                 </v-btn>
             </template>
-            <v-card height="200px">
+            <v-card>
                 <v-toolbar color="indigo" dark>
                     <v-toolbar-title>Клиенты</v-toolbar-title>
                     <v-spacer></v-spacer>
                 </v-toolbar>
                 <v-layout row wrap>
-                    <v-flex class="px-3" xs12>
+                    <v-flex class="px-3" xs5>
                         <v-combobox
                             v-model="chips"
                             :items="chipsItem"
                             multiple
                             label="Клиенты"
                         ></v-combobox>
+                    </v-flex>
+                    <v-flex class="px-3" xs5>
+                        <v-layout row wrap>
+                            <v-flex pt-1 xs12>
+                                <v-menu
+                                    v-model="menu1"
+                                    :close-on-content-click="false"
+                                    :nudge-right="40"
+                                    lazy
+                                    transition="scale-transition"
+                                    offset-y
+                                    full-width
+                                    max-width="290px"
+                                    min-width="290px"
+                                >
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                            v-model="dateStartClient"
+                                            hint="Формат дд.мм.гггг"
+                                            persistent-hint
+                                            prepend-icon="event"
+                                            label="Начало"
+                                            v-on="on"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateStart" no-title @input="menu1 = false"></v-date-picker>
+                                </v-menu>
+                            </v-flex>
+                            <v-flex pb-4 xs12>
+                                <v-menu
+                                    v-model="menu2"
+                                    :close-on-content-click="false"
+                                    :nudge-right="40"
+                                    lazy
+                                    transition="scale-transition"
+                                    offset-y
+                                    full-width
+                                    max-width="290px"
+                                    min-width="290px"
+                                >
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                            v-model="dateEndClient"
+                                            hint="Формат дд.мм.гггг"
+                                            persistent-hint
+                                            prepend-icon="event"
+                                            label="Конец"
+                                            v-on="on"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateEnd" no-title @input="menu2 = false"></v-date-picker>
+                                </v-menu>
+                            </v-flex>
+                        </v-layout>
+                    </v-flex>
+                    <v-flex class="px-3" text-right pt-2 xs2>
+                        <v-btn flat icon @click="resetDate()">
+                            <v-icon>close</v-icon>
+                        </v-btn>                
                     </v-flex>
                 </v-layout>
             </v-card>
@@ -296,7 +355,7 @@
                 :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
             >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
-            <th class="text-xs-left" v-show="hideElem()">
+            <th class="text-xs-left">
                 Действия
             </th>
         </template>
@@ -316,12 +375,15 @@
                     </v-flex>
                 </v-flex>
             </td>
-            <td class="justify-left layout" v-show="hideElem()">
-                <v-icon small class="mr-2" @click="editItem(props.item)">	
+            <td class="justify-left layout">
+                <v-icon small class="mr-2" v-show="hideElem()" @click="editItem(props.item)">	
                     edit	
                 </v-icon>
-                <v-icon small class="mr-2" @click="deleteItem(props.item)">
+                <v-icon small class="mr-2" v-show="hideElem()" @click="deleteItem(props.item)">
                     delete
+                </v-icon>
+                <v-icon class="mr-2" v-show="!hideElem()" @click="editItem(props.item)">
+                    input
                 </v-icon>
             </td>
         </template>
@@ -345,6 +407,8 @@ export default {
         deleteImage: false,
         desserts: [],
         editedIndex: -1,
+        dateStartClient: null,
+        dateEndClient: null,
         loadImages: false,
         editedItem: {},
         defaultItem: {},
@@ -390,9 +454,11 @@ export default {
         }, 400),
         dateStart(val) {
             this.dateStartFormatted = this.formatDate(this.dateStart);
+            this.initialize();
         },
         dateEnd(val) {
             this.dateEndFormatted = this.formatDate(this.dateEnd);
+            this.initialize();
         },
         chips(val) {
             this.initialize();
@@ -405,25 +471,27 @@ export default {
     },
     methods: {
         async getFiltered() {
-            await this.params.filter.forEach((item) => {
-                axios({
-                    method: 'get',
-                    url: item.api,
-                    params: {
-                        city: this.roleUserCity(),
-                    }
+            if(this.params.filter) {
+                await this.params.filter.forEach((item) => {
+                    axios({
+                        method: 'get',
+                        url: item.api,
+                        params: {
+                            city: this.roleUserCity(),
+                        }
+                    })
+                    .then(
+                        response => {
+                            let data = response.data;
+                            data.filter((items) => {
+                                this.chipsItem.push(items[item.value]);
+                            });
+                        }
+                    ).catch(error => {
+                        console.log(error);
+                    })
                 })
-                .then(
-                    response => {
-                        let data = response.data;
-                        data.filter((items) => {
-                            this.chipsItem.push(items[item.value]);
-                        });
-                    }
-                ).catch(error => {
-                    console.log(error);
-                })
-            })
+            }
         },
         filtered(data) {
             if(this.chips.length > 0) {
@@ -461,7 +529,10 @@ export default {
             if(this.isLoggedUser.installers) {
                 return this.isLoggedUser.installers.id;
             }
-            if(!this.isLoggedUser.moderators || this.isLoggedUser.installers) {
+            if(this.isLoggedUser.managers) {
+                return this.isLoggedUser.managers.id;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.installers || !this.isLoggedUser.managers) {
                 return null;
             }
         },
@@ -474,10 +545,10 @@ export default {
             }
         },
         hideElem() {
-            if(this.isLoggedUser.installers) {
+            if(this.isLoggedUser.installers || this.isLoggedUser.managers) {
                 return false;
             }
-            if(!this.isLoggedUser.installers) {
+            if(!this.isLoggedUser.installers || !this.isLoggedUser.managers) {
                 return true;
             }
         },
@@ -512,6 +583,7 @@ export default {
             this.dateStart = null;
             this.dateEnd = null;
             this.initialize();
+            this.chips = [];
             this.orderDate = this.orderFull;
         },
         filteredItems(data) {
@@ -534,6 +606,9 @@ export default {
         refreshSearch() {
             this.loading = true;
             this.search = '';
+            this.dateStart = null;
+            this.dateEnd = null;
+            this.chips = [];
             this.initialize();
         },
         toggleAll () {
@@ -560,8 +635,19 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
+                    let vm = this;
+                    if(this.dateStartClient && this.dateEndClient) {
+                        this.desserts = this.desserts.filter(function (item) {
+                            let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
+                            let dateStart = vm.$moment(vm.formatDate(vm.dateStart), 'DD.MM.YYYY').unix() * 1000;
+                            let dateEnd = vm.$moment(vm.formatDate(vm.dateEnd), 'DD.MM.YYYY').unix() * 1000;
+                            if(itemDateStart >= dateStart && itemDateStart <= dateEnd) {
+                                return item;
+                            } 
+                        });
+                    } 
                     this.filteredItems(this.desserts);
-                    this.filtered(this.desserts);
+                    this.filtered(this.desserts); 
                     this.loading = false;
                 }
             ).catch(error => {

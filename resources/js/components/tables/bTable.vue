@@ -334,7 +334,7 @@ export default {
                             this.close();
                             this.$refs.forms.reset();
                         }
-                    ).catch(error => {
+                    ).catch((error) => {
                         if(error.response.status == 422) {
                             if(error.response.data.errors.email) {
                                 const error = {

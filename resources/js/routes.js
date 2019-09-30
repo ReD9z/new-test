@@ -50,12 +50,12 @@ let routers =  [
         path: '/tasksManager',
         name: 'tasksManager',
         meta: {
-            title: 'Задачи менеджерам',
+            title: 'Задачи',
             requiresAuth: true,
             adminAuth: true,
-            moderatorAuth: true,
-            installerAuth: true,
-            managerAuth: false,
+            moderatorAuth: false,
+            installerAuth: false,
+            managerAuth: true,
             clientAuth: false
         },
         component: require('./views/ManagerTask.vue').default

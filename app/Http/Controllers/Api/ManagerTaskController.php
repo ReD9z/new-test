@@ -19,10 +19,10 @@ class ManagerTaskController extends Controller
         if($request->city) {
             $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get()->where('managers.city_id', $request->city); 
         }
-        else if($request->user) {
+        if($request->user) {
             $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get()->where('manager_id', $request->user); 
         }
-        else {
+        if(!$request->city || !$request->user) {
             $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get(); 
         }
         

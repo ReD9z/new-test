@@ -99,11 +99,15 @@ export default {
                         role: {admin: 'admin', moderator: 'moderator'}
                     },
                     { 
-                        title: 'Задачи менеджерам', icon: 'list', src: 'tasksManager',
-                        role: {admin: 'admin', moderator: 'moderator'}
+                        title: 'Задачи менеджерам', icon: 'assessment', src: 'tasksManager',
+                        role: {admin: 'admin'}
                     }
                 ],
                 role: {admin: 'admin', moderator: 'moderator'}
+            },
+            { 
+                title: 'Мои задачи', icon: 'list', src: 'tasksManager',
+                role: {installer: 'manager'}
             },
             { 
                 title: 'Мои задачи', icon: 'list', src: 'tasks',
@@ -167,16 +171,6 @@ export default {
     }),
     props: {
         source: String
-    },
-    created: function () {
-        let vm = this;
-        axios.interceptors.response.use(undefined, err => {
-            let res = err.response;
-            if (res.status === 401 && res.config && !res.config.__isRetryRequest) {
-                vm.$router.push('/auth')
-                vm.$store.dispatch('logoutError')
-            }
-        });
     },
     computed: {
         isLoggedIn: function(){ 

@@ -145,6 +145,16 @@ router.beforeEach((to, from, next) => {
 
 new Vue({
     el: '#app',
+    created: function () {
+        let vm = this;
+        axios.interceptors.response.use(undefined, err => {
+            let res = err.response;
+            if (res.status === 401 && res.config && !res.config.__isRetryRequest) {
+                vm.$router.push('/auth')
+                vm.$store.dispatch('logoutError')
+            }
+        });
+    },
     store,
     router: router
 });

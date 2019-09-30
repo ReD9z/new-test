@@ -72,6 +72,7 @@ export default {
                     validate: 'required'
                 }
             ],
+            filter: false,
             searchValue: ['orderClient', 'installers', 'types', 'task_date_completion', 'comment', 'statusName'],
             search: true,
             pagination: true,

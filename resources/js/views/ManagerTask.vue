@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-4 mt-4">
         <div class="col-md-12 mb-4 mt-4">
-            <b-table-task :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator', installer: 'installer'})"></b-table-task>
+            <b-table-task :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator', installer: 'installer', manager: 'manager'})"></b-table-task>
         </div>
     </div>
 </template>
@@ -16,7 +16,7 @@ export default {
                     align: 'left',
                     sortable: true,
                     value: 'client_id',
-                    selectText: 'client',
+                    selectText: 'name',
                     TableGetIdName: 'client',
                     selectApi: '/api/clients',
                     input: "select",
