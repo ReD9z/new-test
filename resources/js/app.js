@@ -148,11 +148,13 @@ new Vue({
     created: function () {
         let vm = this;
         axios.interceptors.response.use(undefined, err => {
-            let res = err.response;
-            if (res.status === 401 && res.config && !res.config.__isRetryRequest) {
-                vm.$router.push('/auth')
-                vm.$store.dispatch('logoutError')
-            }
+            return new Promise(function (resolve, reject) {
+                if (err.response.status === 401 && err.response.config && !err.response.config.__isRetryRequest) {
+                    vm.$router.push('/auth')
+                    vm.$store.dispatch('logoutError')
+                }
+                throw err;
+            });
         });
     },
     store,

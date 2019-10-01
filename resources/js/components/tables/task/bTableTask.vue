@@ -29,7 +29,10 @@
             <v-card-text>
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                        <div v-if="param.input == 'text'">
+                        <div v-if="param.input == 'text' && param.value != 'comment'">
+                            <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                        </div>
+                        <div v-if="param.value == 'comment'" v-show="hideComment()">
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'" v-show="hideElem()">
@@ -383,7 +386,7 @@
                     delete
                 </v-icon>
                 <v-icon class="mr-2" v-show="!hideElem()" @click="editItem(props.item)">
-                    input
+                    assignment_turned_in
                 </v-icon>
             </td>
         </template>
@@ -546,6 +549,14 @@ export default {
         },
         hideElem() {
             if(this.isLoggedUser.installers || this.isLoggedUser.managers) {
+                return false;
+            }
+            if(!this.isLoggedUser.installers || !this.isLoggedUser.managers) {
+                return true;
+            }
+        },
+        hideComment() {
+            if(this.isLoggedUser.managers) {
                 return false;
             }
             if(!this.isLoggedUser.installers || !this.isLoggedUser.managers) {
@@ -859,7 +870,7 @@ export default {
                     .then(
                         response => {
                             if (this.editedIndex > -1) {
-                                Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                                this.initialize()
                             } else {
                                 this.initialize()
                             }

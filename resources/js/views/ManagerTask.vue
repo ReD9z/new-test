@@ -65,7 +65,6 @@ export default {
                     input: "text",
                     sortable: true,
                     value: 'result',
-                    // validate: 'required'
                 }
             ],
             filter: [
