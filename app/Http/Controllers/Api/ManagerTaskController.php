@@ -43,7 +43,11 @@ class ManagerTaskController extends Controller
         $tasks->client_id = $request->input('client_id');
         $tasks->manager_id = $request->input('manager_id');
         $tasks->status = $request->input('status');
-        $tasks->task_date_completion = date("Y-m-d 00:00:00", strtotime($request->input('task_date_completion')));
+        if($request->input('task_date_completion')) {
+            $tasks->task_date_completion = $request->input('task_date_completion') ? date("Y-m-d 00:00:00", strtotime($request->input('task_date_completion'))) : null;
+        } else {
+            $tasks->task_date_completion = $tasks->status == '2' ? date("Y-m-d 00:00:00") : null;
+        }
         $tasks->comment = $request->input('comment');
         $tasks->result = $request->input('result');
 

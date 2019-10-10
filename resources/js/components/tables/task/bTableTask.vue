@@ -274,7 +274,7 @@
             </template>
             <v-card>
                 <v-toolbar color="indigo" dark>
-                    <v-toolbar-title>Клиенты</v-toolbar-title>
+                    <v-toolbar-title>Фильтры</v-toolbar-title>
                     <v-spacer></v-spacer>
                 </v-toolbar>
                 <v-layout row wrap>
@@ -830,7 +830,8 @@ export default {
                 })
                 .then(
                     response => {
-                        this.desserts.splice(index, 1);
+                        // this.desserts.splice(index, 1);
+                        this.initialize();
                     }
                 ).catch(error => {
                     console.log(error);

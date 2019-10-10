@@ -12,7 +12,7 @@ export default {
             baseUrl: '/api/managerTask',
             headers: [
                 {
-                    text: 'Клиент',
+                    text: 'ФИО клиента',
                     align: 'left',
                     sortable: true,
                     value: 'client_id',
@@ -21,6 +21,24 @@ export default {
                     selectApi: '/api/clients',
                     input: "select",
                     validate: 'required'
+                },
+                { 
+                    text: 'Дата создания клинта', 
+                    sortable: true,
+                    close: false,
+                    value: 'created_at',
+                },
+                { 
+                    text: 'Email клиента', 
+                    sortable: true,
+                    close: false,
+                    value: 'email'
+                },
+                { 
+                    text: 'Телефон клиента', 
+                    sortable: true,
+                    close: false,
+                    value: 'phone'
                 },
                 {
                     text: 'Менеджер',
@@ -34,12 +52,17 @@ export default {
                     validate: 'required'
                 },
                 { 
-                    text: 'Крайний срок', 
+                    text: 'Дата звонка', 
                     input: "date",
                     sortable: true,
                     close: false,
-                    value: 'task_date_completion',
-                    validate: 'required'
+                    value: 'task_date_completion'
+                },
+                { 
+                    text: 'Дата последнего звонка', 
+                    sortable: true,
+                    close: false,
+                    value: 'task_date_ended'
                 },
                 {
                     data: [
