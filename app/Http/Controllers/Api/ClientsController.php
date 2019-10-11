@@ -20,21 +20,19 @@ class ClientsController extends Controller
     public function index(Request $request)
     {
         if($request->city) {
-            $clients = Clients::with('cities', 'users')->where('city_id', $request->city)->get();
+            $clients = Clients::with('cities', 'users', 'files.comments')->where('city_id', $request->city)->get();
         }
         else {
-            $clients = Clients::with('cities', 'users')->get();
+            $clients = Clients::with('cities', 'users' , 'files.comments')->get();
         }
         return ClientsResource::collection($clients);
     }
-
 
     public function managersAddress($id)
     {
-        $clients = Clients::with('cities', 'users')->where('city_id', $id)->get();
+        $clients = Clients::with('cities', 'users' , 'files.comments')->where('city_id', $id)->get();
         return ClientsResource::collection($clients);
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -92,7 +90,7 @@ class ClientsController extends Controller
 
     public function loadFiles(Request $request)
     {
-        $clients = Clients::findOrFail($request->idClient);
+        $clients = Clients::with('files.comments')->findOrFail($request->idClient);
         if($request->isMethod('delete') && $request->fileClient) {
             $clients::removeTableFiles($request->fileClient);
         } else {

@@ -264,6 +264,7 @@
         <v-spacer></v-spacer>
         <div v-show="params.filter">
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
+            <v-chip v-for="(item, key) in chipsStatus" :key="'K'+ key" close @input="removeStatus(item)">{{item}}</v-chip>
         </div>
         <v-icon v-if="showRoles()" v-show="params.filter">filter_list</v-icon>
         <v-menu v-if="showRoles()" v-show="params.filter" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
@@ -278,7 +279,15 @@
                     <v-spacer></v-spacer>
                 </v-toolbar>
                 <v-layout row wrap>
-                    <v-flex class="px-3" xs5>
+                    <v-flex class="px-3" xs3>
+                        <v-combobox
+                            v-model="chipsStatus"
+                            :items="statusFilter"
+                            multiple
+                            label="Статус"
+                        ></v-combobox>
+                    </v-flex>
+                    <v-flex class="px-3" xs4>
                         <v-combobox
                             v-model="chips"
                             :items="chipsItem"
@@ -286,7 +295,7 @@
                             label="Клиенты"
                         ></v-combobox>
                     </v-flex>
-                    <v-flex class="px-3" xs5>
+                    <v-flex class="px-3" xs3>
                         <v-layout row wrap>
                             <v-flex pt-1 xs12>
                                 <v-menu
@@ -357,7 +366,10 @@
                 :key="header.text"
                 :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
-            >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
+            >
+                {{ header.text }}
+                <v-icon small>arrow_upward</v-icon>
+            </th>
             <th class="text-xs-left">
                 Действия
             </th>
@@ -401,11 +413,13 @@ import XLSX from 'xlsx';
 export default {
     inject: ['$validator'],
     data: (vm) => ({
+        statusFilter: ['Завершена', 'В работе'],
         search: '',
         dialog: false,
         dialogImages: false,
         loading: true,
         loadingExcel: false,
+        chipsStatus: [],
         files: [],
         deleteImage: false,
         desserts: [],
@@ -465,6 +479,9 @@ export default {
         },
         chips(val) {
             this.initialize();
+        },
+        chipsStatus() {
+            this.initialize();
         }
     },
     async created () {
@@ -494,6 +511,25 @@ export default {
                         console.log(error);
                     })
                 })
+            }
+        },
+        filteredStatus(data) {
+            if(this.chipsStatus.length > 0) {
+                let arr = [];
+                this.chipsStatus.forEach((chip) => {
+                    arr.push(chip);
+                });
+                var searchTerm = arr.join('||').trim().toLowerCase(),
+                useOr = 'and' == "or",
+                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                searchTest = new RegExp(regExExpression, "ig");
+                let array = [];
+           
+                this.desserts = this.desserts.filter(function(item) {
+                    return searchTest.test([item.statusName]); 
+                });
             }
         },
         filtered(data) {
@@ -596,6 +632,7 @@ export default {
             this.initialize();
             this.chips = [];
             this.orderDate = this.orderFull;
+            this.chipsStatus = [];
         },
         filteredItems(data) {
             this.desserts = data;
@@ -659,6 +696,7 @@ export default {
                     } 
                     this.filteredItems(this.desserts);
                     this.filtered(this.desserts); 
+                    this.filteredStatus(this.desserts);
                     this.loading = false;
                 }
             ).catch(error => {
@@ -891,6 +929,10 @@ export default {
         remove(item) {
             this.chips.splice(this.chips.indexOf(item), 1)
             this.chips = [...this.chips]
+        },
+        removeStatus(item) {
+            this.chipsStatus.splice(this.chipsStatus.indexOf(item), 1)
+            this.chipsStatus = [...this.chipsStatus]
         },
         roleUser(role, roleList) {
             const {admin, client, installer, moderator, manager} = roleList;

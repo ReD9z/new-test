@@ -96,7 +96,7 @@ export default {
                     input: "text",
                     sortable: true,
                     validate: 'required',
-                    value: 'bik' 
+                    value: 'bik'
                 },
                 { 
                     text: 'Кор. счёт', 

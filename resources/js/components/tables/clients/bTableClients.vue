@@ -68,7 +68,7 @@
     <v-navigation-drawer v-model="dialogFiles" right temporary fixed width="400px">
         <v-card class="borderNone">
             <v-toolbar color="pink" dark>
-                <v-toolbar-title>Файлы с комментариями клиентов</v-toolbar-title>
+                <v-toolbar-title>Файлы</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-icon right dark @click='pickFiles'>control_point</v-icon>
                 <input type="file" ref="filesClient" name='file' style="display: none" @change="elementLoadToFile" multiple>
@@ -79,6 +79,7 @@
             <v-progress-linear value="15" :indeterminate="true" v-show="loadFiles" color="blue" class="ma-0"></v-progress-linear>
             <v-card-text>
                 <v-layout row wrap>
+                    {{addClientFiles.files}}
                     <v-flex v-for="(file, key) in addClientFiles.files" :key="key" xs12>
                         <v-list class="pt-0">
                             <v-list-tile avatar>
@@ -307,6 +308,7 @@ export default {
                     })
                     .then(
                         response => {
+                            
                             Object.assign(this.addClientFiles, response.data);
                             this.loadFiles = false;
                             this.resetFilesLoad();
