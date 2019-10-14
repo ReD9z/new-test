@@ -65,7 +65,7 @@ class ClientsController extends Controller
         }
     
         if($users->save()) { 
-            $clients = $request->isMethod('put') ? Clients::findOrFail($request->id) : new Clients;
+            $clients = $request->isMethod('put') ? Clients::with('files.comments')->findOrFail($request->id) : new Clients;
             if($request->isMethod('post')) {
                 $clients->id = $request->input('id');
             }

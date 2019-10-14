@@ -79,7 +79,7 @@
             <v-progress-linear value="15" :indeterminate="true" v-show="loadFiles" color="blue" class="ma-0"></v-progress-linear>
             <v-card-text>
                 <v-layout row wrap>
-                    {{addClientFiles.files}}
+                    {{addClientFiles}}
                     <v-flex v-for="(file, key) in addClientFiles.files" :key="key" xs12>
                         <v-list class="pt-0">
                             <v-list-tile avatar>
@@ -90,7 +90,7 @@
                                     <v-list-tile-title><a :href="'/storage/' + file.url" download>{{file.url.replace('upload/', '')}}</a></v-list-tile-title>
                                 </v-list-tile-content>
                                 <v-list-tile-action>
-                                    <v-btn @click='removeImg(file)' :disabled="deleteFile" icon ripple>
+                                    <v-btn @click='removeFile(file)' :disabled="deleteFile" icon ripple>
                                         <v-icon color="lighten-1">close</v-icon>
                                     </v-btn> 
                                 </v-list-tile-action>
@@ -267,7 +267,7 @@ export default {
                 this.pagination.descending = false
             }
         },
-        initialize () {
+        initialize() {
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
@@ -308,8 +308,9 @@ export default {
                     })
                     .then(
                         response => {
-                            
-                            Object.assign(this.addClientFiles, response.data);
+                            let data = response.data;
+                            this.editFiles(response.data);
+                            // this.addClientFiles = Object.assign(this.addClientFiles, data);
                             this.loadFiles = false;
                             this.resetFilesLoad();
                         }
@@ -323,7 +324,7 @@ export default {
                 }
             );
         },
-        removeImg(data) {
+        removeFile(data) {
             this.deleteFile = true;
             axios.post('/api/files/remove', data)
             .then(
