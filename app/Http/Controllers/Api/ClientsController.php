@@ -20,17 +20,17 @@ class ClientsController extends Controller
     public function index(Request $request)
     {
         if($request->city) {
-            $clients = Clients::with('cities', 'users', 'files.comments')->where('city_id', $request->city)->get();
+            $clients = Clients::with('cities', 'users', 'comments')->where('city_id', $request->city)->get();
         }
         else {
-            $clients = Clients::with('cities', 'users' , 'files.comments')->get();
+            $clients = Clients::with('cities', 'users' , 'comments')->get();
         }
         return ClientsResource::collection($clients);
     }
 
     public function managersAddress($id)
     {
-        $clients = Clients::with('cities', 'users' , 'files.comments')->where('city_id', $id)->get();
+        $clients = Clients::with('cities', 'users' , 'comments')->where('city_id', $id)->get();
         return ClientsResource::collection($clients);
     }
 
@@ -65,7 +65,7 @@ class ClientsController extends Controller
         }
     
         if($users->save()) { 
-            $clients = $request->isMethod('put') ? Clients::with('files.comments')->findOrFail($request->id) : new Clients;
+            $clients = $request->isMethod('put') ? Clients::with('comments')->findOrFail($request->id) : new Clients;
             if($request->isMethod('post')) {
                 $clients->id = $request->input('id');
             }
@@ -90,7 +90,7 @@ class ClientsController extends Controller
 
     public function loadFiles(Request $request)
     {
-        $clients = Clients::with('files.comments')->findOrFail($request->idClient);
+        $clients = Clients::with('comments')->findOrFail($request->idClient);
         if($request->isMethod('delete') && $request->fileClient) {
             $clients::removeTableFiles($request->fileClient);
         } else {

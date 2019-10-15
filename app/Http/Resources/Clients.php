@@ -32,7 +32,8 @@ class Clients extends JsonResource
             'cor_score' => $this->cor_score,
             'settlement_account' => $this->settlement_account,
             'bank_name' => $this->bank_name,
-            'files' => $this->files
+            'files' => $this->files,
+            'comments' => $this->comments
         ];
     }
 }

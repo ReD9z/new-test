@@ -16,6 +16,8 @@ class CreateCommentToFilesTable extends Migration
         Schema::create('comment_to_files', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('comment')->nullable();    
+            $table->bigInteger('client_id')->unsigned()->nullable();
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
             $table->bigInteger('files_id')->unsigned()->nullable();
             $table->foreign('files_id')->references('id')->on('files')->onDelete('cascade');
             $table->timestamps();

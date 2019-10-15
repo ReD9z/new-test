@@ -77,28 +77,40 @@
                 </v-btn>
             </v-toolbar>
             <v-progress-linear value="15" :indeterminate="true" v-show="loadFiles" color="blue" class="ma-0"></v-progress-linear>
-            <v-card-text>
+           
                 <v-layout row wrap>
-                    {{addClientFiles}}
                     <v-flex v-for="(file, key) in addClientFiles.files" :key="key" xs12>
-                        <v-list class="pt-0">
-                            <v-list-tile avatar>
-                                <v-list-tile-avatar>
-                                    <v-icon>cloud</v-icon>
-                                </v-list-tile-avatar>
-                                <v-list-tile-content>
-                                    <v-list-tile-title><a :href="'/storage/' + file.url" download>{{file.url.replace('upload/', '')}}</a></v-list-tile-title>
-                                </v-list-tile-content>
-                                <v-list-tile-action>
-                                    <v-btn @click='removeFile(file)' :disabled="deleteFile" icon ripple>
-                                        <v-icon color="lighten-1">close</v-icon>
-                                    </v-btn> 
-                                </v-list-tile-action>
-                            </v-list-tile>
-                        </v-list>
+                        <!-- <v-list class="pt-0"> -->
+                            <v-expansion-panel>
+                                <v-expansion-panel-content>
+                                    <template v-slot:header>
+                                        <v-icon>cloud</v-icon>
+                                        <a :href="'/storage/' + file.url" download>{{file.url.replace('upload/', '')}}</a>
+                                        <v-btn @click='removeFile(file)' :disabled="deleteFile" icon>
+                                            <v-icon color="lighten-1">close</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <v-card class="mt-0 ml-4">
+                                        <div>
+                                            <h5>Комментарии</h5>
+                                            <div v-for="(value, keys) in addClientFiles.comments" :key="keys">
+                                                <div v-if="value.files_id == file.id">
+                                                    <v-icon>textsms</v-icon>
+                                                    {{value.comment}}
+                                                    <!-- <v-btn @click='removeFile(file)' :disabled="deleteFile" icon>
+                                                        <v-icon color="lighten-1">close</v-icon>
+                                                    </v-btn> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </v-card>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                            
+                        <!-- </v-list> -->
                     </v-flex>
                 </v-layout>
-            </v-card-text>
+          
         </v-card>
     </v-navigation-drawer>
     <v-toolbar flat color="#fff">
