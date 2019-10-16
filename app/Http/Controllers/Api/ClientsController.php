@@ -96,10 +96,28 @@ class ClientsController extends Controller
         } else {
             if ($request->isMethod('post') && is_array($request->fileClient) || $request->isMethod('put') && is_array($request->fileClient)) {
                 foreach ($request->fileClient as $key => $item) {
-                    $clients::saveTableFiles(json_decode($request->fileClient[$key])->id, $request->idClient);    
+                    $clients::saveTableFiles(json_decode($request->fileClient[$key])->id, $request->idClient, $request->comment);    
                 }
             }
         }
+        return new ClientsResource($clients);
+    }
+
+    public function addComment(Request $request)
+    {
+        if($request->isMethod('delete')) {
+            Clients::removeComment($request->id);
+        } 
+
+        if  ($request->isMethod('post')) {
+            Clients::saveComment($request->fileId, $request->idClient, $request->comment);
+        }
+
+        if ($request->isMethod('put')) {
+            Clients::editComment($request->id, $request->comment);
+        }
+
+        $clients = Clients::with('comments')->findOrFail($request->idClient);
         return new ClientsResource($clients);
     }
 

@@ -31,13 +31,29 @@ class Clients extends Model
     //     return $this->hasMany('App\Models\CommentToFiles', 'files_id', 'id');
     // }
 
-    public static function saveTableFiles($files, $id)
+    public static function saveTableFiles($files, $id, $comment)
     {
         DB::table('client_to_files')->insert(['client_id' => $id, 'files_id' => $files]);
+        DB::table('comment_to_files')->insert(['client_id' => $id, 'files_id' => $files, 'comment' => $comment]);
     }
 
     public static function removeTableFiles($id)
     {
         DB::table('client_to_files')->where('files_id', '=', $id)->delete();
+    }
+
+    public static function saveComment($fileId, $idClient, $comment)
+    {
+        DB::table('comment_to_files')->insert(['client_id' => $idClient, 'files_id' => $fileId, 'comment' => $comment]);
+    }
+
+    public static function removeComment($id)
+    {
+        DB::table('comment_to_files')->where('id', '=', $id)->delete();
+    }
+    
+    public static function editComment($id, $comment)
+    {
+        DB::table('comment_to_files')->where('id',  $id)->update(['comment' => $comment]);
     }
 }

@@ -70,47 +70,60 @@
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>Файлы</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-icon right dark @click='pickFiles'>control_point</v-icon>
-                <input type="file" ref="filesClient" name='file' style="display: none" @change="elementLoadToFile" multiple>
                 <v-btn icon @click="close">
                     <v-icon>close</v-icon>
                 </v-btn>
             </v-toolbar>
             <v-progress-linear value="15" :indeterminate="true" v-show="loadFiles" color="blue" class="ma-0"></v-progress-linear>
-           
-                <v-layout row wrap>
-                    <v-flex v-for="(file, key) in addClientFiles.files" :key="key" xs12>
-                        <!-- <v-list class="pt-0"> -->
-                            <v-expansion-panel>
-                                <v-expansion-panel-content>
-                                    <template v-slot:header>
-                                        <v-icon>cloud</v-icon>
-                                        <a :href="'/storage/' + file.url" download>{{file.url.replace('upload/', '')}}</a>
-                                        <v-btn @click='removeFile(file)' :disabled="deleteFile" icon>
-                                            <v-icon color="lighten-1">close</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <v-card class="mt-0 ml-4">
-                                        <div>
-                                            <h5>Комментарии</h5>
-                                            <div v-for="(value, keys) in addClientFiles.comments" :key="keys">
-                                                <div v-if="value.files_id == file.id">
-                                                    <v-icon>textsms</v-icon>
-                                                    {{value.comment}}
-                                                    <!-- <v-btn @click='removeFile(file)' :disabled="deleteFile" icon>
-                                                        <v-icon color="lighten-1">close</v-icon>
-                                                    </v-btn> -->
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </v-card>
-                                </v-expansion-panel-content>
-                            </v-expansion-panel>
-                            
-                        <!-- </v-list> -->
+                <v-layout class="mt-2 ml-3 mr-3" outline row wrap>
+                    <v-flex xs10>
+                        <v-text-field v-model="comment" placeholder="Комментарий" required></v-text-field>
+                    </v-flex>
+                    <v-flex xs2>
+                        <v-icon black @click='pickFiles'>control_point</v-icon>
+                        <input type="file" ref="filesClient" name='file' style="display: none" @change="elementLoadToFile" multiple>
                     </v-flex>
                 </v-layout>
-          
+                <v-flex v-for="(file, key) in addClientFiles.files" :key="key" xs12>
+                    <v-expansion-panel>
+                        <v-expansion-panel-content>
+                            <template v-slot:header>
+                                <v-icon>cloud</v-icon>
+                                <a :href="'/storage/' + file.url" download>{{file.url.replace('upload/', '')}}</a>
+                                <v-btn @click='removeFile(file)' :disabled="deleteFile" icon>
+                                    <v-icon color="lighten-1">close</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-card class="mt-0 ml-5 mr-5">
+                                <v-layout outline row wrap>
+                                    <v-flex xs10>
+                                        <v-text-field v-model="newComment" placeholder="Комментарий" required></v-text-field>
+                                    </v-flex>
+                                    <v-flex xs2>
+                                        <v-btn @click='addComment(file.id)' icon>
+                                            <v-icon color="lighten-1">add</v-icon>
+                                        </v-btn>
+                                    </v-flex>
+                                </v-layout> 
+                                <div>
+                                    <div v-for="(value, keys) in addClientFiles.comments" :key="keys">
+                                        <div v-if="value.files_id == file.id">
+                                            <v-text-field v-model="value.comment" placeholder="Комментарий" required></v-text-field>
+                                            <v-icon small>textsms</v-icon>
+                                            {{value.comment}}
+                                            <v-btn @click='editComment(value.id, value.comment)' icon>
+                                                <v-icon small>edit</v-icon>
+                                            </v-btn>
+                                            <v-btn @click='removeComment(value.id)' icon>
+                                                <v-icon small >delete</v-icon>
+                                            </v-btn>
+                                        </div>
+                                    </div>
+                                </div>
+                            </v-card>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                </v-flex>
         </v-card>
     </v-navigation-drawer>
     <v-toolbar flat color="#fff">
@@ -167,7 +180,9 @@ export default {
         loading: true,
         loadFiles: false,
         loadingExcel: false,
+        comment: '',
         files: [],
+        newComment: '',
         desserts: [],
         editedIndex: -1,
         editedItem: {},
@@ -315,13 +330,15 @@ export default {
                         data: this.addClientFiles,
                         params: {
                             fileClient: res.data.files,
+                            comment: this.comment,
                             idClient: this.editedItem.id
                         }
                     })
                     .then(
                         response => {
+                            this.comment = '';
                             let data = response.data;
-                            this.editFiles(response.data);
+                            this.editFiles(data);
                             // this.addClientFiles = Object.assign(this.addClientFiles, data);
                             this.loadFiles = false;
                             this.resetFilesLoad();
@@ -335,6 +352,63 @@ export default {
                     console.log(error);
                 }
             );
+        },
+        addComment(idFile) {
+            axios({
+                method: 'post',
+                url: '/api/clientsComment',
+                params: {
+                    fileId: idFile,
+                    comment: this.newComment,
+                    idClient: this.editedItem.id
+                }
+            })
+            .then(
+                response => {
+                    this.newComment = '';
+                    let data = response.data;
+                    this.editFiles(data);
+                }
+            ).catch(error => {
+                console.log(error);
+            })
+        },
+        removeComment(id) {
+            axios({
+                method: 'delete',
+                url: '/api/deleteComment',
+                params: {
+                    id: id,
+                    idClient: this.editedItem.id
+                }
+            })
+            .then(
+                response => {
+                    let data = response.data;
+                    this.editFiles(data);
+                }
+            ).catch(error => {
+                console.log(error);
+            })
+        },
+        editComment(id, comment) {
+            axios({
+                method: 'put',
+                url: '/api/editComment',
+                params: {
+                    id: id,
+                    idClient: this.editedItem.id,
+                    comment: comment
+                }
+            })
+            .then(
+                response => {
+                    let data = response.data;
+                    this.editFiles(data);
+                }
+            ).catch(error => {
+                console.log(error);
+            })
         },
         removeFile(data) {
             this.deleteFile = true;

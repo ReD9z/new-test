@@ -101,6 +101,9 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::get('managersAddress/{id}', 'Api\ClientsController@managersAddress'); // Show managersAddress list
         Route::put('clientsFiles', 'Api\ClientsController@loadFiles'); // Load files
         Route::delete('clientsFiles', 'Api\ClientsController@loadFiles'); // Delete files
+        Route::post('clientsComment', 'Api\ClientsController@addComment'); // add Comment
+        Route::delete('deleteComment', 'Api\ClientsController@addComment'); // add Comment
+        Route::put('editComment', 'Api\ClientsController@addComment'); // add Comment
        
         // Installers
         Route::post('installers', 'Api\InstallersController@store');  // Add one item
