@@ -265,6 +265,7 @@
         <div v-show="params.filter">
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
             <v-chip v-for="(item, key) in chipsStatus" :key="'K'+ key" close @input="removeStatus(item)">{{item}}</v-chip>
+            <v-chip close @input="resetDate()">Задачи {{dateStartClient}} - {{dateEndClient}}</v-chip>
         </div>
         <v-icon v-if="showRoles()" v-show="params.filter">filter_list</v-icon>
         <v-menu v-if="showRoles()" v-show="params.filter" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
@@ -424,8 +425,8 @@ export default {
         deleteImage: false,
         desserts: [],
         editedIndex: -1,
-        dateStartClient: null,
-        dateEndClient: null,
+        dateStartClient: new Date().toISOString().substr(0, 10),
+        dateEndClient: new Date().toISOString().substr(0, 10),
         loadImages: false,
         editedItem: {},
         defaultItem: {},
@@ -629,6 +630,8 @@ export default {
         resetDate() {
             this.dateStart = null;
             this.dateEnd = null;
+            this.dateStartClient = null;
+            this.dateEndClient = null;
             this.initialize();
             this.chips = [];
             this.orderDate = this.orderFull;
