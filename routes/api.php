@@ -98,7 +98,7 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('clients', 'Api\ClientsController@store');  // Edit one item
         Route::delete('clients/{id}', 'Api\ClientsController@destroy'); // Delete one item
         Route::get('clients', 'Api\ClientsController@index'); // Show list
-        Route::get('managersAddress/{id}', 'Api\ClientsController@managersAddress'); // Show managersAddress list
+        Route::get('managersAddress/{id}', 'Api\ClientsController@managersAddress'); // Show managers address list
         Route::put('clientsFiles', 'Api\ClientsController@loadFiles'); // Load files
         Route::delete('clientsFiles', 'Api\ClientsController@loadFiles'); // Delete files
         Route::post('clientsComment', 'Api\ClientsController@addComment'); // add Comment

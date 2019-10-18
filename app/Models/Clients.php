@@ -23,18 +23,12 @@ class Clients extends Model
         return $this->hasMany('App\Models\CommentToFiles', 'client_id', 'id');
     }
 
-    // public function comments() {
-    //     return $this->belongsToMany('App\Models\CommentToFiles', 'comment_to_files',  'client_id' , 'files_id');
-    // }
-
-    // public function comments() {
-    //     return $this->hasMany('App\Models\CommentToFiles', 'files_id', 'id');
-    // }
-
     public static function saveTableFiles($files, $id, $comment)
     {
         DB::table('client_to_files')->insert(['client_id' => $id, 'files_id' => $files]);
-        DB::table('comment_to_files')->insert(['client_id' => $id, 'files_id' => $files, 'comment' => $comment]);
+        if ($comment) {
+            DB::table('comment_to_files')->insert(['client_id' => $id, 'files_id' => $files, 'comment' => $comment]);
+        }
     }
 
     public static function removeTableFiles($id)

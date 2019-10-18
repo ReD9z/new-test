@@ -68,7 +68,6 @@
     <v-navigation-drawer v-model="dialogFiles" right temporary fixed width="400px">
         <v-card class="borderNone">
             <v-toolbar color="pink" dark>
-                <!-- <v-toolbar-title>Файлы</v-toolbar-title> -->
                 <v-text-field color="#fff" v-model="comment" placeholder="Комментарий" required></v-text-field>
                 <v-spacer></v-spacer>
                 <v-icon black @click='pickFiles'>control_point</v-icon>
@@ -114,22 +113,17 @@
                                                 </v-btn>
                                             </template>
                                         </v-text-field>
-                                        <!-- <b-comment v-for="(value, keys) in addClientFiles.comments" :id="editedItem.id" :params="value" :file="file" :key="keys"></b-comment> -->
                                         <div v-for="(value, keys) in addClientFiles.comments" :key="keys">
                                             <v-layout v-if="value.files_id == file.id" >
                                                 <v-flex xs9>
                                                     <v-textarea rows="1" class="pb-0 pt-0 pr-0 pl-0" v-model="value.comment" placeholder="Комментарий" required></v-textarea>
-                                                    <!-- <v-card-text class="px-0"><v-icon small>textsms</v-icon> {{value.comment}}</v-card-text> -->
                                                 </v-flex>
                                                 <v-flex xs2>
                                                     <v-layout row wrap>
                                                         <v-flex xs6>
-                                                            <v-btn @click='showEdit(value)' icon>
+                                                            <v-btn @click='editComment(value.id, value.comment)' icon>
                                                                 <v-icon color="lighten-1" small>save</v-icon>
                                                             </v-btn>
-                                                            <!-- <v-btn @click='editComment(value.id, value.comment)' icon>
-                                                                <v-icon color="lighten-1" small>edit</v-icon>
-                                                            </v-btn> -->
                                                         </v-flex>
                                                         <v-flex xs6>
                                                             <v-btn @click='removeComment(value.id)' icon>

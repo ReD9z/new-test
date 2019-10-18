@@ -265,7 +265,8 @@
         <div v-show="params.filter">
             <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
             <v-chip v-for="(item, key) in chipsStatus" :key="'K'+ key" close @input="removeStatus(item)">{{item}}</v-chip>
-            <v-chip close @input="resetDate()">Задачи {{dateStartClient}} - {{dateEndClient}}</v-chip>
+            <v-chip v-if="dateStartClient" close @input="resetDate()">Начало {{dateStartClient}}</v-chip>
+            <v-chip v-if="dateEndClient" close @input="resetDate()">Конец {{dateEndClient}}</v-chip>
         </div>
         <v-icon v-if="showRoles()" v-show="params.filter">filter_list</v-icon>
         <v-menu v-if="showRoles()" v-show="params.filter" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
@@ -300,7 +301,7 @@
                         <v-layout row wrap>
                             <v-flex pt-1 xs12>
                                 <v-menu
-                                    v-model="menu1"
+                                    v-model="menu4"
                                     :close-on-content-click="false"
                                     :nudge-right="40"
                                     lazy
@@ -320,12 +321,12 @@
                                             v-on="on"
                                         ></v-text-field>
                                     </template>
-                                    <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateStart" no-title @input="menu1 = false"></v-date-picker>
+                                    <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateStartNew" no-title @input="menu4 = false"></v-date-picker>
                                 </v-menu>
                             </v-flex>
                             <v-flex pb-4 xs12>
                                 <v-menu
-                                    v-model="menu2"
+                                    v-model="menu5"
                                     :close-on-content-click="false"
                                     :nudge-right="40"
                                     lazy
@@ -345,7 +346,7 @@
                                             v-on="on"
                                         ></v-text-field>
                                     </template>
-                                    <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateEnd" no-title @input="menu2 = false"></v-date-picker>
+                                    <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateEndNew" no-title @input="menu5 = false"></v-date-picker>
                                 </v-menu>
                             </v-flex>
                         </v-layout>
@@ -422,11 +423,13 @@ export default {
         loadingExcel: false,
         chipsStatus: [],
         files: [],
+        dateStartNew: null,
+        dateEndNew: null,
         deleteImage: false,
         desserts: [],
         editedIndex: -1,
-        dateStartClient: new Date().toISOString().substr(0, 10),
-        dateEndClient: new Date().toISOString().substr(0, 10),
+        dateStartClient: vm.formatDate(new Date().toISOString().substr(0, 10)),
+        dateEndClient: vm.formatDate(new Date().toISOString().substr(0, 10)),
         loadImages: false,
         editedItem: {},
         defaultItem: {},
@@ -449,6 +452,8 @@ export default {
         dateEnd: null,
         menu1: false,
         menu2: false,
+        menu4: false,
+        menu5: false,
         orderDate: [],
         orderFull: []
     }),
@@ -470,12 +475,12 @@ export default {
         search: _.debounce(function () {
             this.initialize()
         }, 400),
-        dateStart(val) {
-            this.dateStartFormatted = this.formatDate(this.dateStart);
+        dateStartNew(val) {
+            this.dateStartClient = this.formatDate(this.dateStartNew);
             this.initialize();
         },
-        dateEnd(val) {
-            this.dateEndFormatted = this.formatDate(this.dateEnd);
+        dateEndNew(val) {
+            this.dateEndClient = this.formatDate(this.dateEndNew);
             this.initialize();
         },
         chips(val) {
@@ -617,8 +622,8 @@ export default {
                 this.orderDate.map(function (item) {
                     let itemDateStart = vm.$moment(item.order_start_date, 'DD.MM.YYYY').unix() * 1000;
                     let itemDateEnd = vm.$moment(item.order_start_date, 'DD.MM.YYYY').unix() * 1000;
-                    let dateStart = vm.$moment(vm.formatDate(vm.dateStart), 'DD.MM.YYYY').unix() * 1000;
-                    let dateEnd = vm.$moment(vm.formatDate(vm.dateEnd), 'DD.MM.YYYY').unix() * 1000;
+                    let dateStart = vm.$moment(vm.formatDate(vm.dateStartNew), 'DD.MM.YYYY').unix() * 1000;
+                    let dateEnd = vm.$moment(vm.formatDate(vm.dateEndNew), 'DD.MM.YYYY').unix() * 1000;
             
                     if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
                         orderData.push(item);
@@ -628,8 +633,8 @@ export default {
             } 
         },
         resetDate() {
-            this.dateStart = null;
-            this.dateEnd = null;
+            this.dateStartNew = null;
+            this.dateEndNew = null;
             this.dateStartClient = null;
             this.dateEndClient = null;
             this.initialize();
@@ -657,8 +662,8 @@ export default {
         refreshSearch() {
             this.loading = true;
             this.search = '';
-            this.dateStart = null;
-            this.dateEnd = null;
+            this.dateStartNew = null;
+            this.dateEndNew = null;
             this.chips = [];
             this.initialize();
         },
@@ -690,8 +695,8 @@ export default {
                     if(this.dateStartClient && this.dateEndClient) {
                         this.desserts = this.desserts.filter(function (item) {
                             let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
-                            let dateStart = vm.$moment(vm.formatDate(vm.dateStart), 'DD.MM.YYYY').unix() * 1000;
-                            let dateEnd = vm.$moment(vm.formatDate(vm.dateEnd), 'DD.MM.YYYY').unix() * 1000;
+                            let dateStart = vm.$moment(vm.formatDate(vm.dateStartNew), 'DD.MM.YYYY').unix() * 1000;
+                            let dateEnd = vm.$moment(vm.formatDate(vm.dateEndNew), 'DD.MM.YYYY').unix() * 1000;
                             if(itemDateStart >= dateStart && itemDateStart <= dateEnd) {
                                 return item;
                             } 
