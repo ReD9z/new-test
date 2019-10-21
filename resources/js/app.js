@@ -50,6 +50,7 @@ Vue.component('b-maps', require('./components/bMaps.vue').default);
 Vue.component('b-table-task', require('./components/tables/task/bTableTask.vue').default);
 Vue.component('b-table-address', require('./components/tables/address/bTableAddress.vue').default);
 Vue.component('b-table-clients', require('./components/tables/clients/bTableClients.vue').default);
+Vue.component('b-add-client', require('./components/bAddClient.vue').default);
 
 let router = new VueRouter({
     mode: 'history',

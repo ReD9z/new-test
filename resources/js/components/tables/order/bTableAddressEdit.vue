@@ -102,7 +102,7 @@
             </v-form>
         </v-card-text>
     </v-card>
-    <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
+    <v-navigation-drawer v-model="dialogImages" right hide-overlay stateless fixed width="700px">
         <v-card class="borderNone">
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>Изображения</v-toolbar-title>

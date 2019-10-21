@@ -5,7 +5,7 @@
         <v-spacer></v-spacer>
         <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать</v-btn>
     </v-toolbar>
-    <v-navigation-drawer v-model="dialog" right temporary fixed>
+    <v-navigation-drawer v-model="dialog" right hide-overlay stateless fixed>
         <v-card class="borderNone">
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
@@ -65,7 +65,7 @@
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
-    <v-navigation-drawer v-model="dialogFiles" right temporary fixed width="400px">
+    <v-navigation-drawer v-model="dialogFiles" right hide-overlay stateless fixed width="400px">
         <v-card class="borderNone">
             <v-toolbar color="pink" dark>
                 <v-text-field color="#fff" v-model="comment" placeholder="Комментарий" required></v-text-field>

@@ -5,7 +5,7 @@
         <v-spacer></v-spacer>
         <v-btn color="green" v-show="hideElem()" large class="mb-2 white--text" to="orders-create"><v-icon left>add</v-icon>Создать заказ</v-btn>
     </v-toolbar>
-    <v-navigation-drawer v-model="dialog" right temporary fixed>
+    <v-navigation-drawer v-model="dialog" right hide-overlay stateless fixed>
         <v-card height="100%">
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
