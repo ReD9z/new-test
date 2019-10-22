@@ -25,6 +25,9 @@ class Tasks extends JsonResource
             'types' => $this->types ? $this->types->title : null,
             'types_to_works_id' => $this->types_to_works_id,
             'task_date_completion' => date("d.m.Y", strtotime($this->task_date_completion)),
+            'number_addresses' => $this->orders ? count($this->orders->orderAddress) : null,
+            'number_entrances' => $this->orders ? $this->countAdresses($this->orders->orderAddress) : null,
+            // 'city' => $this->orders ? $this->orders->clients : null, город
             'comment' => $this->comment,
             'orderAddresses' => $this->orders ? $this->orders->orderAddress : null,
             'status' => $this->status,

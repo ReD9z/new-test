@@ -2,7 +2,7 @@
 <div>
     <v-dialog
       v-model="addClient"
-      max-width="600px"
+      max-width="700px"
     >
         <b-add-client></b-add-client>
     </v-dialog>
@@ -24,7 +24,7 @@
         <v-btn v-show="hideElem()" color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
     </v-toolbar>
     <v-navigation-drawer v-model="dialog" right hide-overlay stateless fixed>
-        <v-card height="100%">
+        <v-card  class="borderNone">
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
                 <v-spacer></v-spacer>
@@ -550,9 +550,16 @@
 </div>
 </template>
 <script>
+import Vue from 'vue'
+import VeeValidate from 'vee-validate'
 import XLSX from 'xlsx';
+
+Vue.use(VeeValidate);
+
 export default {
-    inject: ['$validator'],
+    $_veeValidate: {
+      validator: 'new'
+    },
     data: (vm) => ({
         statusFilter: ['Завершена', 'В работе'],
         search: '',
@@ -831,17 +838,33 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
+                    // console.log(response.data);
                     let vm = this;
-                    if(this.dateStartClient && this.dateEndClient) {
-                        this.desserts = this.desserts.filter(function (item) {
-                            let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
-                            let dateStart = vm.$moment(vm.formatDate(vm.dateStartNew), 'DD.MM.YYYY').unix() * 1000;
-                            let dateEnd = vm.$moment(vm.formatDate(vm.dateEndNew), 'DD.MM.YYYY').unix() * 1000;
-                            if(itemDateStart >= dateStart && itemDateStart <= dateEnd) {
-                                return item;
-                            } 
-                        });
+                    if(this.params.baseUrl == '/api/tasks') {
+                        if(this.dateStart && this.dateEnd) {
+                            this.desserts = this.desserts.filter(function (item) {
+                                let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
+                                let dateStart = vm.$moment(vm.formatDate(vm.dateStart), 'DD.MM.YYYY').unix() * 1000;
+                                let dateEnd = vm.$moment(vm.formatDate(vm.dateEnd), 'DD.MM.YYYY').unix() * 1000;
+                                if(itemDateStart >= dateStart && itemDateStart <= dateEnd) {
+                                    return item;
+                                } 
+                            });
+                        } 
                     } 
+                    if(!this.params.baseUrl == '/api/tasks') {
+                        if(this.dateStartClient && this.dateEndClient) {
+                            this.desserts = this.desserts.filter(function (item) {
+                                let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
+                                let dateStart = vm.$moment(vm.formatDate(vm.dateStartNew), 'DD.MM.YYYY').unix() * 1000;
+                                let dateEnd = vm.$moment(vm.formatDate(vm.dateEndNew), 'DD.MM.YYYY').unix() * 1000;
+                                if(itemDateStart >= dateStart && itemDateStart <= dateEnd) {
+                                    return item;
+                                } 
+                            });
+                        }
+                    }
+                    
                     this.filteredItems(this.desserts);
                     this.filtered(this.desserts); 
                     this.filteredStatus(this.desserts);
@@ -1056,11 +1079,7 @@ export default {
                     })
                     .then(
                         response => {
-                            if (this.editedIndex > -1) {
-                                this.initialize()
-                            } else {
-                                this.initialize()
-                            }
+                            this.initialize();
                             this.loaderSaveBtn = null;
                             this.loadingSaveBtn = false;
                             this.close();

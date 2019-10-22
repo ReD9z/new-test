@@ -53,6 +53,10 @@ export default {
                     validate: 'required'
                 },
                 {
+                    data: [	
+                        {status: 1, text: 'В работе'},	
+                        {status: 2, text: 'Завершена'}	
+                    ],
                     input: "status",
                     value: "status",
                     title: "statusName",
