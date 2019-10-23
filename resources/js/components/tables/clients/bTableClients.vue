@@ -84,7 +84,6 @@
                                 <v-list-tile-avatar>
                                     <v-icon class="blue white--text">cloud</v-icon>
                                 </v-list-tile-avatar>
-
                                 <v-list-tile-content>
                                     <v-list-tile-title><a :href="'/storage/' + file.url" download>{{file.url.replace('upload/', '')}}</a></v-list-tile-title>
                                 </v-list-tile-content>
@@ -114,7 +113,7 @@
                                             </template>
                                         </v-text-field>
                                         <div v-for="(value, keys) in addClientFiles.comments" :key="keys">
-                                            <v-layout v-if="value.files_id == file.id" >
+                                            <v-layout v-if="value.files_id == file.id">
                                                 <v-flex xs9>
                                                     <v-textarea rows="1" class="pb-0 pt-0 pr-0 pl-0" v-model="value.comment" placeholder="Комментарий" required></v-textarea>
                                                 </v-flex>

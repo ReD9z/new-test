@@ -18,7 +18,7 @@
                     </v-list-tile>
                 </v-list>
             </v-toolbar>
-            <v-list class="white--text pt-0" dense>
+            <v-list class="white--text pt-0 icon-menu-padding" dense>
                 <v-divider></v-divider>
                 <div v-for="(item, key) in items" :key="key">
                     <v-list-tile v-show="roleUser(isUserRole, item.role)" :to="{ name: item.src }" active-class="active" v-if="!item.wrapLink">	
@@ -43,8 +43,8 @@
                         </div>
                     </v-list-group>
                 </div>
-                <v-list-tile  @click="exit()">
-                    <v-list-tile-action class="text-xs-center">
+                <v-list-tile class="exit-style-menu" @click="exit()">
+                    <v-list-tile-action>
                         <v-progress-circular
                             v-if="exitProgress"
                             size = "20"

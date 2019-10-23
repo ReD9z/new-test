@@ -1,4 +1,5 @@
 <template>
+<v-dialog v-model="dialog" max-width="700px">
     <v-card>
         <v-card-title>
             <span class="pa-2 headline">Добавить клиента</span>
@@ -6,7 +7,7 @@
         <v-form ref="forms2" v-model="valid" lazy-validation>
             <v-layout class="pa-3" wrap>
                 <v-flex xs12 sm6>
-                    <v-text-field 
+                    <v-text-field
                         data-vv-as="`Имя`" 
                         data-vv-name="name" 
                         :error-messages="errors.collect('name')"
@@ -20,14 +21,13 @@
                     </v-text-field>
                     <v-text-field 
                         class="pa-2"
-                        type="email" 
+                        :data-vv-as="'`Email`'" 
+                        :data-vv-name="'email'" 
+                        :error-messages="errors.collect('email')"
+                        v-validate="'required|email'" 
                         v-model="editedItem.email" 
                         label="Email" 
-                        v-validate="required"
-                        data-vv-name="email" 
-                        :error-messages="errors.collect('email')" 
-                        data-vv-as="`Email`"
-                        xs12>
+                        xs12 required>
                     </v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6>
@@ -58,9 +58,10 @@
                 <v-flex xs12 sm6>
                     <v-text-field 
                         data-vv-as="`Пароль`" 
+                        type="password"
                         data-vv-name="password" 
                         :error-messages="errors.collect('password')"
-                        v-validate="editedItem.password ? {required:true, regex:/^\S*$/ , min:6} : ''"
+                        v-validate="editedItem.password ? {required:true, regex:/^\S*$/ , min:6} : required"
                         v-model="editedItem.password" 
                         label="Пароль" 
                         xs12 
@@ -186,26 +187,49 @@
                 </v-flex>
             </v-layout>
         </v-form>
-        <v-card-actions>
+        <v-card-actions class="pa-2">
             <v-spacer></v-spacer>
-            <!-- <v-btn color="blue darken-1" flat @click="dialog = false">Закрыть</v-btn> -->
-            <v-btn color="blue darken-1" flat @click="save()">Сохранить</v-btn>
+            <div class="text-xs-center pa-3">
+                <v-btn color="info" @click="save()" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
+                    Сохранить
+                    <template v-slot:loaderSaveBtn>
+                        <span class="custom-loader">
+                            <v-icon light>cached</v-icon>
+                        </span>
+                    </template>
+                </v-btn>
+            </div>
         </v-card-actions>
     </v-card>
+</v-dialog>
 </template>
 <script>
-import Vue from 'vue'
-import VeeValidate from 'vee-validate'
+import Vue from 'vue';
+import VeeValidate from 'vee-validate';
 
 export default {
     $_veeValidate: {
         validator: 'new'
+    },
+    props: {
+        addClient: Boolean
+    },
+    watch: {
+        addClient(newVal, oldVal) {
+            if(newVal) {
+                this.dialog = newVal;
+            }else {
+                this.dialog = oldVal;
+            }
+        }
     },
     data: () => ({
         dialog: false,
         required: "required",
         valid: true,
         select: [],
+        loadingSaveBtn: false,
+        loaderSaveBtn: null,
         editedItem: {
             name: '',
             email: '',
@@ -225,12 +249,14 @@ export default {
     }),
     async created () {
         await this.citySelect();
-        
     },
     methods: { 
         save () {
+            this.$emit('update:addClient', false)
             this.$validator.validateAll().then(() => {
                 if(this.$validator.errors.items.length == 0) {
+                    this.loaderSaveBtn = true;
+                    this.loadingSaveBtn = true;
                     axios({
                         method: 'post',
                         url: '/api/clients',
@@ -238,20 +264,15 @@ export default {
                     })
                     .then(
                         response => {
-                            console.log(response)
-                            // if (this.editedIndex > -1) {
-                            //     this.initialize()
-                            // } else {
-                            //     this.initialize()
-                            // }
-                            // this.loaderSaveBtn = null;
-                            // this.loadingSaveBtn = false;
-                            // this.close();
-                            // this.$refs.forms.reset();
+                            this.loaderSaveBtn = null;
+                            this.loadingSaveBtn = false;
+                            this.$refs.forms2.reset();
+                            this.$emit('update:addClient', false)
+                            this.$validator.reset();
+                            this.dialog = false;
                         }
                     ).catch(error => {
                         if(error.response.status == 422) {
-                            console.log(error.response.data.errors.email);
                             if(error.response.data.errors.email) {
                                 const error = {
                                     field: "email",
@@ -259,13 +280,12 @@ export default {
                                     rule: 'required', 
                                     scope: null,
                                     regenerate: () => 'some string', 
-                                    vmId: 4,
+                                    vmId: 88,
                                     id: "2"
                                 };
-                                console.log(this.errors);
                                 this.errors.items.push(error);
-                                // this.loaderSaveBtn = null;
-                                // this.loadingSaveBtn = false;
+                                this.loaderSaveBtn = null;
+                                this.loadingSaveBtn = false;
                             }
                         }
                     })  
@@ -282,9 +302,7 @@ export default {
             .then(
                 res => {
                     if(res) {
-                        console.log(res.data);
                         this.select.push(res.data);
-                        
                     }
                 }
             ).catch(

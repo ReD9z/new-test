@@ -1,11 +1,6 @@
 <template>
 <div>
-    <v-dialog
-      v-model="addClient"
-      max-width="700px"
-    >
-        <b-add-client></b-add-client>
-    </v-dialog>
+    <b-add-client :addClient.sync="addClient" v-on:input="$emit('addClient', $event.target.value)"></b-add-client>
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
@@ -263,7 +258,7 @@
                                                 xs10
                                             >
                                                 <v-autocomplete
-                                                    :items="item.data"
+                                                    :items="clientArr"
                                                     v-model="editedItem[param.value]"
                                                     :item-text="param.selectText"
                                                     item-value="id"
@@ -278,16 +273,17 @@
                                             <v-flex
                                                 xs2
                                             >
-                                                <v-btn
-                                                    color="primary"
-                                                    dark
-                                                    block
-                                                    small
-                                                    icon
-                                                    @click.stop="addClient = true"
-                                                >
-                                                    <v-icon small>add</v-icon>
-                                                </v-btn>
+                                                <div class="text-xs-center">
+                                                    <v-btn
+                                                        color="primary"
+                                                        dark
+                                                        small
+                                                        icon
+                                                        @click.stop="addClient = !addClient"
+                                                    >
+                                                        <v-icon small>add</v-icon>
+                                                    </v-btn>
+                                                </div>
                                             </v-flex>
                                         </v-layout>
                                     </div>
@@ -558,7 +554,7 @@ Vue.use(VeeValidate);
 
 export default {
     $_veeValidate: {
-      validator: 'new'
+        validator: 'new'
     },
     data: (vm) => ({
         statusFilter: ['Завершена', 'В работе'],
@@ -602,7 +598,8 @@ export default {
         menu4: false,
         menu5: false,
         orderDate: [],
-        orderFull: []
+        orderFull: [],
+        clientArr: []
     }),
     props: {
         params: Object
@@ -635,12 +632,18 @@ export default {
         },
         chipsStatus() {
             this.initialize();
+        },
+        addClient(newVal) {
+            if (newVal == false) {
+                this.selectClient();
+            }
         }
     },
     async created () {
         await this.initialize();
         await this.selectStatus();
         await this.getFiltered();
+        await this.selectClient();
     },
     methods: {
         async getFiltered() {
@@ -838,7 +841,6 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
-                    // console.log(response.data);
                     let vm = this;
                     if(this.params.baseUrl == '/api/tasks') {
                         if(this.dateStart && this.dateEnd) {
@@ -852,7 +854,7 @@ export default {
                             });
                         } 
                     } 
-                    if(!this.params.baseUrl == '/api/tasks') {
+                    if(this.params.baseUrl != '/api/tasks') {
                         if(this.dateStartClient && this.dateEndClient) {
                             this.desserts = this.desserts.filter(function (item) {
                                 let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
@@ -881,6 +883,26 @@ export default {
             if (!date) return null
             const [year, month, day] = date.split('-')
             return `${day}.${month}.${year}`
+        },
+        selectClient() {
+            axios({
+                method: 'get',
+                url: '/api/clients',
+                params: {
+                    city: this.roleUserCity(),
+                }
+            })
+            .then(
+                res => {
+                    if(res) {
+                        this.clientArr = res.data;
+                    }
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            ); 
         },
         selectStatus() {
             this.params.headers.forEach(element => {
