@@ -10,6 +10,7 @@ export default {
     data: () => ({
         params: {
             baseUrl: '/api/tasks',
+            excelTask: false,
             headers: [
                 {
                     text: 'Заказ',

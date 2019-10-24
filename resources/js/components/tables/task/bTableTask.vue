@@ -5,6 +5,26 @@
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn
+            color="#f2994a"
+            class="white--text"
+            large
+            :loading="loadingExcelTask"
+            :disabled="loadingExcelTask"
+            @click='loadExcelTask'
+            v-show="params.excelTask"
+        >
+            <v-icon left>vertical_align_bottom</v-icon>
+            Добавить Excel
+            <input
+                type="file"
+                style="display: none"
+                ref="excelTask"
+                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                @change="elementLoadToFileTask"
+                multiple
+            >
+        </v-btn>
+        <v-btn
             v-show="desserts.length > 0 && params.excel"
             color="#f2994a"
             class="white--text"
@@ -559,6 +579,7 @@ export default {
     data: (vm) => ({
         statusFilter: ['Завершена', 'В работе'],
         search: '',
+        loadingExcelTask: false,
         dialog: false,
         addClient: false,
         dialogImages: false,
@@ -937,6 +958,25 @@ export default {
                     ); 
                 }
             });
+        },
+        loadExcelTask() {
+            this.$refs.excelTask.click();
+        },
+        elementLoadToFileTask() {
+            // this.loadingExcel = true;
+            let file = this.$refs.excelTask.files[0];
+            let reader = new FileReader();
+            let vm = this;
+            reader.readAsBinaryString(file);
+            reader.onload = function (e) {
+                let workbook = XLSX.read(e.target.result, {
+                    type: 'binary'
+                });
+                let firstSheet = workbook.SheetNames[0];
+                let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+                vm.$refs.excelTask.value = '';
+                console.log(excelRows);
+            };
         },
         elementLoadToFileImage() {
             this.loadImages = true;

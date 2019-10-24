@@ -10,6 +10,7 @@ export default {
     data: () => ({
         params: {
             baseUrl: '/api/managerTask',
+            excelTask: true,
             headers: [
                 {
                     text: 'ФИО клиента',
