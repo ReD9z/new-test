@@ -56,6 +56,49 @@ class ManagerTaskController extends Controller
         }
     }
 
+    public function addExcelTask(Request $request)
+    {
+        function mb_ucfirst($word)
+        {
+            return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
+        }
+
+        // $users = $request->isMethod('put') ? User::findOrFail($request->users_id) : new User;
+
+        if(count($request->input()) == 8) {
+            $data = [];
+            $tasks = new ManagerTask;
+
+            $tasks->id = $request->input('id');
+            $tasks->client_id = null; // Добавить клиента
+            $tasks->manager_id = null;
+            $tasks->status = '2';
+            if(array_values($request->input())[1]) {
+                $tasks->task_date_completion = array_values($request->input())[1] ? date("Y-m-d 00:00:00", strtotime(array_values($request->input())[1])) : null;
+            } else {
+                $tasks->task_date_completion = $tasks->status == '2' ? date("Y-m-d 00:00:00") : null;
+            }
+            $tasks->comment = array_values($request->input())[7];
+            $tasks->result = null;
+            $tasks->save();
+
+            $data = new ManagerTaskResource($tasks);
+
+            // $tasks->orders_id =  array_values($request->input())[2];
+            // $tasks->installer_id = array_values($request->input())[3];
+            // $tasks->types_to_works_id = array_values($request->input())[4];
+            // $tasks->status = array_values($request->input())[5];
+            // $tasks->task_date_completion = array_values($request->input())[6];
+            // $tasks->comment = array_values($request->input())[7];
+            // $tasks->save();
+            
+            // $data = new AddressResource($task);
+            // date('d M Y H:i:s Z',$timestamp)
+            return response()->json(['errors' => [], 'data' => $data, 'status' => 200], 200);
+        }
+    }
+
+
     /**
      * Display the specified resource.
      *

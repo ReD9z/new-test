@@ -78,7 +78,7 @@ export default {
                     sortable: true,
                 },
                 { 
-                    text: 'Описание задачи', 
+                    text: 'Комментарий', 
                     input: "text",
                     sortable: true,
                     value: 'comment',

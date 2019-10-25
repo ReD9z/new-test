@@ -973,10 +973,34 @@ export default {
                     type: 'binary'
                 });
                 let firstSheet = workbook.SheetNames[0];
-                let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-                vm.$refs.excelTask.value = '';
-                console.log(excelRows);
+                let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet],  {raw: false});
+                vm.loadExecelTask(excelRows);
+                console.table(excelRows);
             };
+        },
+        async loadExecelTask(file) {
+            let vm = this;
+            await file.forEach(function (item) {
+                axios({
+                    method: 'post',
+                    url: '/api/addExcelTask',
+                    data: item
+                })
+                .then(
+                    response => {
+                        let array = response.data.data;
+                        if(array != undefined) {
+                            vm.desserts.push(array);
+                        }
+                        setTimeout(() => (vm.loadingExcel = false), 1000);
+                        vm.$refs.excelTask.value = '';
+                    }
+                ).catch(error => {
+                    console.log(error);
+                });
+            })
+            await this.getFiltered();
+            await this.selectStatus();
         },
         elementLoadToFileImage() {
             this.loadImages = true;
