@@ -979,6 +979,7 @@ export default {
             };
         },
         async loadExecelTask(file) {
+            this.loadingExcelTask = true;
             let vm = this;
             await file.forEach(function (item) {
                 axios({
@@ -994,6 +995,7 @@ export default {
                         }
                         setTimeout(() => (vm.loadingExcel = false), 1000);
                         vm.$refs.excelTask.value = '';
+                        vm.loadingExcelTask = false;
                     }
                 ).catch(error => {
                     console.log(error);
