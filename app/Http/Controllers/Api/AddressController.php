@@ -44,7 +44,9 @@ class AddressController extends Controller
         $address->house_number = $request->input('house_number');
         $address->number_entrances = $request->input('number_entrances');
         $address->management_company = $request->input('management_company');
-    
+        $address->coordinates = $request->input('coordinates');
+
+
         if($address->save()) {
             return new AddressResource($address);
         }
@@ -85,6 +87,7 @@ class AddressController extends Controller
             $address->house_number = array_values($request->input())[3];
             $address->number_entrances = array_values($request->input())[4];
             $address->management_company = array_values($request->input())[5];
+            $address->coordinates =  array_values($request->input())[6];
             $address->save();
             
             $data = new AddressResource($address);

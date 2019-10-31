@@ -50,7 +50,18 @@
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
                         <div v-if="param.input == 'text' && param.value != 'result'">
-                            <v-text-field :data-vv-name="param.value" :data-vv-as="'`'+param.text+'`'" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
+                            <v-text-field 
+                                :data-vv-name="param.value" 
+                                :data-vv-as="'`'+param.text+'`'" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate" 
+                                v-model="editedItem[param.value]" 
+                                :label="param.text" 
+                                v-if="param.input !== 'images' && param.edit != true" 
+                                xs12 
+                                required
+                            >
+                            </v-text-field>
                         </div>
                         <div v-if="param.input == 'select'">
                             <v-autocomplete
@@ -242,6 +253,11 @@ export default {
         this.initialize();
         this.selectStatus();
         this.getFiltered();
+
+        let scriptYandexMap = document.createElement('script');
+        scriptYandexMap.setAttribute('src', 'https://api-maps.yandex.ru/2.1/?apikey=4fa86d95-9009-491e-9dbc-762df5da5650&lang=ru_RU');
+        document.head.appendChild(scriptYandexMap);
+
     },
     methods: {
         formatDate (date) {
@@ -589,7 +605,27 @@ export default {
             }, 300)
             this.$validator.reset()
         },
+       
+        mapsGeo() {
+            let vm = this;
+            this.selectCity.filter(res => 
+                res.id == this.editedItem.city_id ? this.editedItem.city = res.name : null
+            );
+         
+            var coord = [];
+         
+            ymaps.geocode(vm.editedItem.city + ", " + vm.editedItem.street + ", " + vm.editedItem.house_number).then(function(res) {
+                let coord2 = res.geoObjects.get(0).geometry.getCoordinates();
+                coord.push(coord2);
+                vm.editedItem.coordinates = coord2[0] + ", " + coord2[1];
+                
+            });
+
+            console.log(coord);
+          
+        },
         save () {
+            this.mapsGeo();
             this.$validator.validateAll().then(() => {
                 if(this.$validator.errors.items.length == 0) {
                     this.loaderSaveBtn = true;

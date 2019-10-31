@@ -863,6 +863,7 @@ export default {
                 response => {
                     this.desserts = response.data;
                     let vm = this;
+                    console.log(response);
                     if(this.params.baseUrl == '/api/tasks') {
                         if(this.dateStart && this.dateEnd) {
                             this.desserts = this.desserts.filter(function (item) {
@@ -887,7 +888,6 @@ export default {
                             });
                         }
                     }
-                    
                     this.filteredItems(this.desserts);
                     this.filtered(this.desserts); 
                     this.filteredStatus(this.desserts);
@@ -963,7 +963,6 @@ export default {
             this.$refs.excelTask.click();
         },
         elementLoadToFileTask() {
-            // this.loadingExcel = true;
             let file = this.$refs.excelTask.files[0];
             let reader = new FileReader();
             let vm = this;

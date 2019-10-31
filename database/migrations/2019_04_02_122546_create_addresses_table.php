@@ -23,6 +23,7 @@ class CreateAddressesTable extends Migration
             $table->string('house_number')->nullable();
             $table->string('number_entrances')->nullable();
             $table->string('management_company')->nullable();
+            $table->string('coordinates')->nullable();
             $table->timestamps();
         });
     }
