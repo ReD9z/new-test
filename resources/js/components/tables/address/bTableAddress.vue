@@ -203,6 +203,7 @@ export default {
         deleteImage: false,
         desserts: [],
         editedIndex: -1,
+        geo: [],
         editedItem: {},
         defaultItem: {},
         selectCity: [],
@@ -247,6 +248,10 @@ export default {
         },
         'editedItem.city_id'(val) {
             this.selectStatus()
+        },
+        geo(val) {
+            this.editedItem.coordinates = val[0] + ", " +val[1];
+            console.log(this.editedItem);
         }
     },
     created () {
@@ -612,20 +617,14 @@ export default {
                 res.id == this.editedItem.city_id ? this.editedItem.city = res.name : null
             );
          
-            var coord = [];
-         
             ymaps.geocode(vm.editedItem.city + ", " + vm.editedItem.street + ", " + vm.editedItem.house_number).then(function(res) {
-                let coord2 = res.geoObjects.get(0).geometry.getCoordinates();
-                coord.push(coord2);
-                vm.editedItem.coordinates = coord2[0] + ", " + coord2[1];
-                
+                vm.geo = res.geoObjects.get(0).geometry.getCoordinates();    
             });
-
-            console.log(coord);
           
         },
         save () {
             this.mapsGeo();
+          
             this.$validator.validateAll().then(() => {
                 if(this.$validator.errors.items.length == 0) {
                     this.loaderSaveBtn = true;
