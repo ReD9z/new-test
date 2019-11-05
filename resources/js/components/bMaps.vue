@@ -44,18 +44,15 @@ export default {
                 vm.items.forEach((element) => {
                     if(element.data != null) {
                         vm.mapsShow = true;
-                        ymaps.geocode(element.city + ", " + element.street + ", " + element.house_number).then(function(res) {
-                            const coord = res.geoObjects.get(0).geometry.getCoordinates();
-                            const address = res.metaData.geocoder.request;
-
-                            const myPlacemark = new ymaps.Placemark(coord, {
-                                preset: 'islands#blueDotIcon',
-                                balloonContent: address,
-                                draggable: true,
-                            });
-                            vm.mapLoader = false;
-                            myMap.geoObjects.add(myPlacemark);    
+                        console.log(element.coordinates.split(', ') )
+                        const myPlacemark = new ymaps.Placemark(element.coordinates.split(', '), {
+                            preset: 'islands#blueDotIcon',
+                            balloonContent: element.city + ", " + element.street + ", " + element.house_number,
+                            draggable: true,
                         });
+                        vm.mapLoader = false;
+                        myMap.geoObjects.add(myPlacemark);    
+                        
                     }
                     if(vm.mapsShow == false) {
                         vm.mapLoader = false;

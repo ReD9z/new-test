@@ -220,7 +220,8 @@ export default {
             sortBy: 'id'
         },
         selected: [],
-        cityUser: null
+        cityUser: null,
+        testNew: [],
     }),
     props: {
         params: Object
@@ -238,20 +239,24 @@ export default {
     },
     watch: {
         dialog (val) {
-            val || this.close()
+            val || this.close();
         },
         search: _.debounce(function () {
-            this.initialize()
+            this.initialize();
         }, 400),
         chips(val) {
             this.initialize();
         },
         'editedItem.city_id'(val) {
-            this.selectStatus()
+            this.selectStatus();
         },
-        geo(val) {
-            this.editedItem.coordinates = val[0] + ", " +val[1];
-            console.log(this.editedItem);
+        geo(newItem, oldItem) {
+            if(newItem.length > 0) {
+                this.testNew = newItem[0] + ", " + newItem[1];
+            }
+            if(oldItem.length > 0) {
+                this.testNew = oldItem[0] + ", " + oldItem[1];
+            }
         }
     },
     created () {
@@ -262,7 +267,6 @@ export default {
         let scriptYandexMap = document.createElement('script');
         scriptYandexMap.setAttribute('src', 'https://api-maps.yandex.ru/2.1/?apikey=4fa86d95-9009-491e-9dbc-762df5da5650&lang=ru_RU');
         document.head.appendChild(scriptYandexMap);
-
     },
     methods: {
         formatDate (date) {
@@ -401,13 +405,8 @@ export default {
                         });
                         this.filteredItems(this.desserts);
                         this.filtered(this.desserts);
-                        // this.filteredStatus(this.desserts); 
                         this.loading = false;
                     }
-                    // this.desserts = response.data;
-                    // this.filteredItems(this.desserts);
-                    // this.filtered(this.desserts);
-                    // this.loading = false;
                 }
             ).catch(error => {
                 console.log(error);
@@ -610,25 +609,22 @@ export default {
             }, 300)
             this.$validator.reset()
         },
-       
-        mapsGeo() {
+        async save () {
             let vm = this;
-            this.selectCity.filter(res => 
+            this.loaderSaveBtn = true;
+            this.loadingSaveBtn = true;
+            await this.selectCity.filter(res => 
                 res.id == this.editedItem.city_id ? this.editedItem.city = res.name : null
             );
-         
-            ymaps.geocode(vm.editedItem.city + ", " + vm.editedItem.street + ", " + vm.editedItem.house_number).then(function(res) {
-                vm.geo = res.geoObjects.get(0).geometry.getCoordinates();    
+            var geocoder = ymaps.geocode(this.editedItem.city + ", " + this.editedItem.street + ", " + this.editedItem.house_number);
+
+            await geocoder.then(res => {
+                let geo = res.geoObjects.get(0).geometry.getCoordinates();
+                vm.editedItem.coordinates = geo[0] + ", " + geo[1];   
             });
-          
-        },
-        save () {
-            this.mapsGeo();
-          
-            this.$validator.validateAll().then(() => {
+            
+            await this.$validator.validateAll().then(() => {
                 if(this.$validator.errors.items.length == 0) {
-                    this.loaderSaveBtn = true;
-                    this.loadingSaveBtn = true;
                     let method = null;
                     if (this.editedIndex > -1) {
                         method = 'put'

@@ -31,6 +31,7 @@
     },
     "dependencies": {
         "@babel/polyfill": "^7.6.0",
+        "@pderas/vue2-geocoder": "^1.1.0",
         "babel-loader": "^8.0.6",
         "babel-polyfill": "^6.26.0",
         "babel-preset-env": "^1.7.0",
