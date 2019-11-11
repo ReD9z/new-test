@@ -28,6 +28,7 @@ class Address extends JsonResource
             'coordinates' => $this->coordinates,
             'data' => null,
             'result' => 'Свободен',
+            'entrances' => $this->entrances,
             'files' => null
         ];
     }

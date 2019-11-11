@@ -49,7 +49,7 @@ export default {
                 { 
                     text: 'Количество подъездов', 
                     input: "text",
-                    validate: 'required',
+                    validate: 'required|numeric',
                     value: 'number_entrances' 
                 },
                 { 

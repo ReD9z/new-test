@@ -17,13 +17,13 @@ class TasksController extends Controller
     public function index(Request $request)
     {
         if($request->city) {
-            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get()->where('installers.city_id', $request->city); 
+            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get()->where('installers.city_id', $request->city); 
         }
-        if($request->user) {
-            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get()->where('installer_id', $request->user); 
+        else if($request->user) {
+            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'installers.users', 'types', 'installers')->get()->where('installer_id', $request->user); 
         }
-        if(!$request->city || !$request->user) {
-            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get(); 
+        else {
+            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'installers.users', 'types', 'installers')->get(); 
         }
         
         return TasksResource::collection($tasks);
@@ -46,8 +46,20 @@ class TasksController extends Controller
         $tasks->status = $request->input('status');
         $tasks->task_date_completion = date("Y-m-d 00:00:00", strtotime($request->input('task_date_completion')));
         $tasks->comment = $request->input('comment');
-
+         
         if($tasks->save()) {
+            if($request->isMethod('put')) {
+                $entrances = Entrances::findOrFail($request->id)
+                $entrances->shield = $request->input('shield');
+                $entrances->glass = $request->input('glass');
+                $entrances->information = $request->input('information');
+                $entrances->mood = $request->input('mood');
+                $entrances->status = $request->input('status');
+                if($request->input('image'))) {
+                    $entrances->file_id = $entrances::saveFile($request->input('image'));
+                }
+                $entrances->save();
+            }   
             return new TasksResource($tasks);
         }
     }

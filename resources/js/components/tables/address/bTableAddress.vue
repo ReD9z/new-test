@@ -203,7 +203,6 @@ export default {
         deleteImage: false,
         desserts: [],
         editedIndex: -1,
-        geo: [],
         editedItem: {},
         defaultItem: {},
         selectCity: [],
@@ -221,7 +220,6 @@ export default {
         },
         selected: [],
         cityUser: null,
-        testNew: [],
     }),
     props: {
         params: Object
@@ -249,14 +247,6 @@ export default {
         },
         'editedItem.city_id'(val) {
             this.selectStatus();
-        },
-        geo(newItem, oldItem) {
-            if(newItem.length > 0) {
-                this.testNew = newItem[0] + ", " + newItem[1];
-            }
-            if(oldItem.length > 0) {
-                this.testNew = oldItem[0] + ", " + oldItem[1];
-            }
         }
     },
     created () {
@@ -383,6 +373,7 @@ export default {
             .then(
                 response => {
                     this.desserts = response.data;
+                    console.log(this.desserts);
                     let vm = this;
                     if(!this.dateToday) {
                         this.initialize();

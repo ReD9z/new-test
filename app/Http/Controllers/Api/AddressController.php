@@ -19,10 +19,10 @@ class AddressController extends Controller
     public function index(Request $request)
     {
         if($request->city) {
-            $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders')->where('city_id', $request->city)->get();
+            $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->where('city_id', $request->city)->get();
         }
         else {
-            $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders')->get();
+            $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get();
         }
         return AddressResource::collection($address);
     }
@@ -45,9 +45,9 @@ class AddressController extends Controller
         $address->number_entrances = $request->input('number_entrances');
         $address->management_company = $request->input('management_company');
         $address->coordinates = $request->input('coordinates');
-
-
+        
         if($address->save()) {
+            $request->isMethod('post') ? $address::addEntrances($address) : null;
             return new AddressResource($address);
         }
     }
