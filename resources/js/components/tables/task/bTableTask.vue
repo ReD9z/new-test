@@ -939,8 +939,8 @@ export default {
                         res => {
                             if(res) {
                                 if(element.selectText == 'orderClient') {
-                                    this.orderDate = res.data;
-                                    this.orderFull = res.data;
+                                    this.orderDate = res.data.filter(item=>!item.task);
+                                    this.orderFull = res.data.filter(item=>!item.task);
                                 }else {
                                     this.select.push(
                                         {

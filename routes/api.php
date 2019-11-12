@@ -147,5 +147,8 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::delete('managerTask/{id}', 'Api\ManagerTaskController@destroy'); // Delete one item
         Route::get('managerTask', 'Api\ManagerTaskController@index'); // Show list
         Route::post('addExcelTask', 'Api\ManagerTaskController@addExcelTask'); // Show list
+
+        // EntrancesManager   
+        Route::put('entrancesSave', 'Api\EntrancesController@store'); // Save one item
     });
 });

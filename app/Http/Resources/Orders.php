@@ -20,6 +20,7 @@ class Orders extends JsonResource
             'orderClient' => $this->clients ? 'Заказ #'.$this->id.' - '.$this->clients->users->name : null,
             'clients_name' => $this->clients ? $this->clients->users->name : null,
             'clients_id' => $this->clients_id,
+            'task' => $this->tasks,
             'address' => $this->orderAddress ? $this->orderAddress : [],
             'order_start_date' => date("d.m.Y", strtotime($this->order_start_date)),
             'order_end_date' => date("d.m.Y", strtotime($this->order_end_date))

@@ -17,17 +17,13 @@ class FilesUploadController extends Controller
      */
     public function add(Request $request)
     {
-        // $rules = [
-        //     ['files.*' => 'required|file|mimes:jpg,jpeg,png,bmp,zip,docx|max:20000'],
-        //     ['files.*.mimes' => 'Недопустимый формат данных', 'files.*.max' => 'Максимальный размер - 20 мегабайт']
-        // ];
         $loadfile = [];   
         foreach ($request->file('file') as $key => $file) {
             $filename = uniqid() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $path = Storage::disk('public')->putFileAs('upload',  $file, $filename);
+            Storage::disk('public')->putFileAs('upload',  $file, $filename);
             
             $uploadfile = new Files();
-            $uploadfile->url = $path;
+            $uploadfile->url = Storage::url('upload/'.$filename);
             $uploadfile->save();
             $loadfile[] = $uploadfile;
         }

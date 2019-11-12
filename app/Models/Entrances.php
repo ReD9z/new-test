@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Models;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Files;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,5 +22,9 @@ class Entrances extends Model
         $uploadfile->url = $path;
         $uploadfile->save();
         return $uploadfile->id;
+    }
+
+    public function files() {
+        return $this->hasOne('App\Models\Files', 'id', 'file_id');
     }
 }

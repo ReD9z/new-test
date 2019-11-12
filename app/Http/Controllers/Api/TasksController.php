@@ -17,13 +17,13 @@ class TasksController extends Controller
     public function index(Request $request)
     {
         if($request->city) {
-            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get()->where('installers.city_id', $request->city); 
+            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address', 'orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'orders.orderAddress.address.entrances.files', 'orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get()->where('installers.city_id', $request->city); 
         }
         else if($request->user) {
-            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'installers.users', 'types', 'installers')->get()->where('installer_id', $request->user); 
+            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'orders.orderAddress.address.entrances.files','orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get()->where('installer_id', $request->user); 
         }
         else {
-            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'installers.users', 'types', 'installers')->get(); 
+            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'orders.orderAddress.address.entrances.files','orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get(); 
         }
         
         return TasksResource::collection($tasks);
@@ -48,18 +48,6 @@ class TasksController extends Controller
         $tasks->comment = $request->input('comment');
          
         if($tasks->save()) {
-            if($request->isMethod('put')) {
-                $entrances = Entrances::findOrFail($request->id)
-                $entrances->shield = $request->input('shield');
-                $entrances->glass = $request->input('glass');
-                $entrances->information = $request->input('information');
-                $entrances->mood = $request->input('mood');
-                $entrances->status = $request->input('status');
-                if($request->input('image'))) {
-                    $entrances->file_id = $entrances::saveFile($request->input('image'));
-                }
-                $entrances->save();
-            }   
             return new TasksResource($tasks);
         }
     }

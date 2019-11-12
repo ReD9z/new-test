@@ -120,7 +120,7 @@
                         <v-layout row wrap>
                             <v-flex v-for="(file, key) in addOrderImages.files" :key="key" xs4 d-flex>
                                 <v-card flat tile class="d-flex pr-1 pb-1">
-                                    <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
+                                    <v-img :src="file.url" :lazy-src="file.url" aspect-ratio="1" class="grey lighten-2">
                                         <template v-slot:placeholder>
                                             <v-layout fill-height align-center justify-center ma-0 >
                                                 <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
@@ -140,7 +140,7 @@
                                                         <v-btn icon class="white--text" v-on="on" @click='filesImg(file)'><v-icon>search</v-icon></v-btn>
                                                     </template>
                                                     <v-card v-if="imgBig">
-                                                        <v-img :src="'/storage/' + imgBig" :lazy-src="'/storage/' + imgBig" aspect-ratio="1" class="grey lighten-2"></v-img>
+                                                        <v-img :src="imgBig" :lazy-src="imgBig" aspect-ratio="1" class="grey lighten-2"></v-img>
                                                     </v-card>
                                                 </v-dialog>
                                             </v-layout>

@@ -14,4 +14,9 @@ class Orders extends Model
     {
         return $this->hasMany('App\Models\AddressToOrders', 'order_id', 'id');
     }
+
+    public function tasks()
+    {
+        return $this->hasOne('App\Models\Tasks', 'orders_id', 'id');
+    }
 }

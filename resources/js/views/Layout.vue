@@ -21,7 +21,7 @@
             <v-list class="white--text pt-0 icon-menu-padding" dense>
                 <v-divider></v-divider>
                 <div v-for="(item, key) in items" :key="key">
-                    <v-list-tile v-show="roleUser(isUserRole, item.role)" :to="{ name: item.src }" active-class="active" v-if="!item.wrapLink">	
+                    <v-list-tile class="exit-style-menu" v-show="roleUser(isUserRole, item.role)" :to="{ name: item.src }" active-class="active" v-if="!item.wrapLink">	
                         <v-list-tile-action><v-icon class="white--text">{{ item.icon }}</v-icon></v-list-tile-action>	
                         <v-list-tile-content>	
                             <v-list-tile-title>{{ item.title }}</v-list-tile-title>	
