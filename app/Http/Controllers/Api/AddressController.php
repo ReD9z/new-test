@@ -8,6 +8,8 @@ use App\Models\Address;
 use App\Models\Areas;
 use App\Models\CitiesToWorks;
 use App\Http\Resources\Address as AddressResource;
+use App\Imports\AddressImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AddressController extends Controller
 {
@@ -48,6 +50,7 @@ class AddressController extends Controller
         
         if($address->save()) {
             $request->isMethod('post') ? $address::addEntrances($address) : null;
+            $request->isMethod('put') ? $address::editEntrances($address) : null;
             return new AddressResource($address);
         }
     }
@@ -59,40 +62,49 @@ class AddressController extends Controller
             return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
         }
 
-        if(count($request->input()) == 6) {
-            $data = [];
-            $citywork = CitiesToWorks::where('name', mb_ucfirst(array_values($request->input())[0]))->first();
-            $area = Areas::where('name', mb_ucfirst(array_values($request->input())[1]))->first();
-            $address = new Address;
-            if (!empty($citywork)) {
-                $address->city_id = $citywork->id;
-            } else {
-                $toWorks = new CitiesToWorks;
-                $toWorks->name = mb_ucfirst(array_values($request->input())[0]);
-                $toWorks->save();
-                $address->city_id = $toWorks->id;
-            }
+        // if(count($request->input()) == 6) {
+        //     $data = [];
+        //     $citywork = CitiesToWorks::where('name', mb_ucfirst(array_values($request->input())[0]))->first();
+        //     $area = Areas::where('name', mb_ucfirst(array_values($request->input())[1]))->first();
+        //     $address = new Address;
+        //     if (!empty($citywork)) {
+        //         $address->city_id = $citywork->id;
+        //     } else {
+        //         $toWorks = new CitiesToWorks;
+        //         $toWorks->name = mb_ucfirst(array_values($request->input())[0]);
+        //         $toWorks->save();
+        //         $address->city_id = $toWorks->id;
+        //     }
      
-            if (!empty($area)) {
-                $address->area_id = $area->id;
-            } else {
-                $areas = new Areas;
-                $areas->name = mb_ucfirst(array_values($request->input())[1]);
-                $areas->city_id = $address->city_id;
-                $areas->save();
-                $address->area_id = $areas->id;
-            }
+        //     if (!empty($area)) {
+        //         $address->area_id = $area->id;
+        //     } else {
+        //         $areas = new Areas;
+        //         $areas->name = mb_ucfirst(array_values($request->input())[1]);
+        //         $areas->city_id = $address->city_id;
+        //         $areas->save();
+        //         $address->area_id = $areas->id;
+        //     }
 
-            $address->street = array_values($request->input())[2];
-            $address->house_number = array_values($request->input())[3];
-            $address->number_entrances = array_values($request->input())[4];
-            $address->management_company = array_values($request->input())[5];
-            $address->coordinates =  array_values($request->input())[6];
-            $address->save();
-            
-            $data = new AddressResource($address);
-            return response()->json(['errors' => [], 'data' => $data, 'status' => 200], 200);
-        }
+        //     $address->street = array_values($request->input())[2];
+        //     $address->house_number = array_values($request->input())[3];
+        //     $address->number_entrances = array_values($request->input())[4];
+        //     $address->management_company = array_values($request->input())[5];
+        //     // $address->coordinates = array_values($request->input())[6];
+        //     $address->save();
+        //     $data = new AddressResource($address);
+        //     if($address->save()) {
+        //         $request->isMethod('post') ? $address::addEntrances($address) : null;
+        //         $request->isMethod('put') ? $address::editEntrances($address) : null;
+        //     }
+        Excel::import(new AddressImport, $request->file('file'));
+        // $test = Excel::import(new AddressImport, $request->input());
+        // Excel::load($request->input(), function($reader) {
+
+        //     return response()->json(['errors' => [], 'data' => $reader, 'status' => 200], 200);
+
+        // });
+        return response()->json(['errors' => [], 'data' => $request->file('file'), 'status' => 200], 200);
     }
 
     /**

@@ -31,7 +31,7 @@ class Tasks extends JsonResource
             'comment' => $this->comment,
             'orderAddresses' => $this->orders ? $this->orders->orderAddress : null,
             'status' => $this->status,
-            'statusName' => $this->status == 1 ? 'В работе' : 'Завершена',
+            'statusName' => $this->status == '1' ? 'В работе' : 'Завершена',
         ];
     }
 }

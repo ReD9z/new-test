@@ -654,10 +654,8 @@ export default {
         chipsStatus() {
             this.initialize();
         },
-        addClient(newVal) {
-            if (newVal == false) {
-                this.selectClient();
-            }
+        addClient(newVal, oldVal) {
+            this.selectClient();
         }
     },
     async created () {
@@ -863,7 +861,6 @@ export default {
                 response => {
                     this.desserts = response.data;
                     let vm = this;
-                    console.log(response.data);
                     if(this.params.baseUrl == '/api/tasks') {
                         if(this.dateStart && this.dateEnd) {
                             this.desserts = this.desserts.filter(function (item) {
@@ -972,9 +969,8 @@ export default {
                     type: 'binary'
                 });
                 let firstSheet = workbook.SheetNames[0];
-                let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet],  {raw: false});
+                let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], {raw: false});
                 vm.loadExecelTask(excelRows);
-                console.table(excelRows);
             };
         },
         async loadExecelTask(file) {

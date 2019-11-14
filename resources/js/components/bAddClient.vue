@@ -24,7 +24,7 @@
                         :data-vv-as="'`Email`'" 
                         :data-vv-name="'email'" 
                         :error-messages="errors.collect('email')"
-                        v-validate="'required|email'" 
+                        v-validate="'email'" 
                         v-model="editedItem.email" 
                         label="Email" 
                         xs12 required>
@@ -35,7 +35,6 @@
                         data-vv-as="`Телефон`" 
                         data-vv-name="phone" 
                         :error-messages="errors.collect('phone')"
-                        v-validate="required" 
                         v-model="editedItem.phone" 
                         label="Телефон" 
                         xs12 
@@ -47,7 +46,6 @@
                         data-vv-as="`Логин`" 
                         data-vv-name="login" 
                         :error-messages="errors.collect('login')"
-                        v-validate="required" 
                         v-model="editedItem.login" 
                         label="Логин" 
                         class="pa-2"
@@ -61,7 +59,6 @@
                         type="password"
                         data-vv-name="password" 
                         :error-messages="errors.collect('password')"
-                        v-validate="editedItem.password ? {required:true, regex:/^\S*$/ , min:6} : required"
                         v-model="editedItem.password" 
                         label="Пароль" 
                         xs12 
@@ -78,8 +75,7 @@
                         label="Город"
                         data-vv-as="`Город`" 
                         data-vv-name="city_id" 
-                        :error-messages="errors.collect('city_id')" 
-                        v-validate="required"
+                        :error-messages="errors.collect('city_id')"
                     >
                     </v-autocomplete>
                 </v-flex>
@@ -88,7 +84,6 @@
                         data-vv-as="`Юридическое название'`" 
                         data-vv-name="legal_name" 
                         :error-messages="errors.collect('legal_name')"
-                        v-validate="required" 
                         v-model="editedItem.legal_name" 
                         label="Юридическое название" 
                         xs12 
@@ -100,7 +95,6 @@
                         data-vv-as="`Фактическое название`" 
                         data-vv-name="actual_title" 
                         :error-messages="errors.collect('actual_title')"
-                        v-validate="required" 
                         v-model="editedItem.actual_title" 
                         label="Фактическое название" 
                         class="pa-2"
@@ -113,7 +107,6 @@
                         data-vv-as="`Юридический адрес`" 
                         data-vv-name="legal_address" 
                         :error-messages="errors.collect('legal_address')"
-                        v-validate="required" 
                         v-model="editedItem.legal_address" 
                         label="Юридический адрес" 
                         xs12 
@@ -125,7 +118,6 @@
                         data-vv-as="`Фактический адрес`" 
                         data-vv-name="actual_address" 
                         :error-messages="errors.collect('actual_address')"
-                        v-validate="required" 
                         v-model="editedItem.actual_address" 
                         label="Фактический адрес" 
                         class="pa-2"
@@ -138,7 +130,6 @@
                         data-vv-as="`Название банка`" 
                         data-vv-name="bank_name" 
                         :error-messages="errors.collect('bank_name')"
-                        v-validate="required" 
                         v-model="editedItem.bank_name" 
                         label="Название банка" 
                         xs12 
@@ -150,7 +141,6 @@
                         data-vv-as="`БИК`" 
                         data-vv-name="bik" 
                         :error-messages="errors.collect('bik')"
-                        v-validate="required" 
                         v-model="editedItem.bik" 
                         label="БИК" 
                         class="pa-2"
@@ -163,7 +153,6 @@
                         data-vv-as="`Кор. счёт`" 
                         data-vv-name="cor_score" 
                         :error-messages="errors.collect('cor_score')"
-                        v-validate="required" 
                         v-model="editedItem.cor_score" 
                         label="Кор. счёт" 
                         xs12 
@@ -177,7 +166,6 @@
                         data-vv-as="`Расчётный счёт`" 
                         data-vv-name="settlement_account" 
                         :error-messages="errors.collect('settlement_account')"
-                        v-validate="required" 
                         v-model="editedItem.settlement_account" 
                         label="Расчётный счёт" 
                         class="pa-2"
@@ -252,7 +240,7 @@ export default {
     },
     methods: { 
         save () {
-            this.$emit('update:addClient', false)
+            this.$emit('update:addClient', true)
             this.$validator.validateAll().then(() => {
                 if(this.$validator.errors.items.length == 0) {
                     this.loaderSaveBtn = true;
@@ -263,12 +251,12 @@ export default {
                         data: this.editedItem
                     })
                     .then(
-                        response => {
+                        async response => {
                             this.loaderSaveBtn = null;
                             this.loadingSaveBtn = false;
-                            this.$refs.forms2.reset();
-                            this.$emit('update:addClient', false)
-                            this.$validator.reset();
+                            await this.$refs.forms2.reset();
+                            await this.$validator.reset();
+                            await this.$emit('update:addClient', false)
                             this.dialog = false;
                         }
                     ).catch(error => {

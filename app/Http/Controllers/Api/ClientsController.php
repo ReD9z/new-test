@@ -48,10 +48,12 @@ class ClientsController extends Controller
             $users->id = $request->input('id');
         }
 
-        $this->validate($request, [
-            'email' => 'unique:users',
-            'email' => Rule::unique('users')->ignore($request->users_id),
-        ]);
+        if($request->input('email')) {
+            $this->validate($request, [
+                'email' => 'unique:users',
+                'email' => Rule::unique('users')->ignore($request->users_id),
+            ]);
+        }
 
         $users->name = $request->input('name');
         $users->email = $request->input('email');

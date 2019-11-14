@@ -19,11 +19,11 @@ class CreateEntrancesTable extends Migration
             $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
             $table->bigInteger('file_id')->unsigned()->nullable();
             $table->foreign('file_id')->references('id')->on('files')->onDelete('cascade');
-            $table->boolean('shield')->default(1);
-            $table->boolean('glass')->default(1);
-            $table->boolean('information')->default(1);
-            $table->boolean('mood')->default(1);
-            $table->integer('status')->default(1);
+            $table->boolean('shield')->default(0);
+            $table->boolean('glass')->default(0);
+            $table->boolean('information')->default(0);
+            $table->boolean('mood')->default(0);
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }

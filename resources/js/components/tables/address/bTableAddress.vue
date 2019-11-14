@@ -8,8 +8,8 @@
             color="#f2994a"
             class="white--text"
             large
-            :loading="loadingExcel"
-            :disabled="loadingExcel"
+            :loading="excelDownload"
+            :disabled="excelDownload"
             @click='downloadExcel'
         >
             <v-icon left>vertical_align_bottom</v-icon>
@@ -199,6 +199,7 @@ export default {
         dialog: false,
         loading: true,
         loadingExcel: false,
+        excelDownload: false,
         files: [],
         deleteImage: false,
         desserts: [],
@@ -404,6 +405,7 @@ export default {
             })
         },
         downloadExcel() {
+            this.excelDownload = true;
             if(this.desserts.length > 0) {
                 let vm = this;
                 let map = this.desserts.map((item)=> {
@@ -436,6 +438,7 @@ export default {
               
                 XLSX.utils.book_append_sheet(wb, ws, "Адреса");
                 XLSX.writeFile(wb, "Адреса.xlsx");
+                this.excelDownload = false;
             }
         },
         pickImages () {
@@ -477,81 +480,62 @@ export default {
                 }
             });
         },
-        elementLoadToFileImage() {
-            this.loadImages = true;
-            this.files = this.$refs.images.files;
-            Array.from(this.files).forEach(files => {
-                this.formData.append('file[]', files);
-            });
-            axios.post('api/files', this.formData, {
-                headers: {'Content-Type': 'multipart/form-data'}
-            })
-            .then(
-                res => {
-                    axios({
-                        method: 'put',
-                        url: this.params.baseUrl,
-                        data: this.editedItem,
-                        params: {
-                            images: res.data.files
-                        }
-                    })
-                    .then(
-                        response => {
-                            Object.assign(this.editedItem, response.data);
-                            this.loadImages = false;
-                            this.resetFilesLoad();
-                        }
-                    ).catch(error => {
-                        console.log(error);
-                    })
-                }
-            ).catch(
-                error => {
-                    console.log(error);
-                }
-            );
-        },
-        async loadExecel(file) {
+        async loadExcel(file) {
             let vm = this;
-            await file.forEach(function (item) {
-                axios({
-                    method: 'post',
-                    url: vm.params.baseUrl +'/excel',
-                    data: item
+            let files = this.$refs.excel.files[0];
+            
+            this.formData.append('file', files);
+            
+            console.log(this.formData.getAll('file'));
+            // await file.forEach(function (item) {
+
+                // axios({
+                //     method: 'post',
+                //     url: vm.params.baseUrl +'/excel',
+                //     data: file,
+                //     headers: { 'Content-Type': 'multipart/form-data'}
+                // })
+                axios.post(vm.params.baseUrl +'/excel', this.formData, {
+                    headers: {'Content-Type': 'multipart/form-data'}
                 })
                 .then(
                     response => {
-                        let array = response.data.data;
-                        if(array != undefined) {
-                            vm.desserts.push(array);
-                        }
-                        setTimeout(() => (vm.loadingExcel = false), 1000);
-                        vm.$refs.excel.value = '';
+                        // let array = response.data.data;
+                        console.log(response);
+                        // if(array != undefined) {
+                        //     vm.desserts.push(array);
+                        // }
+                        // setTimeout(() => (vm.loadingExcel = false), 1000);
+                        // vm.$refs.excel.value = '';
+                        // this.loadingExcel = false;
                     }
                 ).catch(error => {
                     console.log(error);
                 });
-            })
-            await this.getFiltered();
-            await this.selectStatus();
+            // })
+            // await this.getFiltered();
+            // await this.selectStatus();
         },
         elementLoadToFile() {
             this.loadingExcel = true;
-            let file = this.$refs.excel.files[0];
+            let file = this.$refs.excel.files;
             let reader = new FileReader();
             let vm = this;
-            reader.readAsBinaryString(file);
-            reader.onload = function (e) {
-                let workbook = XLSX.read(e.target.result, {
-                    type: 'binary'
-                });
-                let firstSheet = workbook.SheetNames[0];
-                let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-
-                vm.loadExecel(excelRows);
-                file.value = '';
-            };
+            this.loadExcel(file);
+            // reader.readAsBinaryString(file);
+            // reader.onload = function (e) {
+            //     let workbook = XLSX.read(e.target.result, {
+            //         type: 'binary'
+            //     });
+            //     let firstSheet = workbook.SheetNames[0];
+            //     let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+            //     excelRows.forEach((item, key) => {
+            //         console.log(key, item);
+            //     });
+            //     // console.log(excelRows);
+            //     // vm.loadExcel(excelRows);
+            //     file.value = '';
+            // };
         },
         pickExcel () {
             this.$refs.excel.click();

@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Tasks;
+use App\Models\Address;
+use App\Models\Orders;
 use App\Http\Resources\Tasks as TasksResource;
+use App\Http\Resources\Orders as OrdersResource;
 
 class TasksController extends Controller
 {
@@ -16,15 +19,24 @@ class TasksController extends Controller
      */
     public function index(Request $request)
     {
+        $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get(); 
+
         if($request->city) {
-            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address', 'orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'orders.orderAddress.address.entrances.files', 'orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get()->where('installers.city_id', $request->city); 
+            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files',  'installers.users', 'types')->get()->where('installers.city_id', $request->city); 
         }
         else if($request->user) {
-            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'orders.orderAddress.address.entrances.files','orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get()->where('installer_id', $request->user); 
+            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installer_id', $request->user); 
         }
         else {
-            $tasks = Tasks::with('orders.clients', 'orders.orderAddress', 'orders.orderAddress.address','orders.orderAddress.address.cities', 'orders.orderAddress.address.entrances', 'orders.orderAddress.address.entrances.files','orders.orderAddress.address.areas', 'installers.users', 'types', 'installers')->get(); 
+            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get(); 
         }
+
+        // return response()->json([
+        //     'errors' => [], 
+        //     'data' => TasksResource::collection($tasks), 
+        //     'orders' => OrdersResource::collection($orders), 
+        //     'status' => 200], 
+        // 200);
         
         return TasksResource::collection($tasks);
     }

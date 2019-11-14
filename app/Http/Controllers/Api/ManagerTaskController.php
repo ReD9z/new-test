@@ -67,8 +67,6 @@ class ManagerTaskController extends Controller
         }
 
 
-        // $users = $request->isMethod('put') ? User::findOrFail($request->users_id) : new User;
-
         if(count($request->input()) == 8) {
             $data = [];
 
@@ -95,9 +93,9 @@ class ManagerTaskController extends Controller
                         $toUsers->login = null;
                         $toUsers->role = 'client';
                         
-                        $toUsers->password = bcrypt('123456');
+                        $toUsers->password = null;
                         
-                        $token =  $toUsers->createToken('Laravel Password Grant Client')->accessToken;
+                        $token = $toUsers->createToken('Laravel Password Grant Client')->accessToken;
                         $toUsers->save();
                         $clients->users_id = $toUsers->id;
                     }
@@ -134,7 +132,7 @@ class ManagerTaskController extends Controller
                     $toUsers->login = null;
                     $toUsers->role = 'client';
                     
-                    $toUsers->password = bcrypt('123456');
+                    $toUsers->password = null;
                     
                     $token =  $toUsers->createToken('Laravel Password Grant Client')->accessToken;
                     $toUsers->save();

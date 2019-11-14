@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Address extends Model
 {
+    protected $fillable = [
+        'street'
+    ];
+
     public function cities() {
         return $this->belongsTo('App\Models\CitiesToWorks', 'city_id');
     }
@@ -17,11 +21,6 @@ class Address extends Model
     public function orderAddress()
     {
         return $this->hasMany('App\Models\AddressToOrders', 'address_id', 'id');
-        // return $this->belongsToMany('App\Models\AddressToOrders', 'address',  'address_id');
-        // return $this->belongsToMany('App\Models\AddressToOrders', 'address',  'address_id')->withPivot('address_id');
-        // return $this->hasOne('App\Models\AddressToOrders');
-        // return $this->hasManyThrough('App\Models\AddressToOrders');
-        // return $this->belongsToMany('App\Role', 'role_user', 'user_id', 'role_id');
     }
 
     public function entrances()
@@ -36,6 +35,37 @@ class Address extends Model
             $entrances = new Entrances;
             $entrances->address_id = $id;
             $entrances->save();
+        }
+    }
+
+    public static function editEntrances($data) {
+        $arr = Entrances::where('address_id', $data->id)->get();
+        $absNumber = abs((int)$data->number_entrances - count($arr));
+        $number = (int)$data->number_entrances;
+        $id = $data->id;
+        if(count($arr ) == 0) {
+            for($i=0; $i < $number; $i++) {
+                $entrances = new Entrances;
+                $entrances->number = $i+1;
+                $entrances->address_id = $id;
+                $entrances->save();
+            }
+        }
+        else if((int)$data->number_entrances < count($arr)) {
+            for($i=0; $i < $absNumber; $i++) {
+                $num = Entrances::where('address_id', $data->id)->get();
+                $address = $num[count($num)-1];
+                $address->delete();
+            }
+        }
+
+        else if((int)$data->number_entrances > count($arr)) {
+           for($i=0; $i < $absNumber; $i++) {
+                $entrances = new Entrances;
+                $entrances->number = count($arr) + ($i+1);
+                $entrances->address_id = $id;
+                $entrances->save();
+            }
         }
     }
 }
