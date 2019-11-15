@@ -2,13 +2,66 @@
 
 namespace App\Models;
 use App\Models\Entrances;
+use App\Models\Areas;
+use App\Models\CitiesToWorks;
 use Illuminate\Database\Eloquent\Model;
 
 class Address extends Model
 {
     protected $fillable = [
-        'street'
+        'city_id',
+        'area_id',
+        'street',
+        'house_number',
+        'number_entrances',
+        'management_company',
+        'coordinates'
     ];
+
+    public static function mb_ucfirst($word)
+    {
+        return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
+    }
+
+    public static function getCoordinates($value)
+    {
+        $api = new \Yandex\Geo\Api();
+        $api->setQuery($value);
+        $api->setLimit(1)->setLang(\Yandex\Geo\Api::LANG_RU)->load();
+        $response = $api->getResponse();
+        return $response->getLatitude().', '.$response->getLongitude();
+    }
+
+    public static function getCityId($value)
+    {
+        $id = null;
+        $citywork = CitiesToWorks::where('name', self::mb_ucfirst($value))->first();
+        if (!empty($citywork)) {
+            $id = $citywork->id;
+        } else {
+            $toWorks = new CitiesToWorks;
+            $toWorks->name = self::mb_ucfirst($value);
+            $toWorks->save();
+            $id = $toWorks->id;
+        }
+        return $id;
+    }
+    
+    public static function getAreaId($value, $city)
+    {
+        $id = null;
+        $area = Areas::where('name', self::mb_ucfirst($value))->first();
+        if (!empty($area)) {
+            $id = $area->id;
+        } else {
+            $areas = new Areas;
+            $areas->name = self::mb_ucfirst($value);
+            $areas->city_id = self::getAddressId($city);
+            $areas->save();
+            $id = $areas->id;
+        }
+        return $id;
+    }
 
     public function cities() {
         return $this->belongsTo('App\Models\CitiesToWorks', 'city_id');
