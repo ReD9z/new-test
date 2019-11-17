@@ -27,7 +27,7 @@ class Address extends JsonResource
             'status' => $this->orderAddress,
             'coordinates' => $this->coordinates,
             'data' => null,
-            'result' => 'Свободен',
+            'result' => $this->status($this->orderAddress),
             'entrances' => $this->entrances,
             'files' => null
         ];

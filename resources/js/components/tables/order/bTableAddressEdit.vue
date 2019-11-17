@@ -230,9 +230,10 @@
                 <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
                     image
                 </v-icon>
-                <v-icon small class="mr-2" v-if="props.item.data !== null"  @click="deleteItem(props.item)">
+                <v-icon small class="mr-2" v-if="props.item !== null" @click="deleteItem(props.item)">
                     delete
                 </v-icon>
+                <!-- {{props.item}} -->
             </td>
         </template>
         <template v-slot:no-data>
@@ -523,27 +524,27 @@ export default {
             })
             .then(
                 response => {
-                    this.desserts = response.data;
+                    this.desserts = response.data.address;
                     let vm = this;
                     if(!this.dateStartFormatted && !this.dateEndFormatted) {
                         this.initialize();
                     } else {
                         this.desserts.forEach(function (item) {
-                            if(item.status.length > 0) {
-                                return item.status.filter(function (stats) {
-                                    let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
-                                    let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
-                                    let dateStart = vm.$moment(vm.dateStartFormatted, 'DD-MM-YYYY').unix() * 1000;
-                                    let dateEnd = vm.$moment(vm.dateEndFormatted, 'DD-MM-YYYY').unix() * 1000;
-                                    if((itemDateStart >= dateStart) && (itemDateStart <= dateEnd) || (itemDateEnd >= dateStart) && (itemDateEnd <= dateEnd)) {
-                                        item.result = 'Занят';
-                                        item.data = stats;
-                                        item.files = stats.files;
-                                        let index = vm.desserts.indexOf(item);
-                                        Object.assign(vm.desserts[index], item);
-                                    } 
-                                });
-                            } 
+                            // if(item.status.length > 0) {
+                                // return item.status.filter(function (stats) {
+                                //     let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
+                                //     let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
+                                //     let dateStart = vm.$moment(vm.dateStartFormatted, 'DD-MM-YYYY').unix() * 1000;
+                                //     let dateEnd = vm.$moment(vm.dateEndFormatted, 'DD-MM-YYYY').unix() * 1000;
+                                //     if((itemDateStart >= dateStart) && (itemDateStart <= dateEnd) || (itemDateEnd >= dateStart) && (itemDateEnd <= dateEnd)) {
+                                //         item.result = 'Занят';
+                                //         item.data = stats;
+                                //         item.files = stats.files;
+                                //         let index = vm.desserts.indexOf(item);
+                                //         Object.assign(vm.desserts[index], item);
+                                //     } 
+                                // });
+                            // } 
                         });
                         this.filteredItems(this.desserts);
                         this.filtered(this.desserts);

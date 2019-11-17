@@ -387,7 +387,7 @@ export default {
             })
             .then(
                 response => {
-                    this.desserts = response.data;
+                    this.desserts = response.data.address;
                     let vm = this;
                     if(!this.dateStartFormatted && !this.dateEndFormatted) {
                         this.initialize();

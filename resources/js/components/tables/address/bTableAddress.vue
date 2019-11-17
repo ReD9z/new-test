@@ -113,7 +113,7 @@
         </v-flex>
         <v-spacer></v-spacer>
         <div>
-            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
+            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item['name']}}</v-chip>
         </div>
         <v-icon v-if="showRoles()">filter_list</v-icon>
         <v-menu v-if="showRoles()" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
@@ -131,7 +131,8 @@
                     <v-flex class="px-3" xs12>
                         <v-combobox
                             v-model="chips"
-                            :items="chipsItem"
+                            :items="selectCity"
+                            item-text="name"
                             multiple
                             label="Города"
                         ></v-combobox>
@@ -213,7 +214,6 @@ export default {
         dateToday: vm.formatDate(new Date().toISOString().substr(0, 10)),
         formData: new FormData(),
         chips: [],
-        chipsItem: [],
         picker: new Date().toISOString().substr(0, 10),
         valid: true,
         pagination: {
@@ -247,17 +247,11 @@ export default {
             this.initialize();
         },
         'editedItem.city_id'(val) {
-            this.selectStatus();
+            this.initialize();
         }
     },
     created () {
         this.initialize();
-        this.selectStatus();
-        this.getFiltered();
-
-        let scriptYandexMap = document.createElement('script');
-        scriptYandexMap.setAttribute('src', 'https://api-maps.yandex.ru/2.1/?apikey=4fa86d95-9009-491e-9dbc-762df5da5650&lang=ru_RU');
-        document.head.appendChild(scriptYandexMap);
     },
     methods: {
         formatDate (date) {
@@ -285,47 +279,22 @@ export default {
                 return true;
             }
         },
-        async getFiltered() {
-            this.chipsItem = [];
-            await this.params.filter.forEach((item) => {
-                if(item.api) {
-                    axios({
-                        method: 'get',
-                        url: item.api
-                    })
-                    .then(
-                        response => {
-                            let data = response.data;
-                            data.filter((items) => {
-                                this.chipsItem.push(items[item.value]);
-                            });
-                        }
-                    ).catch(error => {
-                        console.log(error);
-                    })
-                } else {
-                    item.data.filter((items) => {
-                        this.chipsItem.push(items[item.value]);
-                    });
-                }
-            });
+        refreshSearch() {
+            this.chips = [];
+            this.loading = true;
+            this.search = '';
+            this.initialize();
         },
-        filtered(data) {
-            if(this.chips.length > 0) {
-                let arr = [];
-                this.chips.forEach((chip) => {
-                    arr.push(chip);
-                });
-                var searchTerm = arr.join('||').trim().toLowerCase(),
-                useOr = 'and' == "or",
-                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
-                OR_RegEx = searchTerm.replace(/ +/g,"|"),
-                regExExpression = useOr ? OR_RegEx : AND_RegEx,
-                searchTest = new RegExp(regExExpression, "ig");
-           
-                this.desserts = this.desserts.filter(function(item) {
-                    return searchTest.test([item.city]);
-                });
+        toggleAll () {
+            if (this.selected.length) this.selected = []
+            else this.selected = this.desserts.slice()
+        },
+        changeSort (column) {
+            if (this.pagination.sortBy === column) {
+                this.pagination.descending = !this.pagination.descending
+            } else {
+                this.pagination.sortBy = column
+                this.pagination.descending = false
             }
         },
         filteredItems(data) {
@@ -345,22 +314,22 @@ export default {
                 return searchTest.test(arr.join(" ")); 
             });
         },
-        refreshSearch() {
-            this.chips = [];
-            this.loading = true;
-            this.search = '';
-            this.initialize();
-        },
-        toggleAll () {
-            if (this.selected.length) this.selected = []
-            else this.selected = this.desserts.slice()
-        },
-        changeSort (column) {
-            if (this.pagination.sortBy === column) {
-                this.pagination.descending = !this.pagination.descending
-            } else {
-                this.pagination.sortBy = column
-                this.pagination.descending = false
+        filtered(data) {
+            if(this.chips.length > 0) {
+                let arr = [];
+                this.chips.forEach((chip) => {
+                    arr.push(chip['name']);
+                });
+                var searchTerm = arr.join('||').trim().toLowerCase(),
+                useOr = 'and' == "or",
+                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                searchTest = new RegExp(regExExpression, "ig");
+           
+                this.desserts = this.desserts.filter(function(item) {
+                    return searchTest.test([item.city]);
+                });
             }
         },
         initialize() {
@@ -368,41 +337,63 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: this.roleUserCity()
+                    city: this.roleUserCity(),
+                    areaCity: this.editedItem.city_id,
                 }
             })
             .then(
                 response => {
-                    this.desserts = response.data;
-                    console.log(this.desserts);
-                    let vm = this;
-                    if(!this.dateToday) {
-                        this.initialize();
-                    } else {
-                        this.desserts.forEach(function (item) {
-                            if(item.status.length > 0) {
-                                return item.status.filter(function (stats) {
-                                    let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
-                                    let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
-                                    let dateToday = vm.$moment(vm.dateToday, 'DD-MM-YYYY').unix() * 1000;
-                                    if(dateToday >= itemDateStart && dateToday <= itemDateEnd) {
-                                        item.result = 'Занят';
-                                        item.data = stats;
-                                        item.files = stats.files;
-                                        let index = vm.desserts.indexOf(item);
-                                        Object.assign(vm.desserts[index], item);
-                                    } 
-                                });
-                            } 
-                        });
-                        this.filteredItems(this.desserts);
-                        this.filtered(this.desserts);
-                        this.loading = false;
-                    }
+                    this.desserts = response.data.address;
+                    this.selectCity = response.data.city;
+                    this.selectArea = response.data.area;
+
+                    this.filteredItems(this.desserts);
+                    this.filtered(this.desserts);
+                    this.loading = false;
+
+                    console.log(response.data.address);
                 }
             ).catch(error => {
                 console.log(error);
             })
+            // axios({
+            //     method: 'get',
+            //     url: this.params.baseUrl,
+            //     params: {
+            //         city: this.roleUserCity()
+            //     }
+            // })
+            // .then(
+            //     response => {
+            //         this.desserts = response.data;
+            //         let vm = this;
+            //         if(!this.dateToday) {
+            //             this.initialize();
+            //         } else {
+            //             this.desserts.forEach(function (item) {
+            //                 if(item.status.length > 0) {
+            //                     return item.status.filter(function (stats) {
+            //                         let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
+            //                         let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
+            //                         let dateToday = vm.$moment(vm.dateToday, 'DD-MM-YYYY').unix() * 1000;
+            //                         if(dateToday >= itemDateStart && dateToday <= itemDateEnd) {
+            //                             item.result = 'Занят';
+            //                             item.data = stats;
+            //                             item.files = stats.files;
+            //                             let index = vm.desserts.indexOf(item);
+            //                             Object.assign(vm.desserts[index], item);
+            //                         } 
+            //                     });
+            //                 } 
+            //             });
+            //             this.filteredItems(this.desserts);
+            //             this.filtered(this.desserts);
+            //             this.loading = false;
+            //         }
+            //     }
+            // ).catch(error => {
+            //     console.log(error);
+            // })
         },
         downloadExcel() {
             this.excelDownload = true;
@@ -441,111 +432,41 @@ export default {
                 this.excelDownload = false;
             }
         },
-        pickImages () {
-            this.$refs.images.click();
-        },
         parseDate (date) {
             if (!date) return null
             const [year, month, day] = date.split('-')
             return `${day}-${month}-${year}`
         },
-        selectStatus() {
-            this.params.headers.forEach(element => {
-                if(element.selectApi != undefined) {
-                    axios({
-                        method: 'get',
-                        url: element.selectApi,
-                        params: {
-                            city: this.roleUserCity(),
-                            areaCity: this.editedItem.city_id,
-                        }
-                    })
-                    .then(
-                        res => {
-                            if(res) {
-                                if (element.value == 'city_id') {
-                                    this.selectCity = res.data;
-                                }
-
-                                if (element.value == 'area_id') {
-                                    this.selectArea = res.data;
-                                }
-                            }
-                        }
-                    ).catch(
-                        error => {
-                            console.log(error);
-                        }
-                    ); 
-                }
-            });
-        },
         async loadExcel(file) {
-            let vm = this;
-            let files = this.$refs.excel.files[0];
-            
+            let files = file;
             this.formData.append('file', files);
-            
-            console.log(this.formData.getAll('file'));
-            // await file.forEach(function (item) {
-
-                // axios({
-                //     method: 'post',
-                //     url: vm.params.baseUrl +'/excel',
-                //     data: file,
-                //     headers: { 'Content-Type': 'multipart/form-data'}
-                // })
-                axios.post(vm.params.baseUrl +'/excel', this.formData, {
-                    headers: {'Content-Type': 'multipart/form-data'}
-                })
-                .then(
-                    response => {
-                        // let array = response.data.data;
-                        console.log(response);
-                        // if(array != undefined) {
-                        //     vm.desserts.push(array);
-                        // }
-                        // setTimeout(() => (vm.loadingExcel = false), 1000);
-                        // vm.$refs.excel.value = '';
-                        // this.loadingExcel = false;
-                    }
-                ).catch(error => {
-                    console.log(error);
-                });
-            // })
-            // await this.getFiltered();
-            // await this.selectStatus();
+            await axios.post(this.params.baseUrl +'/excel', this.formData, {
+                headers: {'Content-Type': 'multipart/form-data'}
+            })
+            .then(
+                response => {
+                    this.$refs.excel.value = '';
+                    this.loadingExcel = false;
+                    this.initialize();
+                }
+            ).catch(error => {
+                console.log(error);
+            });
         },
         elementLoadToFile() {
             this.loadingExcel = true;
-            let file = this.$refs.excel.files;
-            let reader = new FileReader();
-            let vm = this;
+            let file = this.$refs.excel.files[0];
             this.loadExcel(file);
-            // reader.readAsBinaryString(file);
-            // reader.onload = function (e) {
-            //     let workbook = XLSX.read(e.target.result, {
-            //         type: 'binary'
-            //     });
-            //     let firstSheet = workbook.SheetNames[0];
-            //     let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-            //     excelRows.forEach((item, key) => {
-            //         console.log(key, item);
-            //     });
-            //     // console.log(excelRows);
-            //     // vm.loadExcel(excelRows);
-            //     file.value = '';
-            // };
         },
-        pickExcel () {
+        pickExcel() {
             this.$refs.excel.click();
         },
-        editItem (item) {
+        editItem(item) {
             this.editedIndex = this.desserts.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
         },
-        deleteItem (item) {
+        deleteItem(item) {
             const index = this.desserts.indexOf(item);
             if (confirm('Вы уверены, что хотите удалить этот элемент?')) {
                 axios({
@@ -588,15 +509,6 @@ export default {
             let vm = this;
             this.loaderSaveBtn = true;
             this.loadingSaveBtn = true;
-            await this.selectCity.filter(res => 
-                res.id == this.editedItem.city_id ? this.editedItem.city = res.name : null
-            );
-            var geocoder = ymaps.geocode(this.editedItem.city + ", " + this.editedItem.street + ", " + this.editedItem.house_number);
-
-            await geocoder.then(res => {
-                let geo = res.geoObjects.get(0).geometry.getCoordinates();
-                vm.editedItem.coordinates = geo[0] + ", " + geo[1];   
-            });
             
             await this.$validator.validateAll().then(() => {
                 if(this.$validator.errors.items.length == 0) {

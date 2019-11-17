@@ -5,6 +5,7 @@ use App\Models\Entrances;
 use App\Models\Areas;
 use App\Models\CitiesToWorks;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Address extends Model
 {
@@ -17,6 +18,23 @@ class Address extends Model
         'management_company',
         'coordinates'
     ];
+
+    public static function status($value)
+    {
+        if($value) {
+            $todayDate = Carbon::createFromFormat('d.m.Y', Carbon::parse(Carbon::today())->format('d.m.Y'))->timestamp;
+            $itemDateStart = Carbon::createFromFormat('d.m.Y', Carbon::parse($value['orders']['order_start_date'])->format('d.m.Y'))->timestamp;
+            $itemDateEnd = Carbon::createFromFormat('d.m.Y', Carbon::parse($value['orders']['order_end_date'])->format('d.m.Y'))->timestamp;
+
+            if($todayDate >= $itemDateStart && $todayDate <= $itemDateEnd) {
+                return 'Занят';
+            } else {
+                return 'Свободен';
+            }
+        } else {
+            return 'Свободен';
+        }
+    }
 
     public static function mb_ucfirst($word)
     {
@@ -56,7 +74,7 @@ class Address extends Model
         } else {
             $areas = new Areas;
             $areas->name = self::mb_ucfirst($value);
-            $areas->city_id = self::getAddressId($city);
+            $areas->city_id = self::getCityId($city);
             $areas->save();
             $id = $areas->id;
         }
@@ -73,7 +91,7 @@ class Address extends Model
     
     public function orderAddress()
     {
-        return $this->hasMany('App\Models\AddressToOrders', 'address_id', 'id');
+        return $this->hasOne('App\Models\AddressToOrders', 'address_id', 'id');
     }
 
     public function entrances()

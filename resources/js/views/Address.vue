@@ -19,7 +19,6 @@ export default {
                     value: 'city_id',
                     selectText: 'name',
                     TableGetIdName: 'city',
-                    selectApi: '/api/cities_to_works',
                     input: "select",
                     validate: 'required'
                 },                                                                                                                
@@ -30,7 +29,6 @@ export default {
                     value: 'area_id',
                     selectText: 'name',
                     TableGetIdName: 'area',
-                    selectApi: '/api/areas',
                     input: "select",
                     validate: 'required'
                 },
@@ -68,14 +66,6 @@ export default {
             search: true,
             pagination: true,
             excel: true,
-            filter: [
-                {
-                    title: 'Адреса',
-                    api: '/api/cities_to_works',
-                    value: 'name',
-                    input: 'city'
-                }
-            ],
         }
     }),
     computed: {
