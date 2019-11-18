@@ -40,7 +40,8 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::get('address/{id}', 'Api\AddressController@show'); // Show one item
         Route::put('address', 'Api\AddressController@store');  // Edit one item
         Route::delete('address/{id}', 'Api\AddressController@destroy'); // Delete one item
-        Route::post('address/excel', 'Api\AddressController@addExcelData'); // Delete one item
+        Route::post('address/excel', 'Api\AddressController@addExcelData'); 
+        Route::post('address/excelExport', 'Api\AddressController@exportExcelData');
 
         // Users
         Route::post('users', 'Api\UsersController@store'); // Add one item

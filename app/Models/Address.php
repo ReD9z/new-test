@@ -19,21 +19,23 @@ class Address extends Model
         'coordinates'
     ];
 
-    public static function status($value)
+    public static function status($order)
     {
-        if($value) {
+        $status = 'Свободен';
+        if($order) {
             $todayDate = Carbon::createFromFormat('d.m.Y', Carbon::parse(Carbon::today())->format('d.m.Y'))->timestamp;
-            $itemDateStart = Carbon::createFromFormat('d.m.Y', Carbon::parse($value['orders']['order_start_date'])->format('d.m.Y'))->timestamp;
-            $itemDateEnd = Carbon::createFromFormat('d.m.Y', Carbon::parse($value['orders']['order_end_date'])->format('d.m.Y'))->timestamp;
+            foreach ($order as $value) {
+                $itemDateStart = Carbon::createFromFormat('d.m.Y', Carbon::parse($value['orders']['order_start_date'])->format('d.m.Y'))->timestamp;
+                $itemDateEnd = Carbon::createFromFormat('d.m.Y', Carbon::parse($value['orders']['order_end_date'])->format('d.m.Y'))->timestamp;
 
-            if($todayDate >= $itemDateStart && $todayDate <= $itemDateEnd) {
-                return 'Занят';
-            } else {
-                return 'Свободен';
+                if($todayDate >= $itemDateStart && $todayDate <= $itemDateEnd) {
+                    $status = 'Занят';
+                }
             }
-        } else {
-            return 'Свободен';
         }
+        
+        return $status;
+        
     }
 
     public static function mb_ucfirst($word)
@@ -91,7 +93,7 @@ class Address extends Model
     
     public function orderAddress()
     {
-        return $this->hasOne('App\Models\AddressToOrders', 'address_id', 'id');
+        return $this->hasMany('App\Models\AddressToOrders', 'address_id', 'id');
     }
 
     public function entrances()

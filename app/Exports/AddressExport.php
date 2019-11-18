@@ -2,16 +2,21 @@
 
 namespace App\Exports;
 
-use App\Address;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use App\Invoice;
+use Maatwebsite\Excel\Concerns\FromArray;
 
-class AddressExport implements FromCollection
+class AddressExport implements FromArray
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    protected $invoices;
+
+    public function __construct(array $invoices)
     {
-        return Address::all();
+        $this->invoices = $invoices;
     }
+
+    public function array(): array
+    {
+        return $this->invoices;
+    }
+    
 }
