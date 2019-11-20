@@ -70,17 +70,33 @@ class Address extends Model
     public static function getAreaId($value, $city)
     {
         $id = null;
-        $area = Areas::where('name', self::mb_ucfirst($value))->first();
+        $area = Areas::join('cities_to_works', 'cities_to_works.id', '=', 'areas.city_id')->where('cities_to_works.name', self::mb_ucfirst($value))->orWhere('areas.name', self::mb_ucfirst($value))->first();
         if (!empty($area)) {
+            $save = Areas::where('id', $area->id);
+            // dd($area->id);
+            // $city = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
+            $save->city_id = $city->id;  
+            $save->save();
             $id = $area->id;
+        //     $areas = Areas::with('cities')->where('name', self::mb_ucfirst($value))->orWhere('cities.name', self::mb_ucfirst($value))->first();
+        //     // $citywork = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
         } else {
-            $areas = new Areas;
-            $areas->name = self::mb_ucfirst($value);
-            $areas->city_id = self::getCityId($city);
-            $areas->save();
-            $id = $areas->id;
+        //     $citywork = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
+        //     $areas = new Areas;
+        //     $areas->name = self::mb_ucfirst($value);
+        //     $areas->city_id = self::getAreaCity($value, $city);
+        //     $areas->save();
+        //     $id = $areas->id;
         }
         return $id;
+    }
+
+    public function getAreaCity($area, $city)
+    {
+        // $citywork = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
+        // $area = Areas::where('name', self::mb_ucfirst($area))->first();
+
+
     }
 
     public function cities() {

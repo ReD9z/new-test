@@ -350,7 +350,6 @@ export default {
                     this.filteredItems(this.desserts);
                     this.filtered(this.desserts);
                     this.loading = false;
-                    console.log(response.data.address);
                 }
             ).catch(error => {
                 console.log(error);
@@ -358,80 +357,40 @@ export default {
         },
         downloadExcel() {
             this.excelDownload = true;
+            if(this.desserts.length > 0) {
+                let vm = this;
+                let map = this.desserts.map((item)=> {
+                    let date = null;
+                    item.status.forEach(stats => {
+                        let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
+                        let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
+                        let dateToday = vm.$moment(vm.dateToday, 'DD-MM-YYYY').unix() * 1000;
+                        if(dateToday >= itemDateStart && dateToday <= itemDateEnd) {
+                            date = vm.$moment(stats.orders.order_end_date).format('DD.MM.YYYY');
+                        } 
+                    });
+                    return {
+                        "Город": item.city,
+                        "Район": item.area,
+                        "Улица": item.street,
+                        "Номер дома": item.house_number,
+                        "Количество подъездов": item.number_entrances,
+                        "Управляющая компания": item.management_company,
+                        "Статус": item.result != "Занят" ? item.result : item.result + " до " + date
+                    }
+                });
 
-            axios({
-                method: 'post',
-                url: '/api/address/excelExport',
-                data: this.desserts,
-            })
-            .then(
-                response => {
-                    var data = new FormData();
-                    var file = response.data;
-                    data.append('filenya', file);
-                    console.log(data);
-                    // let file = response.data;
-                    // let reader = new FileReader();
-                    // console.log(reader.readAsText(response.data));
-                    // let vm = this;
-                    // reader.readAsBinaryString(file);
-                    // reader.onload = function (e) {
-                        // let workbook = XLSX.read(e.target.result, {
-                            // type: 'binary'
-                        // });
-                        // console.log(workbook);
-                        // let firstSheet = workbook.SheetNames[0];
-                        // let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], {raw: false});
-                        // console.log(excelRows);
-                        // vm.loadExecelTask(excelRows);
-                    // };
-                    // let ws = XLSX.utils.json_to_sheet(response.data, {raw:true});
-                    // console.log(XLSX.utils);
-                    // console.log(response.data);
-                    // let wb = XLSX.utils.book_new();
-
-                    // XLSX.utils.book_append_sheet(wb, ws, "Адреса");
-                    // XLSX.writeFile(wb, "Адреса.xlsx");
-                    this.excelDownload = false;
+                let ws = XLSX.utils.json_to_sheet(map, {raw:true});
+                if(!ws['!cols']) ws['!cols'] = [];
+                for (let i = 0; i < 7; i++) {
+                    ws['!cols'][i] = { wch: 28 };
                 }
-            ).catch(error => {
-                console.log(error);
-            })
-
-            // if(this.desserts.length > 0) {
-            //     let vm = this;
-            //     let map = this.desserts.map((item)=> {
-            //         let date = null;
-            //         item.status.forEach(stats => {
-            //             let itemDateStart = vm.$moment(stats.orders.order_start_date).unix() * 1000;
-            //             let itemDateEnd = vm.$moment(stats.orders.order_end_date).unix() * 1000;
-            //             let dateToday = vm.$moment(vm.dateToday, 'DD-MM-YYYY').unix() * 1000;
-            //             if(dateToday >= itemDateStart && dateToday <= itemDateEnd) {
-            //                 date = vm.$moment(stats.orders.order_end_date).format('DD.MM.YYYY');
-            //             } 
-            //         });
-            //         return {
-            //             "Город": item.city,
-            //             "Район": item.area,
-            //             "Улица": item.street,
-            //             "Номер дома": item.house_number,
-            //             "Количество подъездов": item.number_entrances,
-            //             "Управляющая компания": item.management_company,
-            //             "Статус": item.result != "Занят" ? item.result : item.result + " до " + date
-            //         }
-            //     });
-
-                // let ws = XLSX.utils.json_to_sheet(map, {raw:true});
-            //     if(!ws['!cols']) ws['!cols'] = [];
-            //     for (let i = 0; i < 7; i++) {
-            //         ws['!cols'][i] = { wch: 28 };
-            //     }
-                // let wb = XLSX.utils.book_new();
+                let wb = XLSX.utils.book_new();
               
-            //     XLSX.utils.book_append_sheet(wb, ws, "Адреса");
-            //     XLSX.writeFile(wb, "Адреса.xlsx");
-            //     this.excelDownload = false;
-            // }
+                XLSX.utils.book_append_sheet(wb, ws, "Адреса");
+                XLSX.writeFile(wb, "Адреса.xlsx");
+                this.excelDownload = false;
+            }
         },
         parseDate (date) {
             if (!date) return null

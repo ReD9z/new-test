@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Imports\AddressImport;
-use App\Exports\AddressExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Address;
 use App\Models\Areas;
@@ -72,28 +71,6 @@ class AddressController extends Controller
     public function addExcelData(Request $request)
     {
         Excel::import(new AddressImport, $request->file('file'));
-        
-        // return response()->json(['errors' => [], 'data' => $request->file('file'), 'status' => 200], 200);
-    }
-
-    public function exportExcelData(Request $request)
-    {
-        $export = new AddressExport([
-            [1, 2, 3],
-            [4, 5, 6]
-        ]);
-        // return Excel::download($export, 'invoices.xlsx');
-        // $rows = Excel::import($request->all(), 'test.xlsx');
-        // return Excel::download($request->all(), 'export.xlsx');
-        // return response()->json(['errors' => [], 'data' => $rows, 'status' => 200], 200);
-        // return Excel::download($request->all(), 'users.xlsx')->export('xlsx');
-        // return (new $request->all())->download('invoices.xlsx');
-        // return ($request->all())->download('invoices.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-        // return [
-        //     new DownloadExcel(),
-        // ];
-        //  return $excel->download($request->all(), 'invoices.xlsx');
-        return Excel::download($export, 'invoices.xlsx');
     }
 
     /**
