@@ -72,12 +72,22 @@ class Address extends Model
         $id = null;
         $area = Areas::join('cities_to_works', 'cities_to_works.id', '=', 'areas.city_id')->where('cities_to_works.name', self::mb_ucfirst($value))->orWhere('areas.name', self::mb_ucfirst($value))->first();
         if (!empty($area)) {
-            $save = Areas::where('id', $area->id);
-            // dd($area->id);
-            // $city = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
-            $save->city_id = $city->id;  
-            $save->save();
-            $id = $area->id;
+            $toWorks = new CitiesToWorks;
+            $toWorks->name = self::mb_ucfirst($city);
+            $toWorks->save();
+
+            $areas = new Areas;
+            $areas->name = self::mb_ucfirst($value);
+            $areas->city_id = $toWorks->id;  
+            $areas->save();
+            $id = $areas->id;
+
+
+
+            
+
+            
+          
         //     $areas = Areas::with('cities')->where('name', self::mb_ucfirst($value))->orWhere('cities.name', self::mb_ucfirst($value))->first();
         //     // $citywork = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
         } else {
