@@ -976,6 +976,11 @@ export default {
         async loadExecelTask(file) {
             this.loadingExcelTask = true;
             let vm = this;
+            this.dateStartNew = null;
+            this.dateEndNew = null;
+            this.dateStartClient = null;
+            this.dateEndClient = null;
+            
             await file.forEach(function (item) {
                 axios({
                     method: 'post',
@@ -1122,8 +1127,8 @@ export default {
                 })
                 .then(
                     response => {
-                        // this.desserts.splice(index, 1);
-                        this.initialize();
+                        this.desserts.splice(index, 1);
+                        // this.initialize();
                     }
                 ).catch(error => {
                     console.log(error);
