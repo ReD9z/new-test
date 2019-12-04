@@ -1,6 +1,6 @@
 <template>
 <div>
-    <b-add-client :addClient.sync="addClient" v-on:input="$emit('addClient', $event.target.value)"></b-add-client>
+    <b-add-client :addClient.sync="addClient" :clientNew.sync="clientNew" v-on:input="$emit('addClient', $event.target.value)"></b-add-client>
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>{{$route.meta.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
@@ -579,6 +579,7 @@ export default {
     data: (vm) => ({
         statusFilter: ['Завершена', 'В работе'],
         search: '',
+        clientNew: {},
         loadingExcelTask: false,
         dialog: false,
         addClient: false,
@@ -656,6 +657,14 @@ export default {
         },
         addClient(newVal, oldVal) {
             this.selectClient();
+            console.log(this);
+            // if(this.clientNew.length > 0) {
+            //     console.log(this.clientNew.id);
+            //     this.editedItem['client_id'] = this.clientNew.id;
+            // }
+        },
+        clientNew(newVal, oldVal) {
+            //  console.log(this.$emit('clientNew', $event.target.value));
         }
     },
     async created () {
@@ -759,10 +768,10 @@ export default {
             }
         },
         hideElem() {
-            if(this.isLoggedUser.installers || this.isLoggedUser.managers) {
+            if(this.isLoggedUser.installers) {
                 return false;
             }
-            if(!this.isLoggedUser.installers || !this.isLoggedUser.managers) {
+            if(!this.isLoggedUser.installers) {
                 return true;
             }
         },
@@ -877,8 +886,8 @@ export default {
                         if(this.dateStartClient && this.dateEndClient) {
                             this.desserts = this.desserts.filter(function (item) {
                                 let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
-                                let dateStart = vm.$moment(vm.formatDate(vm.dateStartNew), 'DD.MM.YYYY').unix() * 1000;
-                                let dateEnd = vm.$moment(vm.formatDate(vm.dateEndNew), 'DD.MM.YYYY').unix() * 1000;
+                                let dateStart = vm.$moment(vm.formatDate(vm.dateStartClient), 'DD.MM.YYYY').unix() * 1000;
+                                let dateEnd = vm.$moment(vm.formatDate(vm.dateEndClient), 'DD.MM.YYYY').unix() * 1000;
                                 if(itemDateStart >= dateStart && itemDateStart <= dateEnd) {
                                     return item;
                                 } 
@@ -974,8 +983,8 @@ export default {
             };
         },
         async loadExecelTask(file) {
-            this.loadingExcelTask = true;
             let vm = this;
+            this.loadingExcelTask = true;
             this.dateStartNew = null;
             this.dateEndNew = null;
             this.dateStartClient = null;
@@ -1065,7 +1074,7 @@ export default {
                 let ws = XLSX.utils.json_to_sheet(map, {raw:true});
                 if(!ws['!cols']) ws['!cols'] = [];
                 for (let i = 0; i < 5; i++) {
-                    ws['!cols'][i] = { wch: 28 };
+                    ws['!cols'][i] = {wch: 28};
                 }
                 let wb = XLSX.utils.book_new();
               
@@ -1109,6 +1118,7 @@ export default {
             this.$refs.excel.click();
         },
         editItem (item) {
+            this.editedItem['status'] = 1;
             this.editedIndex = this.desserts.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
@@ -1141,6 +1151,7 @@ export default {
             setTimeout(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
                 this.editedIndex = -1
+                this.editedItem['status'] = 1;
             }, 300)
             this.$validator.reset()
         },
@@ -1199,12 +1210,13 @@ export default {
         },
         dataAdd() {
             if(this.isLoggedUser.managers) {
-                // this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
+                this.editedItem['manager_id'] = this.isLoggedUser.managers.id;
             }
             if(this.isLoggedUser.moderators) {
                 // this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
                 // this.editedItem['moderator_id'] = this.isLoggedUser.moderators.id;
             }
+            this.editedItem['status'] = 1;
         }
     },
     mounted() {

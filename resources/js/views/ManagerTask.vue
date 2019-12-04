@@ -50,7 +50,7 @@ export default {
                     TableGetIdName: 'managers',
                     selectApi: '/api/managers',
                     input: "select",
-                    validate: 'required'
+                    // validate: 'required'
                 },
                 { 
                     text: 'Дата звонка', 
@@ -74,7 +74,7 @@ export default {
                     value: "status",
                     title: "statusName",
                     text: 'Статус',
-                    validate: 'required',
+                    // validate: 'required',
                     sortable: true,
                 },
                 { 
@@ -82,7 +82,7 @@ export default {
                     input: "text",
                     sortable: true,
                     value: 'comment',
-                    validate: 'required'
+                    // validate: 'required'
                 },
                 { 
                     text: 'Результат выполнения', 

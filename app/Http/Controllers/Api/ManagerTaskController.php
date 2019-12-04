@@ -88,8 +88,8 @@ class ManagerTaskController extends Controller
                     } else {
                         $toUsers = new User;
                         $toUsers->name = mb_ucfirst(array_values($request->input())[4]);
-                        $toUsers->email = str_replace(' ', '', array_values($request->input())[5]);
-                        $toUsers->phone = str_replace(' ', '', array_values($request->input())[6]);
+                        $toUsers->email = str_replace(' ', '', array_values($request->input())[6]);
+                        $toUsers->phone = str_replace(' ', '', array_values($request->input())[5]);
                         $toUsers->login = null;
                         $toUsers->role = 'client';
                         
@@ -127,8 +127,8 @@ class ManagerTaskController extends Controller
                 } else {
                     $toUsers = new User;
                     $toUsers->name = mb_ucfirst(array_values($request->input())[4]);
-                    $toUsers->email = str_replace(' ', '', array_values($request->input())[5]);
-                    $toUsers->phone = str_replace(' ', '', array_values($request->input())[6]);
+                    $toUsers->email = str_replace(' ', '', array_values($request->input())[6]);
+                    $toUsers->phone = str_replace(' ', '', array_values($request->input())[5]);
                     $toUsers->login = null;
                     $toUsers->role = 'client';
                     

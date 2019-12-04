@@ -200,7 +200,8 @@ export default {
         validator: 'new'
     },
     props: {
-        addClient: Boolean
+        addClient: Boolean,
+        clientNew: Object 
     },
     watch: {
         addClient(newVal, oldVal) {
@@ -216,6 +217,7 @@ export default {
         required: "required",
         valid: true,
         select: [],
+        client: [],
         loadingSaveBtn: false,
         loaderSaveBtn: null,
         editedItem: {
@@ -240,7 +242,7 @@ export default {
     },
     methods: { 
         save () {
-            this.$emit('update:addClient', true)
+            this.$emit('update:addClient', true);
             this.$validator.validateAll().then(() => {
                 if(this.$validator.errors.items.length == 0) {
                     this.loaderSaveBtn = true;
@@ -257,7 +259,10 @@ export default {
                             await this.$refs.forms2.reset();
                             await this.$validator.reset();
                             await this.$emit('update:addClient', false)
+                            await this.$emit('update:clientNew', response.data)
+                            console.log(this);
                             this.dialog = false;
+                            // console.log(this.clientArr);
                         }
                     ).catch(error => {
                         if(error.response.status == 422) {
