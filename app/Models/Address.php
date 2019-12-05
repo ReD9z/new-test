@@ -116,6 +116,11 @@ class Address extends Model
         return $this->hasMany('App\Models\AddressToOrders', 'address_id', 'id');
     }
 
+    public function order()
+    {
+        return $this->hasOne('App\Models\AddressToOrders');
+    }
+
     public function entrances()
     {
         return $this->hasMany('App\Models\Entrances', 'address_id', 'id');

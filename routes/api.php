@@ -17,6 +17,7 @@ Route::group(['middleware' => ['json.response']], function () {
     
     /******* Public routes *******/
     Route::post('login', 'Api\AuthController@login');
+    Route::get('taskAddress/{id}', 'Api\TasksController@taskAddress');
     
     
     /******* Private routes *******/
@@ -25,15 +26,6 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::post('files', 'Api\FilesUploadController@add');
         Route::post('files/remove', 'Api\FilesUploadController@remove');
     
-        // Article
-        Route::post('article', 'Api\ArticleController@store'); // Add one item
-        Route::get('article', 'Api\ArticleController@index'); // Show list
-        Route::get('article/{id}', 'Api\ArticleController@show'); // Show one item
-        Route::put('article', 'Api\ArticleController@store');  // Edit one item
-        Route::delete('article', 'Api\ArticleController@store');  // Edit one item
-        Route::delete('article/{id}', 'Api\ArticleController@destroy'); // Delete one item
-        Route::post('article/excel', 'Api\ArticleController@addExcelData'); // Delete one item
-
         // Address
         Route::post('address', 'Api\AddressController@store'); // Add one item
         Route::get('address', 'Api\AddressController@index'); // Show list
@@ -140,6 +132,7 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('tasks', 'Api\TasksController@store');  // Edit one item
         Route::delete('tasks/{id}', 'Api\TasksController@destroy'); // Delete one item
         Route::get('tasks', 'Api\TasksController@index'); // Show list
+       
 
         // TasksManager   
         Route::post('managerTask', 'Api\ManagerTaskController@store'); // Add one item

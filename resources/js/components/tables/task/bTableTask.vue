@@ -870,6 +870,7 @@ export default {
                 response => {
                     this.desserts = response.data;
                     let vm = this;
+                    console.log(response.data);
                     if(this.params.baseUrl == '/api/tasks') {
                         if(this.dateStart && this.dateEnd) {
                             this.desserts = this.desserts.filter(function (item) {
