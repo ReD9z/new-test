@@ -7,8 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Tasks;
 use App\Models\Address;
 use App\Models\Orders;
+use App\Models\Entrances;
 use App\Http\Resources\Tasks as TasksResource;
 use App\Http\Resources\Orders as OrdersResource;
+use App\Http\Resources\TaskAddress as TaskAddressResource;
+use App\Http\Resources\TaskM as TaskMResource;
+use App\Http\Resources\Entrances as EntrancesResource;
 
 class TasksController extends Controller
 {
@@ -31,25 +35,42 @@ class TasksController extends Controller
 
         return TasksResource::collection($tasks);
     }
+
+    public function task(Request $request)
+    {
+        if($request->city) {
+            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installers.city_id', $request->city); 
+        }
+        else if($request->user) {
+            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installer_id', $request->user); 
+        }
+        else {
+            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get(); 
+        }
+
+        return TaskMResource::collection($tasks);
+    }
     
     public function taskAddress($id)
     {
-        $address = Orders::with('tasks', 'orderAddress.address')->get()->where('tasks.id', $id);
+        $tasks = Tasks::with('orders.orderAddress.address')->where('id', $id)->first();
+    
+        $address = [];
 
-        return response()->json(['errors' => [], 'data' => $address, 'status' => 200], 200);
-        // $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get();
-        // $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->where('city_id', $request->city)->get();
-        // if($request->city) {
-        //     $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files',  'installers.users', 'types')->get()->where('installers.city_id', $request->city); 
-        // }
-        // else if($request->user) {
-        //     $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installer_id', $request->user); 
-        // }
-        // else {
-        //     $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get(); 
-        // }
+        foreach ($tasks->orders->orderAddress as $key => $value) {
+            $address[] = $value->address_id;
+        }
 
-        // return TasksResource::collection($tasks);
+        $addresses = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('id', $address)->get();
+
+        return TaskAddressResource::collection($addresses);
+    }
+
+    public function taskEntrances($id)
+    {
+        $entrances = Entrances::with('address')->where('address_id', $id)->get();
+
+        return EntrancesResource::collection($entrances);
     }
 
     /**

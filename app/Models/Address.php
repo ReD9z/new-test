@@ -116,6 +116,23 @@ class Address extends Model
         return $this->hasMany('App\Models\AddressToOrders', 'address_id', 'id');
     }
 
+    public function statusAddress($id)
+    {
+        $entrances = Entrances::with('address')->where('address_id', $id)->get();
+        $status = 0;
+        foreach ($entrances as $key => $value) {
+            if($value->status == 0) {
+                $status = 0;
+            }
+            else if($value->status == 3)
+                $status = 0;
+            else {
+                $status = 1;
+            }
+        }
+        return $status;
+    }
+
     public function order()
     {
         return $this->hasOne('App\Models\AddressToOrders');

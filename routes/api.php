@@ -17,9 +17,8 @@ Route::group(['middleware' => ['json.response']], function () {
     
     /******* Public routes *******/
     Route::post('login', 'Api\AuthController@login');
+  
     Route::get('taskAddress/{id}', 'Api\TasksController@taskAddress');
-    
-    
     /******* Private routes *******/
     Route::middleware('auth:api')->group(function () {
         Route::get('logout', 'Api\AuthController@logout');
@@ -132,6 +131,8 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('tasks', 'Api\TasksController@store');  // Edit one item
         Route::delete('tasks/{id}', 'Api\TasksController@destroy'); // Delete one item
         Route::get('tasks', 'Api\TasksController@index'); // Show list
+        Route::get('task', 'Api\TasksController@task');
+        Route::get('taskEntrances/{id}', 'Api\TasksController@taskEntrances');
        
 
         // TasksManager   
@@ -144,5 +145,6 @@ Route::group(['middleware' => ['json.response']], function () {
 
         // EntrancesManager   
         Route::put('entrancesSave', 'Api\EntrancesController@store'); // Save one item
+        Route::get('entrances/{id}', 'Api\EntrancesController@index');
     });
 });

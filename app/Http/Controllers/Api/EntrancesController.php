@@ -9,6 +9,12 @@ use App\Http\Resources\Entrances as EntrancesResource;
 
 class EntrancesController extends Controller
 {
+    public function index($id)
+    {
+        $entrances = Entrances::with('address')->where('id', $id)->get();
+
+        return EntrancesResource::collection($entrances);
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -17,7 +23,7 @@ class EntrancesController extends Controller
      */
     public function store(Request $request)
     {
-        $entrances = Entrances::with('files')->findOrFail($request->id);
+        $entrances = Entrances::with('files', 'address')->findOrFail($request->id);
         $entrances->shield = $request->input('shield');
         $entrances->glass = $request->input('glass');
         $entrances->information = $request->input('information');

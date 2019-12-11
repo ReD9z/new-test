@@ -579,7 +579,7 @@ export default {
     data: (vm) => ({
         statusFilter: ['Завершена', 'В работе'],
         search: '',
-        clientNew: {},
+        clientNew: null,
         loadingExcelTask: false,
         dialog: false,
         addClient: false,
@@ -655,16 +655,11 @@ export default {
         chipsStatus() {
             this.initialize();
         },
-        addClient(newVal, oldVal) {
-            this.selectClient();
-            console.log(this);
-            // if(this.clientNew.length > 0) {
-            //     console.log(this.clientNew.id);
-            //     this.editedItem['client_id'] = this.clientNew.id;
-            // }
-        },
         clientNew(newVal, oldVal) {
-            //  console.log(this.$emit('clientNew', $event.target.value));
+            this.selectClient();
+            if(this.clientNew) {
+                this.editedItem['client_id'] = this.clientNew;
+            }
         }
     },
     async created () {
@@ -870,7 +865,6 @@ export default {
                 response => {
                     this.desserts = response.data;
                     let vm = this;
-                    console.log(response.data);
                     if(this.params.baseUrl == '/api/tasks') {
                         if(this.dateStart && this.dateEnd) {
                             this.desserts = this.desserts.filter(function (item) {
@@ -1149,11 +1143,11 @@ export default {
         close () {
             this.dialog = false
             this.dialogImages = false
-            setTimeout(() => {
-                this.editedItem = Object.assign({}, this.defaultItem)
-                this.editedIndex = -1
-                this.editedItem['status'] = 1;
-            }, 300)
+            // setTimeout(() => {
+            //     this.editedItem = Object.assign({}, this.defaultItem)
+            //     this.editedIndex = -1
+            //     this.editedItem['status'] = 1;
+            // }, 300)
             this.$validator.reset()
         },
         resetFilesLoad() {
@@ -1182,8 +1176,8 @@ export default {
                             this.initialize();
                             this.loaderSaveBtn = null;
                             this.loadingSaveBtn = false;
-                            this.close();
-                            this.$refs.forms.reset();
+                            // this.close();
+                            // this.$refs.forms.reset();
                         }
                     ).catch(error => {
                         console.log(error);

@@ -201,7 +201,7 @@ export default {
     },
     props: {
         addClient: Boolean,
-        clientNew: Object 
+        clientNew: Number
     },
     watch: {
         addClient(newVal, oldVal) {
@@ -259,8 +259,8 @@ export default {
                             await this.$refs.forms2.reset();
                             await this.$validator.reset();
                             await this.$emit('update:addClient', false)
-                            await this.$emit('update:clientNew', response.data)
-                            console.log(this);
+                            await this.$emit('update:clientNew', response.data.id)
+                            // console.log(this.clientNew);
                             this.dialog = false;
                             // console.log(this.clientArr);
                         }

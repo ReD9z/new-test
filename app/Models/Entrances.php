@@ -27,4 +27,9 @@ class Entrances extends Model
     public function files() {
         return $this->hasOne('App\Models\Files', 'id', 'file_id');
     }
+
+    public function address()
+    {
+        return $this->hasOne('App\Models\Address', 'id', 'address_id');
+    }
 }
