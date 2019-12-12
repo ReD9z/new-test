@@ -4,15 +4,20 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use App\Models\Tasks;
 use App\Models\Address;
 use App\Models\Orders;
 use App\Models\Entrances;
+use App\Models\TypesToWorks;
+use App\Models\Installers;
 use App\Http\Resources\Tasks as TasksResource;
 use App\Http\Resources\Orders as OrdersResource;
 use App\Http\Resources\TaskAddress as TaskAddressResource;
 use App\Http\Resources\TaskM as TaskMResource;
 use App\Http\Resources\Entrances as EntrancesResource;
+use App\Http\Resources\TypesToWorks as TypesToWorksResource;
+use App\Http\Resources\Installers as InstallersResource;
 
 class TasksController extends Controller
 {
@@ -23,6 +28,31 @@ class TasksController extends Controller
      */
     public function index(Request $request)
     {
+        $types = TypesToWorks::get(); 
+        $installers = Installers::with('users', 'cities', 'moderator.users')->get();
+        $ordersArray = Orders::with('clients', 'orderAddress', 'clients.users')->get();
+        $ordersId = []; 
+        $orders = [];
+        
+        if($request->dateStart || $request->dateEnd) {
+            $dateStart = Carbon::createFromFormat('d.m.Y', Carbon::parse($request->dateStart)->format('d.m.Y'))->timestamp;
+            $dateEnd = Carbon::createFromFormat('d.m.Y', Carbon::parse($request->dateEnd)->format('d.m.Y'))->timestamp;
+            foreach ($ordersArray as $key => $value) {
+                $itemDateStart = Carbon::createFromFormat('d.m.Y', Carbon::parse($value->order_start_date)->format('d.m.Y'))->timestamp;
+                $itemDateEnd = Carbon::createFromFormat('d.m.Y', Carbon::parse($value->order_start_date)->format('d.m.Y'))->timestamp;
+                if($dateStart >= $itemDateStart && $dateEnd <= $itemDateEnd || $dateStart <= $itemDateStart && $dateEnd >= $itemDateEnd) {
+                    $ordersId[] = $ordersArray[$key]['id'];
+                }
+            }
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users')->whereIn('id', $ordersId)->get();
+        } else {
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users')->get();
+        }
+        $status = [
+            ['id' => 1, 'title' => 'В работе'], 
+            ['id' => 2, 'title' => 'Завершена']
+        ];
+
         if($request->city) {
             $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installers.city_id', $request->city); 
         }
@@ -33,7 +63,14 @@ class TasksController extends Controller
             $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get(); 
         }
 
-        return TasksResource::collection($tasks);
+        return response()->json([
+            'tasks' => TasksResource::collection($tasks), 
+            'types' => TypesToWorksResource::collection($types), 
+            'orders' => OrdersResource::collection($orders),
+            'installers' => InstallersResource::collection($installers),
+            'statusName' => $status,
+        ]);
+        // return TasksResource::collection($tasks);
     }
 
     public function task(Request $request)

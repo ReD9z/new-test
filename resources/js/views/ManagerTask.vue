@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-4 mt-4">
         <div class="col-md-12 mb-4 mt-4">
-            <b-table-task :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator', installer: 'installer', manager: 'manager'})"></b-table-task>
+            <b-task-manager :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator', installer: 'installer', manager: 'manager'})"></b-task-manager>
         </div>
     </div>
 </template>

@@ -2,7 +2,6 @@
     <div class="maps-wrap">
         <v-progress-linear height="5" v-show="mapLoader" indeterminate class="maps-loader"></v-progress-linear>
         <div id="orderMaps" v-show="mapsShow"></div>
-        <!-- <v-progress-circular indeterminate class="maps-loader" v-show="mapLoader"></v-progress-circular> -->
     </div>
 </template>
 <style type="text/css">
@@ -57,7 +56,6 @@ export default {
                     if(vm.mapsShow == false) {
                         vm.mapLoader = false;
                     }
-
                 });
             });
         }

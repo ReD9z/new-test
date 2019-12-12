@@ -13,68 +13,64 @@ export default {
             excelTask: false,
             headers: [
                 {
+                    input: "select",
                     text: 'Заказ',
                     align: 'left',
                     sortable: true,
                     value: 'orders_id',
-                    selectText: 'orderClient',
-                    TableGetIdName: 'orderClient',
-                    selectApi: '/api/orders',
-                    input: "select",
+                    tableValue: 'orders',
+                    childField: 'orderClient',
                     validate: 'required'
                 },
                 {
+                    input: "select",
                     text: 'Монтажник',
                     align: 'left',
                     sortable: true,
                     value: 'installer_id',
-                    selectText: 'name',
-                    TableGetIdName: 'installers',
-                    selectApi: '/api/installers',
-                    input: "select",
+                    tableValue: 'installers',
+                    childField: 'name',
                     validate: 'required'
                 },
                 { 
-                    text: 'Дата выполнения', 
                     input: "date",
+                    text: 'Дата выполнения', 
                     sortable: true,
                     close: false,
                     value: 'task_date_completion',
+                    tableValue: 'task_date_completion',
                     validate: 'required'
                 },
                 {
+                    input: "select",
                     text: 'Тип работы',
                     align: 'left',
                     sortable: true,
                     value: 'types_to_works_id',
-                    selectText: 'title',
-                    TableGetIdName: 'types',
-                    selectApi: '/api/types_to_work',
-                    input: "select",
+                    tableValue: 'types',
+                    childField: 'title',
                     validate: 'required'
                 },
                 {
-                    data: [	
-                        {status: 1, text: 'В работе'},	
-                        {status: 2, text: 'Завершена'}	
-                    ],
-                    input: "status",
+                    input: "select",
                     value: "status",
-                    title: "statusName",
+                    tableValue: 'statusName',
+                    childField: 'title',
                     text: 'Статус',
                     validate: 'required',
                     sortable: true,
                 },
                 { 
                     text: 'Комментарий', 
-                    input: "text",
+                    tableValue: "comment",
+                    input: "textarea",
                     sortable: true,
                     value: 'comment',
                     validate: 'required'
                 }
             ],
             filter: false,
-            searchValue: ['orderClient', 'installers', 'types', 'task_date_completion', 'comment', 'statusName'],
+            searchValue: ['orders', 'installers', 'types', 'task_date_completion', 'comment', 'statusName'],
             search: true,
             pagination: true,
             excel: true

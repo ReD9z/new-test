@@ -34,8 +34,7 @@ class Address extends Model
             }
         }
         
-        return $status;
-        
+        return $status; 
     }
 
     public static function mb_ucfirst($word)

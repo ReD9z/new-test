@@ -36,7 +36,7 @@ let routers =  [
         path: '/tasks',
         name: 'tasks',
         meta: {
-            title: 'Задачи',
+            title: 'Задачи монтажникам',
             requiresAuth: true,
             adminAuth: true,
             moderatorAuth: true,
@@ -50,7 +50,7 @@ let routers =  [
         path: '/tasksManager',
         name: 'tasksManager',
         meta: {
-            title: 'Задачи',
+            title: 'Задачи менеджерам',
             requiresAuth: true,
             adminAuth: true,
             moderatorAuth: false,
