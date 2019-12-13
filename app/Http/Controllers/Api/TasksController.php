@@ -28,12 +28,13 @@ class TasksController extends Controller
      */
     public function index(Request $request)
     {
-        $types = TypesToWorks::get(); 
-        $installers = Installers::with('users', 'cities', 'moderator.users')->get();
-        $ordersArray = Orders::with('clients', 'orderAddress', 'clients.users')->get();
         $ordersId = []; 
         $orders = [];
-        
+
+        $types = TypesToWorks::get(); 
+        $installers = Installers::with('users', 'cities', 'moderator.users')->get();
+        $ordersArray = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get();
+        $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
         if($request->dateStart || $request->dateEnd) {
             $dateStart = Carbon::createFromFormat('d.m.Y', Carbon::parse($request->dateStart)->format('d.m.Y'))->timestamp;
             $dateEnd = Carbon::createFromFormat('d.m.Y', Carbon::parse($request->dateEnd)->format('d.m.Y'))->timestamp;
@@ -44,9 +45,9 @@ class TasksController extends Controller
                     $ordersId[] = $ordersArray[$key]['id'];
                 }
             }
-            $orders = Orders::with('clients', 'orderAddress', 'clients.users')->whereIn('id', $ordersId)->get();
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where('tasks','=', null);
         } else {
-            $orders = Orders::with('clients', 'orderAddress', 'clients.users')->get();
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
         }
         $status = [
             ['id' => 1, 'title' => 'В работе'], 
@@ -68,7 +69,7 @@ class TasksController extends Controller
             'types' => TypesToWorksResource::collection($types), 
             'orders' => OrdersResource::collection($orders),
             'installers' => InstallersResource::collection($installers),
-            'statusName' => $status,
+            'statusName' => $status
         ]);
         // return TasksResource::collection($tasks);
     }

@@ -136,6 +136,36 @@
                                 </template>
                             </v-autocomplete>
                         </div>
+                        <div v-if="param.input == 'date'">
+                            <v-menu
+                                v-model="param.close"
+                                :close-on-content-click="false"
+                                :nudge-right="40"
+                                lazy
+                                transition="scale-transition"
+                                offset-y
+                                full-width
+                                max-width="290px"
+                                min-width="290px"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        v-model="editedItem[param.value]"
+                                        hint="Формат дд.мм.гггг"
+                                        persistent-hint
+                                        @blur="editedItem[param.value] = formatDate(picker)"
+                                        prepend-icon="event"
+                                        :label="param.text"
+                                        :data-vv-as="'`'+param.text+'`'" 
+                                        :data-vv-name="param.value" 
+                                        :error-messages="errors.collect(param.value)" 
+                                        v-validate="param.validate"
+                                        v-on="on"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                            </v-menu>
+                        </div>
                         <div v-if="param.input == 'textarea'">
                             <v-textarea
                                 rows='1'
@@ -239,6 +269,7 @@ export default {
         dateEnd: null,
         dateStartShow: false,
         dateEndShow: false,
+        picker: new Date().toISOString().substr(0, 10),
         loadingExcel:false,
         pagination: {
             sortBy: 'id'
@@ -317,29 +348,21 @@ export default {
         },
         downloadExcel() {
             if(this.desserts.length > 0) {
+                console.log(this.desserts);
                 let map = this.desserts.map((item)=> {
-                    let address = [];
-                    item.orderAddresses.map((item2, key) => {
-                        address += "г." + item2.address.cities.name 
-                        address += ", " + item2.address.areas.name + ","
-                        address += " ул. " + item2.address.street + ","
-                        address += " дом " + item2.address.house_number + ","
-                        address += " количество подъездов " + item2.address.number_entrances + ","
-                        address += " управляющая компания " + item2.address.management_company + " ";
-                    });
-
                     return {
-                        "Название организации клиента" : item.orders,
-                        "Дата выполнения задачи"  : item.task_date_completion,
-                        "Тип работы"  : item.types,
-                        "Комментарий" : item.comment,
-                        "Адреса": address
+                        "Название организации клиента": item.orders,
+                        "Дата выполнения задачи": item.task_date_completion,
+                        "Тип работы": item.types,
+                        "Комментарий": item.comment,
+                        "Адреса": item.orderAddress
                     }
                 });
                 
                 let ws = XLSX.utils.json_to_sheet(map, {raw:true});
+
                 if(!ws['!cols']) ws['!cols'] = [];
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 6; i++) {
                     ws['!cols'][i] = {wch: 28};
                 }
                 let wb = XLSX.utils.book_new();
@@ -362,6 +385,7 @@ export default {
                     this.desserts = response.data.tasks;
                     this.formFilds = response.data;
                     this.filteredItems(this.desserts);
+                    console.log(response.data);
                     this.loading = false;
                 }
             ).catch(error => {
@@ -380,9 +404,10 @@ export default {
             this.search = '';
             this.initialize();
         },
-        editItem (item) {
+        editItem(item) {
             this.editedIndex = this.desserts.indexOf(item);
             this.editedItem = Object.assign({}, item);
+            this.formFilds.orders.push(this.editedItem.order);
             this.dialog = true;
         },
         deleteItem (item) {
@@ -402,6 +427,7 @@ export default {
             }
         },
         close() {
+            this.initialize();
             this.dialog = false;
             setTimeout(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
@@ -429,7 +455,7 @@ export default {
                         response => {
                             this.initialize();
                             this.loadingSaveBtn = false;
-                            // this.dialog = false;
+                            this.dialog = false;
                         }
                     ).catch(error => {
                         console.log(error);

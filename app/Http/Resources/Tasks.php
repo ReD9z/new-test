@@ -18,6 +18,8 @@ class Tasks extends JsonResource
             'id' => $this->id,
             'orders_id' => $this->orders_id,
             'orders' =>  $this->orders->clients ? 'Заказ #'.$this->orders->id.' - '.$this->orders->clients->users->name : null,
+            'orderAddress' => $this->getAddress($this->orders->orderAddress),
+            'order' => $this->orders ? $this->orderTask($this->orders->id)[0] : null,
             'installer_id' => $this->installer_id,
             'installers' => $this->installers ? $this->installers->users->name : null,
             'types' => $this->types ? $this->types->title : null,
