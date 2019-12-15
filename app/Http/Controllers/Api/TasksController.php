@@ -33,8 +33,8 @@ class TasksController extends Controller
 
         $types = TypesToWorks::get(); 
         $installers = Installers::with('users', 'cities', 'moderator.users')->get();
-        $ordersArray = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get();
-        $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
+        $ordersArray = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
+
         if($request->dateStart || $request->dateEnd) {
             $dateStart = Carbon::createFromFormat('d.m.Y', Carbon::parse($request->dateStart)->format('d.m.Y'))->timestamp;
             $dateEnd = Carbon::createFromFormat('d.m.Y', Carbon::parse($request->dateEnd)->format('d.m.Y'))->timestamp;
@@ -45,9 +45,20 @@ class TasksController extends Controller
                     $ordersId[] = $ordersArray[$key]['id'];
                 }
             }
-            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where('tasks','=', null);
+            if($request->cityOrder) {
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where([
+                    ['tasks','=', null],
+                    ['clients.city_id','=', $request->cityOrder]
+                ]);
+            } else {
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where('tasks','=', null);
+            }
         } else {
-            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
+            if($request->cityOrder) {
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
+            } else {
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
+            }
         }
         $status = [
             ['id' => 1, 'title' => 'В работе'], 

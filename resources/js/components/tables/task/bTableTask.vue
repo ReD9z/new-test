@@ -15,7 +15,7 @@
             <v-icon left>vertical_align_bottom</v-icon>
             Скачать в Excel
         </v-btn>
-        <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
+        <v-btn color="green" v-show="hideElem()" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
     </v-toolbar>
     <v-navigation-drawer v-model="dialog" right hide-overlay stateless fixed>
         <v-card class="borderNone">
@@ -29,7 +29,7 @@
             <v-card-text>
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                        <div v-if="param.input == 'text'">
+                        <div v-if="param.input == 'text'" v-show="roleUser(param.role, {admin: 'admin', moderator: 'moderator'})">
                             <v-text-field 
                                 :data-vv-as="'`'+param.text+'`'" 
                                 :data-vv-name="param.value" 
@@ -47,6 +47,7 @@
                                 :items="formFilds[param.tableValue]"
                                 v-model="editedItem[param.value]"
                                 :item-text="param.childField"
+                                v-show="roleUser(param.role, {admin: 'admin', moderator: 'moderator'})"
                                 item-value="id"
                                 :label="param.text"
                                 :data-vv-as="'`'+param.text+'`'" 
@@ -136,7 +137,7 @@
                                 </template>
                             </v-autocomplete>
                         </div>
-                        <div v-if="param.input == 'date'">
+                        <div v-if="param.input == 'date'" v-show="roleUser(param.role, {admin: 'admin', moderator: 'moderator'})">
                             <v-menu
                                 v-model="param.close"
                                 :close-on-content-click="false"
@@ -166,7 +167,7 @@
                                 <v-date-picker locale="ru" :first-day-of-week="1" v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
                             </v-menu>
                         </div>
-                        <div v-if="param.input == 'textarea'">
+                        <div v-if="param.input == 'textarea'" v-show="roleUser(param.role, {admin: 'admin', moderator: 'moderator', installer: 'installer'})">
                             <v-textarea
                                 rows='1'
                                 :data-vv-as="'`'+param.text+'`'" 
@@ -228,11 +229,14 @@
                 {{props.item[param.tableValue]}}
             </td>
             <td class="justify-left layout">
-                <v-icon small class="mr-2" @click="editItem(props.item)">	
+                <v-icon small class="mr-2" v-show="hideElem()" @click="editItem(props.item)">	
                     edit	
                 </v-icon>
-                <v-icon small class="mr-2" @click="deleteItem(props.item)">
+                <v-icon small class="mr-2" v-show="hideElem()" @click="deleteItem(props.item)">
                     delete
+                </v-icon>
+                <v-icon class="mr-2" v-show="!hideElem()" @click="editItem(props.item)">
+                    assignment_turned_in
                 </v-icon>
             </td>
         </template>
@@ -329,6 +333,51 @@ export default {
             this.initialize();
             this.orderDate = false;
         },
+        hideElem() {
+            if(this.isLoggedUser.installers) {
+                return false;
+            }
+            if(!this.isLoggedUser.installers) {
+                return true;
+            }
+        },
+        roleUser(role, roleList) {
+            if(role) {
+                const {admin, client, installer, moderator, manager} = roleList;
+                if (role === admin || role === client || role === installer || role === manager || role === moderator) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return true;
+            }
+        },
+        roleUserCity() {
+            if(this.isLoggedUser.moderators) {
+                return this.isLoggedUser.moderators.city_id;
+            }
+            if(this.isLoggedUser.managers) {
+                return this.isLoggedUser.managers.city_id;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return null;
+            }
+        },
+        roleUserId() {
+            if(this.isLoggedUser.moderators) {
+                return this.isLoggedUser.moderators.id;
+            }
+            if(this.isLoggedUser.installers) {
+                return this.isLoggedUser.installers.id;
+            }
+            if(this.isLoggedUser.managers) {
+                return this.isLoggedUser.managers.id;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.installers || !this.isLoggedUser.managers) {
+                return null;
+            }
+        },
         filteredItems(data) {
             this.desserts = data;
             let searchTerm = this.search.trim().toLowerCase(),
@@ -377,7 +426,10 @@ export default {
                 url: this.params.baseUrl,
                 params: {
                     dateStart: this.dateStartFormatted,
-                    dateEnd: this.dateEndFormatted
+                    dateEnd: this.dateEndFormatted,
+                    city: this.roleUserCity(),
+                    user: this.roleUserId(),
+                    cityOrder: this.roleUserCity(),   
                 }
             })
             .then(
@@ -385,7 +437,6 @@ export default {
                     this.desserts = response.data.tasks;
                     this.formFilds = response.data;
                     this.filteredItems(this.desserts);
-                    console.log(response.data);
                     this.loading = false;
                 }
             ).catch(error => {

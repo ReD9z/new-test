@@ -7,7 +7,7 @@
 </template>
 <script>
 export default {
-    data: () => ({
+    data: (vm) => ({
         params: {
             baseUrl: '/api/tasks',
             excelTask: false,
@@ -20,7 +20,8 @@ export default {
                     value: 'orders_id',
                     tableValue: 'orders',
                     childField: 'orderClient',
-                    validate: 'required'
+                    validate: 'required',
+                    role: vm.$store.getters.isUserRole
                 },
                 {
                     input: "select",
@@ -30,7 +31,8 @@ export default {
                     value: 'installer_id',
                     tableValue: 'installers',
                     childField: 'name',
-                    validate: 'required'
+                    validate: 'required',
+                    role: vm.$store.getters.isUserRole
                 },
                 { 
                     input: "date",
@@ -39,7 +41,8 @@ export default {
                     close: false,
                     value: 'task_date_completion',
                     tableValue: 'task_date_completion',
-                    validate: 'required'
+                    validate: 'required',
+                    role: vm.$store.getters.isUserRole
                 },
                 {
                     input: "select",
@@ -49,7 +52,8 @@ export default {
                     value: 'types_to_works_id',
                     tableValue: 'types',
                     childField: 'title',
-                    validate: 'required'
+                    validate: 'required',
+                    role: vm.$store.getters.isUserRole
                 },
                 {
                     input: "select",
@@ -59,6 +63,7 @@ export default {
                     text: 'Статус',
                     validate: 'required',
                     sortable: true,
+                    role: null
                 },
                 { 
                     text: 'Комментарий', 
@@ -66,7 +71,8 @@ export default {
                     input: "textarea",
                     sortable: true,
                     value: 'comment',
-                    validate: 'required'
+                    validate: 'required',
+                    role: vm.$store.getters.isUserRole
                 }
             ],
             filter: false,
@@ -90,6 +96,10 @@ export default {
                 return false;
             }
         }
+    },
+    mounted() {
+        // this.dataAdd();
+        console.log(this.params.headers);
     }
 }
 </script>
