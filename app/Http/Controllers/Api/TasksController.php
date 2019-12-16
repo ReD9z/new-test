@@ -46,16 +46,13 @@ class TasksController extends Controller
                 }
             }
             if($request->cityOrder) {
-                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where([
-                    ['tasks','=', null],
-                    ['clients.city_id','=', $request->cityOrder]
-                ]);
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where('clients.city_id', $request->cityOrder)->where('tasks','=', null);
             } else {
                 $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where('tasks','=', null);
             }
         } else {
             if($request->cityOrder) {
-                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('clients.city_id', $request->cityOrder)->where('tasks','=', null);
             } else {
                 $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
             }
@@ -82,7 +79,6 @@ class TasksController extends Controller
             'installers' => InstallersResource::collection($installers),
             'statusName' => $status
         ]);
-        // return TasksResource::collection($tasks);
     }
 
     public function task(Request $request)

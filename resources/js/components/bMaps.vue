@@ -43,7 +43,6 @@ export default {
                 vm.items.forEach((element) => {
                     if(element.data != null) {
                         vm.mapsShow = true;
-                        console.log(element.coordinates.split(', ') )
                         const myPlacemark = new ymaps.Placemark(element.coordinates.split(', '), {
                             preset: 'islands#blueDotIcon',
                             balloonContent: element.city + ", " + element.street + ", " + element.house_number,

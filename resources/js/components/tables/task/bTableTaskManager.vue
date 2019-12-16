@@ -1044,39 +1044,6 @@ export default {
                 }
             );
         },
-        downloadExcel() {
-            if(this.desserts.length > 0) {
-                let map = this.desserts.map((item)=> {
-                    let address = [];
-                    item.orderAddresses.map((item2, key) => {
-                        address += "г." + item2.address.cities.name 
-                        address += ", " + item2.address.areas.name + ","
-                        address += " ул. " + item2.address.street + ","
-                        address += " дом " + item2.address.house_number + ","
-                        address += " количество подъездов " + item2.address.number_entrances + ","
-                        address += " управляющая компания " + item2.address.management_company + " ";
-                    });
-
-                    return {
-                        "Название организации клиента" : item.orders,
-                        "Дата выполнения задачи"  : item.task_date_completion,
-                        "Тип работы"  : item.types,
-                        "Комментарий" : item.comment,
-                        "Адреса": address
-                    }
-                });
-                
-                let ws = XLSX.utils.json_to_sheet(map, {raw:true});
-                if(!ws['!cols']) ws['!cols'] = [];
-                for (let i = 0; i < 5; i++) {
-                    ws['!cols'][i] = {wch: 28};
-                }
-                let wb = XLSX.utils.book_new();
-              
-                XLSX.utils.book_append_sheet(wb, ws, "Задачи");
-                XLSX.writeFile(wb, "Задачи.xlsx");
-            }
-        },
         elementLoadToFile() {
             this.loadingExcel = true;
             let file = this.$refs.excel.files[0];

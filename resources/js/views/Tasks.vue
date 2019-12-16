@@ -96,10 +96,6 @@ export default {
                 return false;
             }
         }
-    },
-    mounted() {
-        // this.dataAdd();
-        console.log(this.params.headers);
     }
 }
 </script>
