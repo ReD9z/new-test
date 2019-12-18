@@ -19,6 +19,13 @@ class ManagerTaskController extends Controller
      */
     public function index(Request $request)
     {
+        $clients = Clients::with('cities', 'users' , 'comments')->get();
+
+        $status = [
+            ['id' => 1, 'title' => 'В работе'], 
+            ['id' => 2, 'title' => 'Завершена']
+        ];
+
         if($request->city) {
             $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get()->where('managers.city_id', $request->city); 
         }
@@ -29,7 +36,11 @@ class ManagerTaskController extends Controller
             $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get(); 
         }
         
-        return ManagerTaskResource::collection($tasks);
+        return response()->json([
+            'tasks' => ManagerTaskResource::collection($tasks), 
+            'clients' => ClientsResource::collection($clients),
+            'statusName' => $status
+        ]);
     }
 
     /**

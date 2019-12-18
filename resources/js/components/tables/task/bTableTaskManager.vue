@@ -24,18 +24,6 @@
                 multiple
             >
         </v-btn>
-        <v-btn
-            v-show="desserts.length > 0 && params.excel"
-            color="#f2994a"
-            class="white--text"
-            large
-            :loading="loadingExcel"
-            :disabled="loadingExcel"
-            @click='downloadExcel'
-        >
-            <v-icon left>vertical_align_bottom</v-icon>
-            Скачать в Excel
-        </v-btn>
         <v-btn v-show="hideElem()" color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
     </v-toolbar>
     <v-navigation-drawer v-model="dialog" right hide-overlay stateless fixed>
@@ -57,100 +45,6 @@
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select' && param.value != 'client_id'" v-show="hideElem()">
-                            <div v-if="param.selectText == 'orderClient'">
-                                <v-layout justify-space-around row>
-                                    <v-autocomplete
-                                        :items="orderDate"
-                                        v-model="editedItem[param.value]"
-                                        :item-text="param.selectText"
-                                        item-value="id"
-                                        :label="param.text"
-                                        :data-vv-as="'`'+param.text+'`'" 
-                                        :data-vv-name="param.value" 
-                                        :error-messages="errors.collect(param.value)" 
-                                        v-validate="param.validate"
-                                    >
-                                        <template v-slot:append-outer>
-                                            <v-menu
-                                                v-model="menu"
-                                                :close-on-content-click="false"
-                                                offset-x
-                                            >
-                                                <template v-slot:activator="{ on }">
-                                                    <v-btn flat icon v-on="on">
-                                                        <v-icon>date_range</v-icon>
-                                                    </v-btn>
-                                                </template>
-                                                <v-card>
-                                                    <v-layout pa-4 row wrap>
-                                                        <v-flex xs12 lg5>
-                                                            <v-menu
-                                                                v-model="menu1"
-                                                                :close-on-content-click="false"
-                                                                :nudge-right="40"
-                                                                lazy
-                                                                transition="scale-transition"
-                                                                offset-y
-                                                                full-width
-                                                                max-width="290px"
-                                                                min-width="290px"
-                                                            >
-                                                                <template v-slot:activator="{ on }">
-                                                                    <v-text-field
-                                                                        v-model="dateStartFormatted"
-                                                                        hint="Формат дд.мм.гггг"
-                                                                        persistent-hint
-                                                                        prepend-icon="event"
-                                                                        label="Начало"
-                                                                        v-on="on"
-                                                                    ></v-text-field>
-                                                                </template>
-                                                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateStart" no-title @input="menu1 = false"></v-date-picker>
-                                                            </v-menu>
-                                                        </v-flex>
-                                                        <v-flex xs12 lg5>
-                                                            <v-menu
-                                                                v-model="menu2"
-                                                                :close-on-content-click="false"
-                                                                :nudge-right="40"
-                                                                lazy
-                                                                transition="scale-transition"
-                                                                offset-y
-                                                                full-width
-                                                                max-width="290px"
-                                                                min-width="290px"
-                                                            >
-                                                                <template v-slot:activator="{ on }">
-                                                                    <v-text-field
-                                                                        v-model="dateEndFormatted"
-                                                                        hint="Формат дд.мм.гггг"
-                                                                        persistent-hint
-                                                                        prepend-icon="event"
-                                                                        label="Конец"
-                                                                        v-on="on"
-                                                                    ></v-text-field>
-                                                                </template>
-                                                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateEnd" no-title @input="menu2 = false"></v-date-picker>
-                                                            </v-menu>
-                                                        </v-flex>
-                                                        <v-flex xs12 lg2>
-                                                            <v-btn flat icon @click="resetDate()">
-                                                                <v-icon>close</v-icon>
-                                                            </v-btn>                
-                                                        </v-flex>
-                                                    </v-layout>
-                                                    <v-card-actions>
-                                                        <v-spacer></v-spacer>
-                                                        <v-btn flat @click="menu = false">Закрыть</v-btn>
-                                                        <v-btn color="primary" flat @click="dateFilter()">Применить</v-btn>
-                                                    </v-card-actions>
-                                                </v-card>
-                                            </v-menu> 
-                                        </template>
-                                    </v-autocomplete>
-                                </v-layout>
-                            </div>
-                            <div v-else>
                                 <div v-for="item in select" :key="item[0]">
                                     <div v-if="item.url == param.selectApi">
                                         <v-layout justify-space-around row>
@@ -372,46 +266,6 @@
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
-    <v-navigation-drawer v-model="dialogImages" right temporary fixed width="700px">
-        <v-card>
-            <v-toolbar color="pink" dark>
-                <v-toolbar-title>Изображения</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-icon right dark @click='pickImages'>control_point</v-icon>
-                <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
-                <v-btn icon @click="close">
-                    <v-icon>close</v-icon>
-                </v-btn>
-            </v-toolbar>
-            <v-progress-linear value="15" :indeterminate="true" v-show="loadImages" color="blue" class="ma-0"></v-progress-linear>
-            <v-card-text>
-                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                    <v-flex xs12 v-if="param.input == 'images'">
-                        <v-layout row wrap>
-                            <v-flex v-for="(file, key) in editedItem.files" :key="key" xs4 d-flex>
-                                <v-card flat tile class="d-flex pr-1 pb-1">
-                                    <v-img :src="'/storage/' + file.url" :lazy-src="'/storage/' + file.url" aspect-ratio="1" class="grey lighten-2">
-                                        <template v-slot:placeholder>
-                                            <v-layout fill-height align-center justify-center ma-0>
-                                                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
-                                            </v-layout>
-                                        </template>
-                                        <template>
-                                            <v-layout fill-height right top ma-0>
-                                                <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
-                                                    <v-icon>close</v-icon>
-                                                </v-btn>
-                                            </v-layout>
-                                        </template>
-                                    </v-img>
-                                </v-card>
-                            </v-flex>
-                        </v-layout>
-                    </v-flex>
-                </v-flex>
-            </v-card-text>
-        </v-card>
-    </v-navigation-drawer>
     <v-toolbar flat color="#fff">
         <v-flex xs12 sm6 md3>
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
@@ -577,20 +431,15 @@ export default {
         validator: 'new'
     },
     data: (vm) => ({
-        statusFilter: ['Завершена', 'В работе'],
         search: '',
         clientNew: null,
         loadingExcelTask: false,
         dialog: false,
         addClient: false,
-        dialogImages: false,
-        loading: true,
-        loadingExcel: false,
         chipsStatus: [],
         files: [],
         dateStartNew: null,
         dateEndNew: null,
-        deleteImage: false,
         desserts: [],
         editedIndex: -1,
         dateStartClient: vm.formatDate(new Date().toISOString().substr(0, 10)),
@@ -604,7 +453,6 @@ export default {
         formData: new FormData(),
         chips: [],
         chipsItem: [],
-        picker: new Date().toISOString().substr(0, 10),
         valid: true,
         pagination: {
             sortBy: 'id'
@@ -664,7 +512,7 @@ export default {
     },
     async created () {
         await this.initialize();
-        await this.selectStatus();
+        // await this.selectStatus();
         await this.getFiltered();
         await this.selectClient();
     },
@@ -784,27 +632,6 @@ export default {
             const [year, month, day] = date.split('-')
             return `${day}.${month}.${year}`
         },
-        dateFilter() {
-            let vm = this;
-            this.orderDate = this.orderFull;
-            this.menu = false;
-            let orderData = [];
-            if(this.dateStart == null || this.dateEnd == null) {
-                this.orderDate = this.orderFull;
-            } else {
-                this.orderDate.map(function (item) {
-                    let itemDateStart = vm.$moment(item.order_start_date, 'DD.MM.YYYY').unix() * 1000;
-                    let itemDateEnd = vm.$moment(item.order_start_date, 'DD.MM.YYYY').unix() * 1000;
-                    let dateStart = vm.$moment(vm.formatDate(vm.dateStartNew), 'DD.MM.YYYY').unix() * 1000;
-                    let dateEnd = vm.$moment(vm.formatDate(vm.dateEndNew), 'DD.MM.YYYY').unix() * 1000;
-            
-                    if(dateStart >= itemDateStart && dateEnd <= itemDateEnd || dateStart <= itemDateStart && dateEnd >= itemDateEnd) {
-                        orderData.push(item);
-                    } 
-                });
-                this.orderDate = orderData;
-            } 
-        },
         resetDate() {
             this.dateStartNew = null;
             this.dateEndNew = null;
@@ -863,32 +690,20 @@ export default {
             })
             .then(
                 response => {
-                    this.desserts = response.data;
-                    let vm = this;
-                    if(this.params.baseUrl == '/api/tasks') {
-                        if(this.dateStart && this.dateEnd) {
-                            this.desserts = this.desserts.filter(function (item) {
-                                let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
-                                let dateStart = vm.$moment(vm.formatDate(vm.dateStart), 'DD.MM.YYYY').unix() * 1000;
-                                let dateEnd = vm.$moment(vm.formatDate(vm.dateEnd), 'DD.MM.YYYY').unix() * 1000;
-                                if(itemDateStart >= dateStart && itemDateStart <= dateEnd) {
-                                    return item;
-                                } 
-                            });
-                        } 
-                    } 
-                    if(this.params.baseUrl != '/api/tasks') {
-                        if(this.dateStartClient && this.dateEndClient) {
-                            this.desserts = this.desserts.filter(function (item) {
-                                let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
-                                let dateStart = vm.$moment(vm.formatDate(vm.dateStartClient), 'DD.MM.YYYY').unix() * 1000;
-                                let dateEnd = vm.$moment(vm.formatDate(vm.dateEndClient), 'DD.MM.YYYY').unix() * 1000;
-                                if(itemDateStart >= dateStart && itemDateStart <= dateEnd) {
-                                    return item;
-                                } 
-                            });
-                        }
-                    }
+                    this.desserts = response.data.tasks; 
+                    this.statusFilter = response.data.statusName;
+                    // this.statusFilter              
+                    // if(this.dateStartClient && this.dateEndClient) {
+                    //     this.desserts = this.desserts.filter(function (item) {
+                    //         let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
+                    //         let dateStart = vm.$moment(vm.formatDate(vm.dateStartClient), 'DD.MM.YYYY').unix() * 1000;
+                    //         let dateEnd = vm.$moment(vm.formatDate(vm.dateEndClient), 'DD.MM.YYYY').unix() * 1000;
+                    //         if(itemDateStart >= dateStart && itemDateStart <= dateEnd) {
+                    //             return item;
+                    //         } 
+                    //     });
+                    // }
+                    
                     this.filteredItems(this.desserts);
                     this.filtered(this.desserts); 
                     this.filteredStatus(this.desserts);
@@ -906,60 +721,60 @@ export default {
             const [year, month, day] = date.split('-')
             return `${day}.${month}.${year}`
         },
-        selectClient() {
-            axios({
-                method: 'get',
-                url: '/api/clients',
-                params: {
-                    city: this.roleUserCity(),
-                }
-            })
-            .then(
-                res => {
-                    if(res) {
-                        this.clientArr = res.data;
-                    }
-                }
-            ).catch(
-                error => {
-                    console.log(error);
-                }
-            ); 
-        },
-        selectStatus() {
-            this.params.headers.forEach(element => {
-                if(element.selectApi != undefined) {
-                    axios({
-                        method: 'get',
-                        url: element.selectApi,
-                        params: {
-                            city: this.roleUserCity()
-                        }
-                    })
-                    .then(
-                        res => {
-                            if(res) {
-                                if(element.selectText == 'orderClient') {
-                                    this.orderDate = res.data.filter(item=>!item.task);
-                                    this.orderFull = res.data.filter(item=>!item.task);
-                                }else {
-                                    this.select.push(
-                                        {
-                                            data: res.data,
-                                            url: element.selectApi
-                                        }
-                                    );
-                                }
-                            }
-                        }
-                    ).catch(
-                        error => {
-                            console.log(error);
-                        }
-                    ); 
-                }
-            });
-        },
+        // selectClient() {
+        //     axios({
+        //         method: 'get',
+        //         url: '/api/clients',
+        //         params: {
+        //             city: this.roleUserCity(),
+        //         }
+        //     })
+        //     .then(
+        //         res => {
+        //             if(res) {
+        //                 this.clientArr = res.data;
+        //             }
+        //         }
+        //     ).catch(
+        //         error => {
+        //             console.log(error);
+        //         }
+        //     ); 
+        // },
+        // selectStatus() {
+        //     this.params.headers.forEach(element => {
+        //         if(element.selectApi != undefined) {
+        //             axios({
+        //                 method: 'get',
+        //                 url: element.selectApi,
+        //                 params: {
+        //                     city: this.roleUserCity()
+        //                 }
+        //             })
+        //             .then(
+        //                 res => {
+        //                     if(res) {
+        //                         if(element.selectText == 'orderClient') {
+        //                             this.orderDate = res.data.filter(item=>!item.task);
+        //                             this.orderFull = res.data.filter(item=>!item.task);
+        //                         }else {
+        //                             this.select.push(
+        //                                 {
+        //                                     data: res.data,
+        //                                     url: element.selectApi
+        //                                 }
+        //                             );
+        //                         }
+        //                     }
+        //                 }
+        //             ).catch(
+        //                 error => {
+        //                     console.log(error);
+        //                 }
+        //             ); 
+        //         }
+        //     });
+        // },
         loadExcelTask() {
             this.$refs.excelTask.click();
         },
@@ -1008,87 +823,10 @@ export default {
             await this.getFiltered();
             await this.selectStatus();
         },
-        elementLoadToFileImage() {
-            this.loadImages = true;
-            this.files = this.$refs.images.files;
-            Array.from(this.files).forEach(files => {
-                this.formData.append('file[]', files);
-            });
-            axios.post('api/files', this.formData, {
-                headers: {'Content-Type': 'multipart/form-data'}
-            })
-            .then(
-                res => {
-                    axios({
-                        method: 'put',
-                        url: this.params.baseUrl,
-                        data: this.editedItem,
-                        params: {
-                            images: res.data.files,
-                            city: this.isLoggedUser.installers.city_id
-                        }
-                    })
-                    .then(
-                        response => {
-                            Object.assign(this.editedItem, response.data);
-                            this.loadImages = false;
-                            this.resetFilesLoad();
-                        }
-                    ).catch(error => {
-                        console.log(error);
-                    })
-                }
-            ).catch(
-                error => {
-                    console.log(error);
-                }
-            );
-        },
-        elementLoadToFile() {
-            this.loadingExcel = true;
-            let file = this.$refs.excel.files[0];
-            let reader = new FileReader();
-            let vm = this;
-            reader.readAsBinaryString(file);
-            reader.onload = function (e) {
-                let workbook = XLSX.read(e.target.result, {
-                    type: 'binary'
-                });
-                let firstSheet = workbook.SheetNames[0];
-                let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-
-                vm.loadExecel(excelRows);
-                
-                file.value = '';
-            };
-        },
-        removeImg(data) {
-            this.loadImages = true;
-            axios.post('/api/files/remove', data)
-            .then(
-                res => {
-                    this.editedItem.files.splice(this.editedItem.files.indexOf(data.id), 1);
-                    this.loadImages = false;
-                }
-            ).catch(
-                error => {
-                    console.log(error);
-                }
-            );
-        },
-        pickExcel () {
-            this.$refs.excel.click();
-        },
         editItem (item) {
-            this.editedItem['status'] = 1;
             this.editedIndex = this.desserts.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
-        },
-        editPhotos(item) {
-            this.editedIndex = this.desserts.indexOf(item);
-            this.editedItem = Object.assign({}, item);
-            this.dialogImages = true;
         },
         deleteItem (item) {
             const index = this.desserts.indexOf(item);
@@ -1110,11 +848,10 @@ export default {
         close () {
             this.dialog = false
             this.dialogImages = false
-            // setTimeout(() => {
-            //     this.editedItem = Object.assign({}, this.defaultItem)
-            //     this.editedIndex = -1
-            //     this.editedItem['status'] = 1;
-            // }, 300)
+            setTimeout(() => {
+                this.editedItem = Object.assign({}, this.defaultItem)
+                this.editedIndex = -1
+            }, 300)
             this.$validator.reset()
         },
         resetFilesLoad() {
@@ -1143,8 +880,8 @@ export default {
                             this.initialize();
                             this.loaderSaveBtn = null;
                             this.loadingSaveBtn = false;
-                            // this.close();
-                            // this.$refs.forms.reset();
+                            this.close();
+                            this.$refs.forms.reset();
                         }
                     ).catch(error => {
                         console.log(error);
@@ -1178,7 +915,6 @@ export default {
                 // this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
                 // this.editedItem['moderator_id'] = this.isLoggedUser.moderators.id;
             }
-            this.editedItem['status'] = 1;
         }
     },
     mounted() {
