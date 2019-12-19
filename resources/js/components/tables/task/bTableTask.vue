@@ -283,7 +283,7 @@ export default {
         },
         defaultItem: { 
             status: 1
-        }
+        } 
     }),
     props: {
         params: Object
@@ -308,6 +308,9 @@ export default {
         },
         dateEnd(val) {
             this.dateEndFormatted = this.formatDate(this.dateEnd);
+        }, 
+        picker(val) {
+            this.editedItem.task_date_completion = this.formatDate(this.picker);
         },
     },
     async created () {
@@ -436,7 +439,6 @@ export default {
                 response => {
                     this.desserts = response.data.tasks;
                     this.formFilds = response.data;
-                    console.log(response.data);
                     this.filteredItems(this.desserts);
                     this.loading = false;
                 }
@@ -479,8 +481,8 @@ export default {
             }
         },
         close() {
-            this.initialize();
             this.dialog = false;
+            this.picker = null;
             setTimeout(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
                 this.editedIndex = -1

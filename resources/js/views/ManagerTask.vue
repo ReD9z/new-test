@@ -26,17 +26,20 @@ export default {
                     text: 'Дата создания клинта', 
                     sortable: true,
                     close: false,
-                    value: 'created_at',
+                    tableValue: 'created_at',
+                    value: 'created_at'
                 },
                 { 
                     text: 'Email клиента', 
                     sortable: true,
                     close: false,
+                    tableValue: 'email',
                     value: 'email'
                 },
                 { 
                     text: 'Телефон клиента', 
                     sortable: true,
+                    tableValue: 'phone',
                     close: false,
                     value: 'phone'
                 },
@@ -47,20 +50,21 @@ export default {
                     value: 'manager_id',
                     childField: 'name',
                     tableValue: 'managers',
-                    input: "select",
-                    // validate: 'required'
+                    input: "select"
                 },
                 { 
                     text: 'Дата звонка', 
                     input: "date",
                     sortable: true,
                     close: false,
-                    value: 'task_date_completion'
+                    value: 'task_date_completion',
+                    tableValue: 'task_date_completion'
                 },
                 { 
                     text: 'Дата последнего звонка', 
                     sortable: true,
                     close: false,
+                    tableValue: 'task_date_ended',
                     value: 'task_date_ended'
                 },
                 {
@@ -76,26 +80,20 @@ export default {
                 { 
                     text: 'Комментарий', 
                     input: "text",
+                    tableValue: 'comment',
                     sortable: true,
                     value: 'comment',
-                    // validate: 'required'
                 },
                 { 
                     text: 'Результат выполнения', 
                     input: "text",
+                    tableValue: 'result',
                     sortable: true,
-                    value: 'result',
+                    value: 'result'
                 }
             ],
-            filter: [
-                {
-                    title: 'Клиенты',
-                    api: '/api/clients',
-                    value: 'name',
-                    input: 'client'
-                }
-            ],
-            searchValue: ['client', 'managers', 'task_date_completion', 'comment', 'statusName', 'result'],
+            filter: true,
+            searchValue: ['clients', 'managers', 'task_date_completion', 'comment', 'statusName', 'result'],
             search: true,
             pagination: true,
             excel: false

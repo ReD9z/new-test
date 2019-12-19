@@ -83,7 +83,7 @@
                             >
                                 <template v-slot:activator="{ on }">
                                     <v-text-field
-                                        v-model="picker"
+                                        v-model="editedItem[param.value]"
                                         hint="Формат дд.мм.гггг"
                                         persistent-hint
                                         prepend-icon="event"
@@ -95,7 +95,7 @@
                                         v-on="on"
                                     ></v-text-field>
                                 </template>
-                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="editedItem[param.value]" no-title @input="param.close = false"></v-date-picker>
+                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="picker" no-title @input="param.close = false"></v-date-picker>
                             </v-menu>
                         </div>
                         <div v-if="param.input == 'password'">
@@ -122,8 +122,8 @@
         </v-flex>
         <v-spacer></v-spacer>
         <div v-show="params.filter">
-            <v-chip :items="chipsClients" v-for="(item, key) in chipsClients" :key="key" close @input="remove(item)">{{item.name}}</v-chip>
-            <v-chip v-for="(item, key) in chipsStatus" :key="key" close @input="removeStatus(item)">{{item.title}}</v-chip>
+            <v-chip :items="chipsClients" v-for="item in chipsClients" :key="item.id + 'clients'" close @input="remove(item)">{{item.name}}</v-chip>
+            <v-chip :items="chipsStatus" v-for="item in chipsStatus" :key="item.id + 'status'" close @input="removeStatus(item)">{{item.title}}</v-chip>
             <v-chip v-if="dateStartClient" close @input="resetDate()">Начало {{dateStartClient}}</v-chip>
             <v-chip v-if="dateEndClient" close @input="resetDate()">Конец {{dateEndClient}}</v-chip>
         </div>
@@ -239,19 +239,7 @@
         </template>
         <template v-slot:items="props">
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
-                <v-flex v-if="param.input !== 'images'">
-                    <v-flex v-if="param.value === 'orders_id'">
-                        <v-flex v-if="param.selectText">
-                            <a v-if="hideElem()" :href="'/orders-address/'+props.item['orders_id']">{{props.item[param.TableGetIdName]}}</a>
-                            <span v-else>{{props.item[param.TableGetIdName]}}</span>
-                        </v-flex>
-                    </v-flex>
-                    <v-flex v-else>
-                        <v-flex v-if="param.value === 'status'">{{props.item[param.title]}}</v-flex>
-                        <v-flex v-else-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
-                        <v-flex v-else>{{props.item[param.value]}}</v-flex>
-                    </v-flex>
-                </v-flex>
+                {{props.item[param.tableValue]}}
             </td>
             <td class="justify-left layout">
                 <v-icon small class="mr-2" v-show="hideElem()" @click="editItem(props.item)">	
@@ -297,10 +285,12 @@ export default {
         editedIndex: -1,
         dateStartClient: vm.formatDate(new Date().toISOString().substr(0, 10)),
         dateEndClient: vm.formatDate(new Date().toISOString().substr(0, 10)),
-        loadImages: false,
-        editedItem: {},
-        defaultItem: {},
-        select: [],
+        editedItem: {
+            status: 1,
+        },
+        defaultItem: { 
+            status: 1
+        },
         loadingSaveBtn: false,
         loaderSaveBtn: null,
         formData: new FormData(),
@@ -311,21 +301,12 @@ export default {
         pagination: {
             sortBy: 'id'
         },
-        selected: [],
-        menu: false,
-        dateStartFormatted: null,
-        dateEndFormatted: null,
         statusFilter: [],
-        loading: false,
-        dateStart: null,
-        dateEnd: null,
+        loading: true,
         menu1: false,
         menu2: false,
         menu4: false,
         menu5: false,
-        orderDate: [],
-        orderFull: [],
-        clientArr: []
     }),
     props: {
         params: Object
@@ -352,76 +333,50 @@ export default {
             this.dateEndClient = this.formatDate(this.dateEndNew);
         },
         picker(val) {
-            console.log(val);
-            // console.log(this.task_date_completion)
-            // this.picker = this.formatDate(this.picker);
+            this.editedItem.task_date_completion = this.formatDate(this.picker);
+        },
+        chipsClients(val) {
+            this.initialize();
+        },
+        chipsStatus(val) {
+            this.initialize();
+        },
+        clientNew(newVal, oldVal) {
+            this.initialize();
+            if(this.clientNew) {
+                this.editedItem['client_id'] = this.clientNew;
+            }
         }
-        // chips(val) {
-        //     this.initialize();
-        // },
-        // chipsStatus() {
-        //     this.initialize();
-        // }
-        // clientNew(newVal, oldVal) {
-        //     this.selectClient();
-        //     if(this.clientNew) {
-        //         this.editedItem['client_id'] = this.clientNew;
-        //     }
-        // }
     },
     async created () {
         await this.initialize();
-        // await this.selectStatus();
-        // await this.selectClient();
     },
     methods: {
-        // async getFiltered() {
-        //     if(this.params.filter) {
-        //         await this.params.filter.forEach((item) => {
-        //             axios({
-        //                 method: 'get',
-        //                 url: item.api,
-        //                 params: {
-        //                     city: this.roleUserCity(),
-        //                 }
-        //             })
-        //             .then(
-        //                 response => {
-        //                     let data = response.data;
-        //                     data.filter((items) => {
-        //                         this.chipsItem.push(items[item.value]);
-        //                     });
-        //                 }
-        //             ).catch(error => {
-        //                 console.log(error);
-        //             })
-        //         })
-        //     }
-        // },
-        filteredStatus(data) {
+        filteredStatus() {
             if(this.chipsStatus.length > 0) {
-                let arr = [];
+                let status = [];
+            
                 this.chipsStatus.forEach((chip) => {
-                    arr.push(chip);
+                    status.push(chip.title);
                 });
-                var searchTerm = arr.join('||').trim().toLowerCase(),
+
+                var searchTerm = status.join('||').trim().toLowerCase(),
                 useOr = 'and' == "or",
                 AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
                 OR_RegEx = searchTerm.replace(/ +/g,"|"),
                 regExExpression = useOr ? OR_RegEx : AND_RegEx,
                 searchTest = new RegExp(regExExpression, "ig");
-                let array = [];
            
                 this.desserts = this.desserts.filter(function(item) {
-                    return searchTest.test([item.statusName]); 
+                    return searchTest.test([item.statusName]);
                 });
             }
         },
-        filtered(data) {
+        filteredClient() {
             if(this.chipsClients.length > 0) {
                 let arr = [];
                 this.chipsClients.forEach((chip) => {
-                    arr.push(chip);
+                    arr.push(chip.name);
                 });
                 var searchTerm = arr.join('||').trim().toLowerCase(),
                 useOr = 'and' == "or",
@@ -431,7 +386,7 @@ export default {
                 searchTest = new RegExp(regExExpression, "ig");
            
                 this.desserts = this.desserts.filter(function(item) {
-                    return searchTest.test([item.client]);
+                    return searchTest.test([item.clients]);
                 });
             }
         },
@@ -454,6 +409,7 @@ export default {
                 return this.isLoggedUser.installers.id;
             }
             if(this.isLoggedUser.managers) {
+                console.log(this.isLoggedUser.managers.id);
                 return this.isLoggedUser.managers.id;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.installers || !this.isLoggedUser.managers) {
@@ -497,7 +453,6 @@ export default {
             this.dateEndClient = null;
             this.initialize();
             this.chipsClients = [];
-            this.orderDate = this.orderFull;
             this.chipsStatus = [];
         },
         filteredItems(data) {
@@ -525,11 +480,7 @@ export default {
             this.chipsClients = [];
             this.initialize();
         },
-        toggleAll () {
-            if (this.selected.length) this.selected = []
-            else this.selected = this.desserts.slice()
-        },
-        changeSort (column) {
+        changeSort(column) {
             if (this.pagination.sortBy === column) {
                 this.pagination.descending = !this.pagination.descending
             } else {
@@ -537,13 +488,15 @@ export default {
                 this.pagination.descending = false
             }
         },
-        initialize () {
+        initialize() {
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
                     city: this.roleUserCity(),
-                    user: this.roleUserId()
+                    user: this.roleUserId(),
+                    dateStart: this.dateStartClient,
+                    dateEnd: this.dateEndClient
                 }
             })
             .then(
@@ -552,20 +505,9 @@ export default {
                     this.statusFilter = response.data.statusName;
                     this.formFilds = response.data;
                     this.clients = response.data.clients;
-                    // this.statusFilter              
-                    // if(this.dateStartClient && this.dateEndClient) {
-                    //     this.desserts = this.desserts.filter(function (item) {
-                    //         let itemDateStart = vm.$moment(item.task_date_completion, 'DD.MM.YYYY').unix() * 1000;
-                    //         let dateStart = vm.$moment(vm.formatDate(vm.dateStartClient), 'DD.MM.YYYY').unix() * 1000;
-                    //         let dateEnd = vm.$moment(vm.formatDate(vm.dateEndClient), 'DD.MM.YYYY').unix() * 1000;
-                    //         if(itemDateStart >= dateStart && itemDateStart <= dateEnd) {
-                    //             return item;
-                    //         } 
-                    //     });
-                    // }
                     
                     this.filteredItems(this.desserts);
-                    this.filtered(this.desserts); 
+                    this.filteredClient(this.desserts); 
                     this.filteredStatus(this.desserts);
                     this.loading = false;
                 }
@@ -573,68 +515,6 @@ export default {
                 console.log(error);
             })
         },
-        pickImages () {
-            this.$refs.images.click();
-        },
-        parseDate (date) {
-            if (!date) return null
-            const [year, month, day] = date.split('-')
-            return `${day}.${month}.${year}`
-        },
-        // selectClient() {
-        //     axios({
-        //         method: 'get',
-        //         url: '/api/clients',
-        //         params: {
-        //             city: this.roleUserCity(),
-        //         }
-        //     })
-        //     .then(
-        //         res => {
-        //             if(res) {
-        //                 this.clientArr = res.data;
-        //             }
-        //         }
-        //     ).catch(
-        //         error => {
-        //             console.log(error);
-        //         }
-        //     ); 
-        // },
-        // selectStatus() {
-        //     this.params.headers.forEach(element => {
-        //         if(element.selectApi != undefined) {
-        //             axios({
-        //                 method: 'get',
-        //                 url: element.selectApi,
-        //                 params: {
-        //                     city: this.roleUserCity()
-        //                 }
-        //             })
-        //             .then(
-        //                 res => {
-        //                     if(res) {
-        //                         if(element.selectText == 'orderClient') {
-        //                             this.orderDate = res.data.filter(item=>!item.task);
-        //                             this.orderFull = res.data.filter(item=>!item.task);
-        //                         }else {
-        //                             this.select.push(
-        //                                 {
-        //                                     data: res.data,
-        //                                     url: element.selectApi
-        //                                 }
-        //                             );
-        //                         }
-        //                     }
-        //                 }
-        //             ).catch(
-        //                 error => {
-        //                     console.log(error);
-        //                 }
-        //             ); 
-        //         }
-        //     });
-        // },
         loadExcelTask() {
             this.$refs.excelTask.click();
         },
@@ -659,7 +539,6 @@ export default {
             this.dateEndNew = null;
             this.dateStartClient = null;
             this.dateEndClient = null;
-            
             await file.forEach(function (item) {
                 axios({
                     method: 'post',
@@ -680,8 +559,6 @@ export default {
                     console.log(error);
                 });
             })
-            await this.getFiltered();
-            await this.selectStatus();
         },
         editItem (item) {
             this.editedIndex = this.desserts.indexOf(item);
@@ -698,7 +575,6 @@ export default {
                 .then(
                     response => {
                         this.desserts.splice(index, 1);
-                        // this.initialize();
                     }
                 ).catch(error => {
                     console.log(error);
@@ -706,18 +582,13 @@ export default {
             }
         },
         close () {
-            this.dialog = false
-            this.dialogImages = false
+            this.dialog = false;
+            this.picker = null;
             setTimeout(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
                 this.editedIndex = -1
             }, 300)
-            this.$validator.reset()
-        },
-        resetFilesLoad() {
-            this.files = [];
-            this.$refs.images.value = '';
-            this.formData.delete('file[]');
+            this.$validator.reset();
         },
         save () {
             this.$validator.validateAll().then(() => {
@@ -779,7 +650,6 @@ export default {
     },
     mounted() {
         this.dataAdd();
-        console.log(this);
     }
 }
 </script>

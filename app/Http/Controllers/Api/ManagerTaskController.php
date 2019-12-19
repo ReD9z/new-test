@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use App\Models\ManagerTask;
 use App\Models\CitiesToWorks;
 use App\Models\Clients;
@@ -30,20 +31,33 @@ class ManagerTaskController extends Controller
             ['id' => 1, 'title' => 'В работе'], 
             ['id' => 2, 'title' => 'Завершена']
         ];
-        
 
         if($request->city) {
             $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get()->where('managers.city_id', $request->city); 
         }
-        if($request->user) {
+         if($request->user) {
             $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get()->where('manager_id', $request->user); 
         }
-        if(!$request->city || !$request->user) {
+        else {
             $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get(); 
+        }
+
+        $collection = collect($tasks);
+
+        if($request->dateStart && $request->dateEnd) {
+            $collection = $collection->filter(function($value) use($request)  {
+                $dateStart = Carbon::createFromFormat('d.m.Y', Carbon::parse($request->dateStart)->format('d.m.Y'))->timestamp;
+                $dateEnd = Carbon::createFromFormat('d.m.Y', Carbon::parse($request->dateEnd)->format('d.m.Y'))->timestamp;
+                $itemDate = Carbon::createFromFormat('d.m.Y', Carbon::parse($value->task_date_completion)->format('d.m.Y'))->timestamp;
+              
+                if ($itemDate >= $dateStart && $itemDate <= $dateEnd) {
+                    return true;
+                } 
+            });
         }
         
         return response()->json([
-            'tasks' => ManagerTaskResource::collection($tasks), 
+            'tasks' => ManagerTaskResource::collection($collection), 
             'clients' => ClientsResource::collection($clients),
             'managers' => ManagersResource::collection($managers),
             'statusName' => $status
