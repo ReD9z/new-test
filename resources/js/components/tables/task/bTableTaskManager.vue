@@ -44,165 +44,30 @@
                         <div v-if="param.value == 'comment'" v-show="hideComment()">
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
-                        <div v-if="param.input == 'select' && param.value != 'client_id'" v-show="hideElem()">
-                                <div v-for="item in select" :key="item[0]">
-                                    <div v-if="item.url == param.selectApi">
-                                        <v-layout justify-space-around row>
-                                            <v-flex
-                                                grow
-                                                pa-1
-                                            >
-                                                <v-autocomplete
-                                                    :items="item.data"
-                                                    v-model="editedItem[param.value]"
-                                                    :item-text="param.selectText"
-                                                    item-value="id"
-                                                    :label="param.text"
-                                                    :data-vv-as="'`'+param.text+'`'" 
-                                                    :data-vv-name="param.value" 
-                                                    :error-messages="errors.collect(param.value)" 
-                                                    v-validate="param.validate"
-                                                >
-                                                </v-autocomplete>
-                                            </v-flex>
-                                        </v-layout>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-if="param.input == 'select' && param.value == 'client_id'" v-show="hideElem()">
-                            <div v-if="param.selectText == 'orderClient'">
-                                <v-layout justify-space-around row>
-                                    <v-autocomplete
-                                        :items="orderDate"
-                                        v-model="editedItem[param.value]"
-                                        :item-text="param.selectText"
-                                        item-value="id"
-                                        :label="param.text"
-                                        :data-vv-as="'`'+param.text+'`'" 
-                                        :data-vv-name="param.value" 
-                                        :error-messages="errors.collect(param.value)" 
-                                        v-validate="param.validate"
-                                    >
-                                        <template v-slot:append-outer>
-                                            <v-menu
-                                                v-model="menu"
-                                                :close-on-content-click="false"
-                                                offset-x
-                                            >
-                                                <template v-slot:activator="{ on }">
-                                                    <v-btn flat icon v-on="on">
-                                                        <v-icon>date_range</v-icon>
-                                                    </v-btn>
-                                                </template>
-                                                <v-card>
-                                                    <v-layout pa-4 row wrap>
-                                                        <v-flex xs12 lg5>
-                                                            <v-menu
-                                                                v-model="menu1"
-                                                                :close-on-content-click="false"
-                                                                :nudge-right="40"
-                                                                lazy
-                                                                transition="scale-transition"
-                                                                offset-y
-                                                                full-width
-                                                                max-width="290px"
-                                                                min-width="290px"
-                                                            >
-                                                                <template v-slot:activator="{ on }">
-                                                                    <v-text-field
-                                                                        v-model="dateStartFormatted"
-                                                                        hint="Формат дд.мм.гггг"
-                                                                        persistent-hint
-                                                                        prepend-icon="event"
-                                                                        label="Начало"
-                                                                        v-on="on"
-                                                                    ></v-text-field>
-                                                                </template>
-                                                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateStart" no-title @input="menu1 = false"></v-date-picker>
-                                                            </v-menu>
-                                                        </v-flex>
-                                                        <v-flex xs12 lg5>
-                                                            <v-menu
-                                                                v-model="menu2"
-                                                                :close-on-content-click="false"
-                                                                :nudge-right="40"
-                                                                lazy
-                                                                transition="scale-transition"
-                                                                offset-y
-                                                                full-width
-                                                                max-width="290px"
-                                                                min-width="290px"
-                                                            >
-                                                                <template v-slot:activator="{ on }">
-                                                                    <v-text-field
-                                                                        v-model="dateEndFormatted"
-                                                                        hint="Формат дд.мм.гггг"
-                                                                        persistent-hint
-                                                                        prepend-icon="event"
-                                                                        label="Конец"
-                                                                        v-on="on"
-                                                                    ></v-text-field>
-                                                                </template>
-                                                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="dateEnd" no-title @input="menu2 = false"></v-date-picker>
-                                                            </v-menu>
-                                                        </v-flex>
-                                                        <v-flex xs12 lg2>
-                                                            <v-btn flat icon @click="resetDate()">
-                                                                <v-icon>close</v-icon>
-                                                            </v-btn>                
-                                                        </v-flex>
-                                                    </v-layout>
-                                                    <v-card-actions>
-                                                        <v-spacer></v-spacer>
-                                                        <v-btn flat @click="menu = false">Закрыть</v-btn>
-                                                        <v-btn color="primary" flat @click="dateFilter()">Применить</v-btn>
-                                                    </v-card-actions>
-                                                </v-card>
-                                            </v-menu> 
-                                        </template>
-                                    </v-autocomplete>
-                                </v-layout>
-                            </div>
-                            <div v-else>
-                                <div v-for="item in select" :key="item[0]">
-                                    <div v-if="item.url == param.selectApi">
-                                        <v-layout wrap row>
-                                            <v-flex
-                                                xs10
-                                            >
-                                                <v-autocomplete
-                                                    :items="clientArr"
-                                                    v-model="editedItem[param.value]"
-                                                    :item-text="param.selectText"
-                                                    item-value="id"
-                                                    :label="param.text"
-                                                    :data-vv-as="'`'+param.text+'`'" 
-                                                    :data-vv-name="param.value" 
-                                                    :error-messages="errors.collect(param.value)" 
-                                                    v-validate="param.validate"
-                                                >
-                                                </v-autocomplete>
-                                            </v-flex>
-                                            <v-flex
-                                                xs2
-                                            >
-                                                <div class="text-xs-center">
-                                                    <v-btn
-                                                        color="primary"
-                                                        dark
-                                                        small
-                                                        icon
-                                                        @click.stop="addClient = !addClient"
-                                                    >
-                                                        <v-icon small>add</v-icon>
-                                                    </v-btn>
-                                                </div>
-                                            </v-flex>
-                                        </v-layout>
-                                    </div>
-                                </div>
-                            </div>
+                        <div v-if="param.input == 'select'" v-show="hideElem()">
+                            <v-autocomplete
+                                :items="formFilds[param.tableValue]"
+                                v-model="editedItem[param.value]"
+                                :item-text="param.childField"
+                                item-value="id"
+                                :label="param.text"
+                                :data-vv-as="'`'+param.text+'`'" 
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate"
+                            >
+                            <template v-if="param.value == 'client_id'" v-slot:append-outer>
+                                <v-btn
+                                    color="primary"
+                                    dark
+                                    small
+                                    icon
+                                    @click.stop="addClient = !addClient"
+                                >
+                                    <v-icon small>add</v-icon>
+                                </v-btn>
+                                </template>
+                            </v-autocomplete>
                         </div>
                         <div v-if="param.input == 'date'" v-show="hideElem()">
                             <v-menu
@@ -218,10 +83,9 @@
                             >
                                 <template v-slot:activator="{ on }">
                                     <v-text-field
-                                        v-model="editedItem[param.value]"
+                                        v-model="picker"
                                         hint="Формат дд.мм.гггг"
                                         persistent-hint
-                                        @blur="editedItem[param.value] = parseDate(picker)"
                                         prepend-icon="event"
                                         :label="param.text"
                                         :data-vv-as="'`'+param.text+'`'" 
@@ -231,25 +95,11 @@
                                         v-on="on"
                                     ></v-text-field>
                                 </template>
-                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="picker" no-title :value="editedItem[param.value]" @input="param.close = false"></v-date-picker>
+                                <v-date-picker locale="ru" :first-day-of-week="1" v-model="editedItem[param.value]" no-title @input="param.close = false"></v-date-picker>
                             </v-menu>
                         </div>
                         <div v-if="param.input == 'password'">
                             <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
-                        </div>
-                        <div v-if="param.value == 'status'">
-                            <v-autocomplete
-                                :items="param.data"
-                                v-model="editedItem[param.value]"
-                                item-text="text"
-                                item-value="status"
-                                :label="param.text"
-                                :data-vv-as="'`'+param.text+'`'" 
-                                :data-vv-name="param.value" 
-                                :error-messages="errors.collect(param.value)" 
-                                v-validate="param.validate"
-                            >
-                            </v-autocomplete>
                         </div>
                     </v-flex>
                     <div class="text-xs-center">
@@ -272,8 +122,8 @@
         </v-flex>
         <v-spacer></v-spacer>
         <div v-show="params.filter">
-            <v-chip :items="chips" v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
-            <v-chip v-for="(item, key) in chipsStatus" :key="'K'+ key" close @input="removeStatus(item)">{{item}}</v-chip>
+            <v-chip :items="chipsClients" v-for="(item, key) in chipsClients" :key="key" close @input="remove(item)">{{item.name}}</v-chip>
+            <v-chip v-for="(item, key) in chipsStatus" :key="key" close @input="removeStatus(item)">{{item.title}}</v-chip>
             <v-chip v-if="dateStartClient" close @input="resetDate()">Начало {{dateStartClient}}</v-chip>
             <v-chip v-if="dateEndClient" close @input="resetDate()">Конец {{dateEndClient}}</v-chip>
         </div>
@@ -294,14 +144,16 @@
                         <v-combobox
                             v-model="chipsStatus"
                             :items="statusFilter"
+                            item-text="title"
                             multiple
                             label="Статус"
                         ></v-combobox>
                     </v-flex>
                     <v-flex class="px-3" xs4>
                         <v-combobox
-                            v-model="chips"
-                            :items="chipsItem"
+                            v-model="chipsClients"
+                            :items="clients"
+                            item-text="name"
                             multiple
                             label="Клиенты"
                         ></v-combobox>
@@ -440,6 +292,7 @@ export default {
         files: [],
         dateStartNew: null,
         dateEndNew: null,
+        picker:null,
         desserts: [],
         editedIndex: -1,
         dateStartClient: vm.formatDate(new Date().toISOString().substr(0, 10)),
@@ -451,8 +304,9 @@ export default {
         loadingSaveBtn: false,
         loaderSaveBtn: null,
         formData: new FormData(),
-        chips: [],
-        chipsItem: [],
+        chipsClients: [],
+        clients: [],
+        formFilds: [],
         valid: true,
         pagination: {
             sortBy: 'id'
@@ -461,6 +315,8 @@ export default {
         menu: false,
         dateStartFormatted: null,
         dateEndFormatted: null,
+        statusFilter: [],
+        loading: false,
         dateStart: null,
         dateEnd: null,
         menu1: false,
@@ -491,55 +347,57 @@ export default {
         }, 400),
         dateStartNew(val) {
             this.dateStartClient = this.formatDate(this.dateStartNew);
-            this.initialize();
         },
         dateEndNew(val) {
             this.dateEndClient = this.formatDate(this.dateEndNew);
-            this.initialize();
         },
-        chips(val) {
-            this.initialize();
-        },
-        chipsStatus() {
-            this.initialize();
-        },
-        clientNew(newVal, oldVal) {
-            this.selectClient();
-            if(this.clientNew) {
-                this.editedItem['client_id'] = this.clientNew;
-            }
+        picker(val) {
+            console.log(val);
+            // console.log(this.task_date_completion)
+            // this.picker = this.formatDate(this.picker);
         }
+        // chips(val) {
+        //     this.initialize();
+        // },
+        // chipsStatus() {
+        //     this.initialize();
+        // }
+        // clientNew(newVal, oldVal) {
+        //     this.selectClient();
+        //     if(this.clientNew) {
+        //         this.editedItem['client_id'] = this.clientNew;
+        //     }
+        // }
     },
     async created () {
         await this.initialize();
         // await this.selectStatus();
-        await this.getFiltered();
-        await this.selectClient();
+        // await this.selectClient();
     },
     methods: {
-        async getFiltered() {
-            if(this.params.filter) {
-                await this.params.filter.forEach((item) => {
-                    axios({
-                        method: 'get',
-                        url: item.api,
-                        params: {
-                            city: this.roleUserCity(),
-                        }
-                    })
-                    .then(
-                        response => {
-                            let data = response.data;
-                            data.filter((items) => {
-                                this.chipsItem.push(items[item.value]);
-                            });
-                        }
-                    ).catch(error => {
-                        console.log(error);
-                    })
-                })
-            }
-        },
+        // async getFiltered() {
+        //     if(this.params.filter) {
+        //         await this.params.filter.forEach((item) => {
+        //             axios({
+        //                 method: 'get',
+        //                 url: item.api,
+        //                 params: {
+        //                     city: this.roleUserCity(),
+        //                 }
+        //             })
+        //             .then(
+        //                 response => {
+        //                     let data = response.data;
+        //                     data.filter((items) => {
+        //                         this.chipsItem.push(items[item.value]);
+        //                     });
+        //                 }
+        //             ).catch(error => {
+        //                 console.log(error);
+        //             })
+        //         })
+        //     }
+        // },
         filteredStatus(data) {
             if(this.chipsStatus.length > 0) {
                 let arr = [];
@@ -560,9 +418,9 @@ export default {
             }
         },
         filtered(data) {
-            if(this.chips.length > 0) {
+            if(this.chipsClients.length > 0) {
                 let arr = [];
-                this.chips.forEach((chip) => {
+                this.chipsClients.forEach((chip) => {
                     arr.push(chip);
                 });
                 var searchTerm = arr.join('||').trim().toLowerCase(),
@@ -638,7 +496,7 @@ export default {
             this.dateStartClient = null;
             this.dateEndClient = null;
             this.initialize();
-            this.chips = [];
+            this.chipsClients = [];
             this.orderDate = this.orderFull;
             this.chipsStatus = [];
         },
@@ -664,7 +522,7 @@ export default {
             this.search = '';
             this.dateStartNew = null;
             this.dateEndNew = null;
-            this.chips = [];
+            this.chipsClients = [];
             this.initialize();
         },
         toggleAll () {
@@ -692,6 +550,8 @@ export default {
                 response => {
                     this.desserts = response.data.tasks; 
                     this.statusFilter = response.data.statusName;
+                    this.formFilds = response.data;
+                    this.clients = response.data.clients;
                     // this.statusFilter              
                     // if(this.dateStartClient && this.dateEndClient) {
                     //     this.desserts = this.desserts.filter(function (item) {
@@ -892,8 +752,8 @@ export default {
             });
         },
         remove(item) {
-            this.chips.splice(this.chips.indexOf(item), 1)
-            this.chips = [...this.chips]
+            this.chipsClients.splice(this.chipsClients.indexOf(item), 1)
+            this.chipsClients = [...this.chipsClients]
         },
         removeStatus(item) {
             this.chipsStatus.splice(this.chipsStatus.indexOf(item), 1)
@@ -919,6 +779,7 @@ export default {
     },
     mounted() {
         this.dataAdd();
+        console.log(this);
     }
 }
 </script>

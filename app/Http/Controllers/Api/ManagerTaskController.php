@@ -7,8 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Models\ManagerTask;
 use App\Models\CitiesToWorks;
 use App\Models\Clients;
+use App\Models\Managers;
 use App\User;
 use App\Http\Resources\ManagerTask as ManagerTaskResource;
+use App\Http\Resources\Clients as ClientsResource;
+use App\Http\Resources\Managers as ManagersResource;
 
 class ManagerTaskController extends Controller
 {
@@ -21,10 +24,13 @@ class ManagerTaskController extends Controller
     {
         $clients = Clients::with('cities', 'users' , 'comments')->get();
 
+        $managers = Managers::with('users', 'cities', 'moderator.users')->get();
+
         $status = [
             ['id' => 1, 'title' => 'В работе'], 
             ['id' => 2, 'title' => 'Завершена']
         ];
+        
 
         if($request->city) {
             $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get()->where('managers.city_id', $request->city); 
@@ -39,6 +45,7 @@ class ManagerTaskController extends Controller
         return response()->json([
             'tasks' => ManagerTaskResource::collection($tasks), 
             'clients' => ClientsResource::collection($clients),
+            'managers' => ManagersResource::collection($managers),
             'statusName' => $status
         ]);
     }

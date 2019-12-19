@@ -17,9 +17,8 @@ export default {
                     align: 'left',
                     sortable: true,
                     value: 'client_id',
-                    selectText: 'name',
-                    TableGetIdName: 'client',
-                    selectApi: '/api/clients',
+                    childField: 'name',
+                    tableValue: 'clients',
                     input: "select",
                     validate: 'required'
                 },
@@ -46,9 +45,8 @@ export default {
                     align: 'left',
                     sortable: true,
                     value: 'manager_id',
-                    selectText: 'name',
-                    TableGetIdName: 'managers',
-                    selectApi: '/api/managers',
+                    childField: 'name',
+                    tableValue: 'managers',
                     input: "select",
                     // validate: 'required'
                 },
@@ -66,16 +64,14 @@ export default {
                     value: 'task_date_ended'
                 },
                 {
-                    data: [
-                        {status: 1, text: 'В работе'},
-                        {status: 2, text: 'Завершена'}
-                    ],
-                    input: "status",
+                    input: "select",
                     value: "status",
-                    title: "statusName",
+                    tableValue: 'statusName',
+                    childField: 'title',
                     text: 'Статус',
-                    // validate: 'required',
+                    validate: 'required',
                     sortable: true,
+                    role: null
                 },
                 { 
                     text: 'Комментарий', 
