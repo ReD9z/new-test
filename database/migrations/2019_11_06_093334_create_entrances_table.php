@@ -24,7 +24,7 @@ class CreateEntrancesTable extends Migration
             $table->boolean('glass')->default(0);
             $table->boolean('information')->default(0);
             $table->boolean('mood')->default(0);
-            $table->integer('status')->default(0);
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

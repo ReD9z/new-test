@@ -124,7 +124,7 @@ class Address extends Model
                 $status = 0;
             }
             else if($value->status == 3)
-                $status = 0;
+                $status = 3;
             else {
                 $status = 1;
             }
