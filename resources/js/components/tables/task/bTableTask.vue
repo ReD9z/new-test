@@ -226,7 +226,12 @@
         </template>
         <template v-slot:items="props">
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
-                {{props.item[param.tableValue]}}
+                <v-flex v-if="param.value == 'orders_id'">
+                    <a :href="'/orders-address/'+props.item['orders_id']">{{props.item[param.tableValue]}}</a>
+                </v-flex>
+                <v-flex v-else>
+                    {{props.item[param.tableValue]}}
+                </v-flex> 
             </td>
             <td class="justify-left layout">
                 <v-icon small class="mr-2" v-show="hideElem()" @click="editItem(props.item)">	

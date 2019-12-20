@@ -10,6 +10,8 @@ use App\Models\CitiesToWorks;
 use App\Models\Clients;
 use App\Models\Managers;
 use App\User;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ManagerTaskExport;
 use App\Http\Resources\ManagerTask as ManagerTaskResource;
 use App\Http\Resources\Clients as ClientsResource;
 use App\Http\Resources\Managers as ManagersResource;
@@ -44,13 +46,13 @@ class ManagerTaskController extends Controller
 
         $collection = collect($tasks);
 
-        if($request->dateStart && $request->dateEnd) {
+        if($request->dateStart || $request->dateEnd) {
             $collection = $collection->filter(function($value) use($request)  {
                 $dateStart = Carbon::createFromFormat('d.m.Y', Carbon::parse($request->dateStart)->format('d.m.Y'))->timestamp;
                 $dateEnd = Carbon::createFromFormat('d.m.Y', Carbon::parse($request->dateEnd)->format('d.m.Y'))->timestamp;
                 $itemDate = Carbon::createFromFormat('d.m.Y', Carbon::parse($value->task_date_completion)->format('d.m.Y'))->timestamp;
               
-                if ($itemDate >= $dateStart && $itemDate <= $dateEnd) {
+                if($itemDate >= $dateStart && $itemDate <= $dateEnd) {
                     return true;
                 } 
             });
@@ -93,126 +95,8 @@ class ManagerTaskController extends Controller
 
     public function addExcelTask(Request $request)
     {
-        function mb_ucfirst($word)
-        {
-            return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
-        }
-
-
-        if(count($request->input()) == 8) {
-            $data = [];
-
-            $users = User::where('name', mb_ucfirst(array_values($request->input())[4]))->first();
-            $users_id = $users ? $users->id : null;
-            
-            $citywork = CitiesToWorks::where('name', mb_ucfirst(array_values($request->input())[2]))->first();
-            
-            $toClients = null;
-            
-            if(!empty($users)) {
-                $clients = Clients::with('cities', 'users', 'comments')->where('users_id', $users_id)->first();
-                if(!empty($clients)) {
-                    $toClients = $clients->id;
-                }else {
-                    $clients = new Clients;
-                    if (!empty($users)) { 
-                        $clients->users_id = $users->id;
-                    } else {
-                        $toUsers = new User;
-                        $toUsers->name = mb_ucfirst(array_values($request->input())[4]);
-                        $toUsers->email = str_replace(' ', '', array_values($request->input())[6]);
-                        $toUsers->phone = str_replace(' ', '', array_values($request->input())[5]);
-                        $toUsers->login = null;
-                        $toUsers->role = 'client';
-                        
-                        $toUsers->password = null;
-                        
-                        $token = $toUsers->createToken('Laravel Password Grant Client')->accessToken;
-                        $toUsers->save();
-                        $clients->users_id = $toUsers->id;
-                    }
-
-                    if (!empty($citywork)) {
-                        $clients->city_id = $citywork->id;
-                    } else {
-                        $toWorks = new CitiesToWorks;
-                        $toWorks->name = mb_ucfirst(array_values($request->input())[2]);
-                        $toWorks->save();
-                        $clients->city_id = $toWorks->id;
-                    }
-
-                    $clients->legal_name = mb_ucfirst(array_values($request->input())[3]);
-                    $clients->actual_title = mb_ucfirst(array_values($request->input())[3]);
-                    $clients->legal_address = null;
-                    $clients->actual_address = null;
-                    $clients->bik = null;
-                    $clients->cor_score = null;
-                    $clients->settlement_account = null;
-                    $clients->bank_name = null;
-                    $clients->save();
-                    $toClients = $clients->id;
-                }
-            } else {
-                $clients = new Clients;
-                if (!empty($users)) { 
-                    $clients->users_id = $users->id;
-                } else {
-                    $toUsers = new User;
-                    $toUsers->name = mb_ucfirst(array_values($request->input())[4]);
-                    $toUsers->email = str_replace(' ', '', array_values($request->input())[6]);
-                    $toUsers->phone = str_replace(' ', '', array_values($request->input())[5]);
-                    $toUsers->login = null;
-                    $toUsers->role = 'client';
-                    
-                    $toUsers->password = null;
-                    
-                    $token =  $toUsers->createToken('Laravel Password Grant Client')->accessToken;
-                    $toUsers->save();
-                    $clients->users_id = $toUsers->id;
-                }
-
-                if (!empty($citywork)) {
-                    $clients->city_id = $citywork->id;
-                } else {
-                    $toWorks = new CitiesToWorks;
-                    $toWorks->name = mb_ucfirst(array_values($request->input())[2]);
-                    $toWorks->save();
-                    $clients->city_id = $toWorks->id;
-                }
-
-                $clients->legal_name = mb_ucfirst(array_values($request->input())[3]);
-                $clients->actual_title = mb_ucfirst(array_values($request->input())[3]);
-                $clients->legal_address = null;
-                $clients->actual_address = null;
-                $clients->bik = null;
-                $clients->cor_score = null;
-                $clients->settlement_account = null;
-                $clients->bank_name = null;
-                $clients->save();
-                $toClients = $clients->id;
-            }
-
-            $tasks = new ManagerTask;
-
-            $tasks->id = $request->input('id');
-            $tasks->client_id = $toClients; 
-            $tasks->manager_id = null;
-            $tasks->status = '2';
-            if(array_values($request->input())[1]) {
-                $tasks->task_date_completion = array_values($request->input())[1] ? date("Y-m-d 00:00:00", strtotime(array_values($request->input())[1])) : null;
-            } else {
-                $tasks->task_date_completion = $tasks->status == '2' ? date("Y-m-d 00:00:00") : null;
-            }
-            $tasks->comment = array_values($request->input())[7];
-            $tasks->result = null;
-            $tasks->save();
-
-            $data = new ManagerTaskResource($tasks);
-
-            return response()->json(['errors' => [], 'data' => $data, 'status' => 200], 200);
-        }
+        Excel::import(new ManagerTaskExport, $request->file('file'));
     }
-
 
     /**
      * Display the specified resource.

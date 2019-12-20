@@ -21,10 +21,9 @@
                 ref="excelTask"
                 accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 @change="elementLoadToFileTask"
-                multiple
             >
         </v-btn>
-        <v-btn v-show="hideElem()" color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
+        <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
     </v-toolbar>
     <v-navigation-drawer v-model="dialog" right hide-overlay stateless fixed>
         <v-card  class="borderNone">
@@ -38,13 +37,10 @@
             <v-card-text>
                 <v-form ref="forms" v-model="valid" lazy-validation>
                     <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                        <div v-if="param.input == 'text' && param.value != 'comment'">
+                        <div v-if="param.input == 'text'">
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
-                        <div v-if="param.value == 'comment'" v-show="hideComment()">
-                            <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
-                        </div>
-                        <div v-if="param.input == 'select'" v-show="hideElem()">
+                        <div v-if="param.input == 'select'">
                             <v-autocomplete
                                 :items="formFilds[param.tableValue]"
                                 v-model="editedItem[param.value]"
@@ -69,7 +65,7 @@
                                 </template>
                             </v-autocomplete>
                         </div>
-                        <div v-if="param.input == 'date'" v-show="hideElem()">
+                        <div v-if="param.input == 'date'">
                             <v-menu
                                 v-model="param.close"
                                 :close-on-content-click="false"
@@ -98,9 +94,6 @@
                                 <v-date-picker locale="ru" :first-day-of-week="1" v-model="picker" no-title @input="param.close = false"></v-date-picker>
                             </v-menu>
                         </div>
-                        <div v-if="param.input == 'password'">
-                            <v-text-field :type="param.value" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12></v-text-field>
-                        </div>
                     </v-flex>
                     <div class="text-xs-center">
                         <v-btn color="info" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
@@ -127,8 +120,8 @@
             <v-chip v-if="dateStartClient" close @input="resetDate()">Начало {{dateStartClient}}</v-chip>
             <v-chip v-if="dateEndClient" close @input="resetDate()">Конец {{dateEndClient}}</v-chip>
         </div>
-        <v-icon v-if="showRoles()" v-show="params.filter">filter_list</v-icon>
-        <v-menu v-if="showRoles()" v-show="params.filter" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
+        <v-icon v-show="params.filter">filter_list</v-icon>
+        <v-menu v-show="params.filter" :close-on-content-click="false" :nudge-width="200" offset-y bottom left>
             <template v-slot:activator="{ on }" >
                 <v-btn icon v-on="on" v-show="params.filter">
                     <v-icon>more_vert</v-icon>
@@ -239,17 +232,14 @@
         </template>
         <template v-slot:items="props">
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
-                {{props.item[param.tableValue]}}
+                {{props.item[param.tableValue]}} 
             </td>
             <td class="justify-left layout">
-                <v-icon small class="mr-2" v-show="hideElem()" @click="editItem(props.item)">	
+                <v-icon small class="mr-2"  @click="editItem(props.item)">	
                     edit	
                 </v-icon>
-                <v-icon small class="mr-2" v-show="hideElem()" @click="deleteItem(props.item)">
+                <v-icon small class="mr-2"  @click="deleteItem(props.item)">
                     delete
-                </v-icon>
-                <v-icon class="mr-2" v-show="!hideElem()" @click="editItem(props.item)">
-                    assignment_turned_in
                 </v-icon>
             </td>
         </template>
@@ -287,9 +277,11 @@ export default {
         dateEndClient: vm.formatDate(new Date().toISOString().substr(0, 10)),
         editedItem: {
             status: 1,
+            manager_id: vm.$store.getters.isLoggedUser.managers ? vm.$store.getters.isLoggedUser.managers.id : null
         },
         defaultItem: { 
-            status: 1
+            status: 1,
+            manager_id: vm.$store.getters.isLoggedUser.managers ? vm.$store.getters.isLoggedUser.managers.id : null
         },
         loadingSaveBtn: false,
         loaderSaveBtn: null,
@@ -320,16 +312,18 @@ export default {
         }
     },
     watch: {
-        dialog (val) {
+        dialog(val) {
             val || this.close()
         },
         search: _.debounce(function () {
             this.initialize()
         }, 400),
         dateStartNew(val) {
+            this.initialize();
             this.dateStartClient = this.formatDate(this.dateStartNew);
         },
         dateEndNew(val) {
+            this.initialize();
             this.dateEndClient = this.formatDate(this.dateEndNew);
         },
         picker(val) {
@@ -390,6 +384,23 @@ export default {
                 });
             }
         },
+        filteredItems(data) {
+            this.desserts = data;
+            let searchTerm = this.search.trim().toLowerCase(),
+            useOr = this.search == "or",
+            AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+            OR_RegEx = searchTerm.replace(/ +/g,"|"),
+            regExExpression = useOr ? OR_RegEx : AND_RegEx,
+            searchTest = new RegExp(regExExpression, "ig");
+            let thisSearch = this.params.searchValue;
+            return this.desserts = this.desserts.filter(function(item) {
+                let arr = [];
+                thisSearch.forEach(function(val) {
+                    arr.push(item[val]);
+                })
+                return searchTest.test(arr.join(" ")); 
+            });
+        },
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
                 return this.isLoggedUser.moderators.city_id;
@@ -409,38 +420,13 @@ export default {
                 return this.isLoggedUser.installers.id;
             }
             if(this.isLoggedUser.managers) {
-                console.log(this.isLoggedUser.managers.id);
                 return this.isLoggedUser.managers.id;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.installers || !this.isLoggedUser.managers) {
                 return null;
             }
         },
-        showRoles() {
-            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
-                return false;
-            }
-            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
-                return true;
-            }
-        },
-        hideElem() {
-            if(this.isLoggedUser.installers) {
-                return false;
-            }
-            if(!this.isLoggedUser.installers) {
-                return true;
-            }
-        },
-        hideComment() {
-            if(this.isLoggedUser.managers) {
-                return false;
-            }
-            if(!this.isLoggedUser.installers || !this.isLoggedUser.managers) {
-                return true;
-            }
-        },
-        formatDate (date) {
+        formatDate(date) {
             if (!date) return null
 
             const [year, month, day] = date.split('-')
@@ -451,26 +437,9 @@ export default {
             this.dateEndNew = null;
             this.dateStartClient = null;
             this.dateEndClient = null;
-            this.initialize();
             this.chipsClients = [];
             this.chipsStatus = [];
-        },
-        filteredItems(data) {
-            this.desserts = data;
-            let searchTerm = this.search.trim().toLowerCase(),
-            useOr = this.search == "or",
-            AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
-            OR_RegEx = searchTerm.replace(/ +/g,"|"),
-            regExExpression = useOr ? OR_RegEx : AND_RegEx,
-            searchTest = new RegExp(regExExpression, "ig");
-            let thisSearch = this.params.searchValue;
-            return this.desserts = this.desserts.filter(function(item) {
-                let arr = [];
-                thisSearch.forEach(function(val) {
-                    arr.push(item[val]);
-                })
-                return searchTest.test(arr.join(" ")); 
-            });
+            this.initialize();
         },
         refreshSearch() {
             this.loading = true;
@@ -638,18 +607,6 @@ export default {
                 return false;
             }
         },
-        dataAdd() {
-            if(this.isLoggedUser.managers) {
-                this.editedItem['manager_id'] = this.isLoggedUser.managers.id;
-            }
-            if(this.isLoggedUser.moderators) {
-                // this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
-                // this.editedItem['moderator_id'] = this.isLoggedUser.moderators.id;
-            }
-        }
     },
-    mounted() {
-        this.dataAdd();
-    }
 }
 </script>
