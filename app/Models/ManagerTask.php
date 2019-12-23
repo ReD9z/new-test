@@ -11,9 +11,11 @@ class ManagerTask extends Model
 {
     protected $fillable = [
         'client_id',
+        'manager_id',
         'status',
         'task_date_completion',
         'comment',
+        'result'
     ];
 
     public function clients() {
@@ -41,53 +43,60 @@ class ManagerTask extends Model
         return $mostRecent ? date("d.m.Y", $mostRecent) : null;
     }
 
-    function mb_ucfirst($word)
+     public static function mb_ucfirst($word)
     {
         return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
     }
 
+    //  public static function createClient($city, $nameOrganization, $nameClient, $phone, $email)
+
     public static function createClient($city, $nameOrganization, $nameClient, $phone, $email)
     {
+        $users = User::where('name', self::mb_ucfirst($nameClient))->first();
+        $toUsersId = null;
         
-        $users = User::where('name', mb_ucfirst(array_values($nameClient)->first();
-        $citywork = CitiesToWorks::where('name', mb_ucfirst(array_values($city))->first();
-        $clients = Clients::with('cities', 'users', 'comments')->where('users_id', $users_id)->first();
-        
-        if(!empty($clients)) {
-            $toClients = $clients->id;
+        if($users) {
+            $toUsersId = $users->id;
         }else {
-            $clients = new Clients;
-            if (!empty($users)) { 
-                $clients->users_id = $users->id;
-            } else {
-                $toUsers = new User;
-                $toUsers->name = $nameClient;
-                $toUsers->email = $email;
-                $toUsers->phone = $phone;
-                $toUsers->login = null;
-                $toUsers->role = 'client';
-                
-                $toUsers->password = null;
-                
-                $token = $toUsers->createToken('Laravel Password Grant Client')->accessToken;
-                $toUsers->save();
-                $clients->users_id = $toUsers->id;
-            }
-
-            if (!empty($citywork)) {
-                $clients->city_id = $citywork->id;
-            } else {
-                $toWorks = new CitiesToWorks;
-                $toWorks->name = mb_ucfirst(array_values($request->input())[2]);
-                $toWorks->save();
-                $clients->city_id = $toWorks->id;
-            }
-
-            $clients->legal_name = mb_ucfirst($nameOrganization);
-            $clients->actual_title = mb_ucfirst($nameOrganization);
-           
-            $clients->save();
-            $toClients = $clients->id;
+            $toUsers = new User;
+            $toUsers->name = $nameClient;
+            $toUsers->email = null;
+            $toUsers->phone = $phone;
+            $toUsers->login = null;
+            $toUsers->role = 'client';
+            $toUsers->password = null;
+            $token = $toUsers->createToken('Laravel Password Grant Client')->accessToken;
+            $toUsers->save();
+            $toUsersId = $toUsers->id;
         }
+
+        $citywork = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
+        $toCityId = null;
+        if($citywork) {
+            $toCityId = $citywork->id;
+        } else {
+            $toWorks = new CitiesToWorks;
+            $toWorks->name = self::mb_ucfirst($city);
+            $toWorks->save();
+            $toCityId = $toWorks->id;
+        }
+
+
+        $toClientID = null;
+
+        $clients = Clients::with('cities', 'users', 'comments')->where('users_id', $toUsersId)->first();
+        if($clients) {
+            $toClientID = $clients->id;
+        } else {
+            $clientsNew = new Clients;
+            $clientsNew->users_id = $toUsersId;
+            $clientsNew->city_id = $toCityId;
+            $clientsNew->legal_name = self::mb_ucfirst($nameOrganization);
+            $clientsNew->actual_title = self::mb_ucfirst($nameOrganization);
+            $clientsNew->save();
+            $toClientID = $clientsNew->id;
+        }
+
+        return $toClientID;
     }
 }

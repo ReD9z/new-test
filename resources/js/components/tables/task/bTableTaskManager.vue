@@ -19,8 +19,8 @@
                 type="file"
                 style="display: none"
                 ref="excelTask"
-                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                @change="elementLoadToFileTask"
+                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .ods"
+                @change="loadExecelTask"
             >
         </v-btn>
         <v-btn color="green" large class="mb-2 white--text" @click.stop="dialog = !dialog"><v-icon left>add</v-icon>Создать задачу</v-btn>
@@ -252,7 +252,6 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate'
-import XLSX from 'xlsx';
 
 Vue.use(VeeValidate);
 
@@ -487,20 +486,6 @@ export default {
         loadExcelTask() {
             this.$refs.excelTask.click();
         },
-        elementLoadToFileTask() {
-            let file = this.$refs.excelTask.files[0];
-            let reader = new FileReader();
-            let vm = this;
-            reader.readAsBinaryString(file);
-            reader.onload = function (e) {
-                let workbook = XLSX.read(e.target.result, {
-                    type: 'binary'
-                });
-                let firstSheet = workbook.SheetNames[0];
-                let excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], {raw: false});
-                vm.loadExecelTask(excelRows);
-            };
-        },
         async loadExecelTask(file) {
             let vm = this;
             this.loadingExcelTask = true;
@@ -508,26 +493,21 @@ export default {
             this.dateEndNew = null;
             this.dateStartClient = null;
             this.dateEndClient = null;
-            await file.forEach(function (item) {
-                axios({
-                    method: 'post',
-                    url: '/api/addExcelTask',
-                    data: item
-                })
-                .then(
-                    response => {
-                        let array = response.data.data;
-                        if(array != undefined) {
-                            vm.desserts.push(array);
-                        }
-                        setTimeout(() => (vm.loadingExcel = false), 1000);
-                        vm.$refs.excelTask.value = '';
-                        vm.loadingExcelTask = false;
-                    }
-                ).catch(error => {
-                    console.log(error);
-                });
+            let files = this.$refs.excelTask.files[0];
+            
+            this.formData.append('file', files);
+            await axios.post('/api/addExcelTask', this.formData, {
+                headers: {'Content-Type': 'multipart/form-data'}
             })
+            .then(
+                response => {
+                    this.$refs.excelTask.value = '';
+                    this.loadingExcelTask = false;
+                    this.initialize();
+                }
+            ).catch(error => {
+                console.log(error);
+            });
         },
         editItem (item) {
             this.editedIndex = this.desserts.indexOf(item);
