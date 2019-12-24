@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class ManagerTask extends Model
 {
     protected $fillable = [
+        'id',
         'client_id',
         'manager_id',
         'status',
@@ -28,16 +29,13 @@ class ManagerTask extends Model
 
     public function TaskEndDate($id)
     {
-        $clients = ManagerTask::with('clients', 'managers.users', 'managers')->get()->where('client_id', $id);
+        $clients = ManagerTask::where('client_id', $id)->first();
         $mostRecent = null;
-
-        foreach ($clients as $key => $value) {
-            $curDate = strtotime($value->task_date_completion);
-            if ($value->task_date_completion) {
-                $mostRecent = $curDate;
-            } else {
-                $mostRecent = null;
-            }
+        if($clients) {
+            $curDate = strtotime($clients->task_date_completion);
+            $mostRecent = $curDate;
+        } else {
+            $mostRecent = null;
         }
 
         return $mostRecent ? date("d.m.Y", $mostRecent) : null;
@@ -48,11 +46,10 @@ class ManagerTask extends Model
         return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
     }
 
-    //  public static function createClient($city, $nameOrganization, $nameClient, $phone, $email)
 
     public static function createClient($city, $nameOrganization, $nameClient, $phone, $email)
     {
-        $users = User::where('name', self::mb_ucfirst($nameClient))->first();
+        $users = User::where('email', self::mb_ucfirst($email))->first();
         $toUsersId = null;
         
         if($users) {
@@ -60,7 +57,7 @@ class ManagerTask extends Model
         }else {
             $toUsers = new User;
             $toUsers->name = $nameClient;
-            $toUsers->email = null;
+            $toUsers->email = $email;
             $toUsers->phone = $phone;
             $toUsers->login = null;
             $toUsers->role = 'client';
@@ -80,7 +77,6 @@ class ManagerTask extends Model
             $toWorks->save();
             $toCityId = $toWorks->id;
         }
-
 
         $toClientID = null;
 

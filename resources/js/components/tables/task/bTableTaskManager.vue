@@ -461,10 +461,10 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: this.roleUserCity(),
-                    user: this.roleUserId(),
-                    dateStart: this.dateStartClient,
-                    dateEnd: this.dateEndClient
+                    // city: this.roleUserCity(),
+                    // user: this.roleUserId(),
+                    // dateStart: this.dateStartClient,
+                    // dateEnd: this.dateEndClient
                 }
             })
             .then(
@@ -473,6 +473,8 @@ export default {
                     this.statusFilter = response.data.statusName;
                     this.formFilds = response.data;
                     this.clients = response.data.clients;
+
+                    console.log(response.data.tasks);
                     
                     this.filteredItems(this.desserts);
                     this.filteredClient(this.desserts); 
