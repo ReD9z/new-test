@@ -118,7 +118,7 @@
                 <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
                     <v-flex xs12 v-if="param.input == 'images'">
                         <v-layout row wrap>
-                            <v-flex v-for="(file, key) in addOrderImages.files" :key="key" xs4 d-flex>
+                            <v-flex v-for="(file, key) in addOrderImages" :key="key" xs4 d-flex>
                                 <v-card flat tile class="d-flex pr-1 pb-1">
                                     <v-img :src="file.url" :lazy-src="file.url" aspect-ratio="1" class="grey lighten-2">
                                         <template v-slot:placeholder>
@@ -127,7 +127,7 @@
                                             </v-layout>
                                         </template>
                                         <template>
-                                            <v-layout fill-height right top ma-0 >
+                                            <v-layout fill-height right top ma-0>
                                                 <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
                                                     <v-icon>close</v-icon>
                                                 </v-btn>
@@ -244,6 +244,7 @@
 </template>
 <script>
 import XLSX from 'xlsx';
+import { constants } from 'crypto';
 export default {
     inject: ['$validator'],
     data: vm => ({
@@ -277,7 +278,8 @@ export default {
         valid: true,
         order: [],
         cityUser: null,
-        selected: []
+        selected: [],
+        addOrder: []
     }),
     props: {
         params: Object,
@@ -455,14 +457,14 @@ export default {
                     axios({
                         method: 'put',
                         url: '/api/address_to_orders',
-                        data: this.addOrderImages,
+                        data: this.addOrder,
                         params: {
                             images: res.data.files
                         }
                     })
                     .then(
                         response => {
-                            Object.assign(this.addOrderImages, response.data);
+                            Object.assign(this.addOrderImages, response.data.files);
                             this.loadImages = false;
                             this.resetFilesLoad();
                         }
@@ -500,10 +502,16 @@ export default {
         },
         removeImg(data) {
             this.loadImages = true;
+            const index = Array.from(this.addOrderImages).indexOf(data.id);
+            console.log(index);
             axios.post('/api/files/remove', data)
             .then(
                 res => {
-                    this.addOrderImages.files.splice(this.addOrderImages.files.indexOf(data.id), 1);
+                    // console.log(this.addOrderImages.map().indexOf(data.id));
+                    // this.initialize()
+                    // console.log(this.addOrderImages);
+                    // console.log(this.addOrderImages.indexOf(res.id));
+                    this.addOrderImages.splice(index, 1);
                     this.loadImages = false;
                 }
             ).catch(
@@ -545,6 +553,7 @@ export default {
                                 });
                             } 
                         });
+                        console.log(this.desserts);
                         this.filteredItems(this.desserts);
                         this.filtered(this.desserts);
                         this.filteredStatus(this.desserts); 
@@ -600,7 +609,8 @@ export default {
             this.dateEnd =  this.$moment(vm.order.order_end_date, "DD-MM-YYYY").format("YYYY-MM-DD");
         },
         editPhotos(item) {
-            this.addOrderImages = Object.assign({}, item.data);
+            this.addOrderImages =  item.images;
+            this.addOrder = Object.assign({}, item.data);
             this.dialogImages = true;
         },
         deleteItem (item) {

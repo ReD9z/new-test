@@ -26,6 +26,7 @@ class Address extends JsonResource
             'management_company' => $this->management_company,
             'status' => $this->orderAddress,
             'coordinates' => $this->coordinates,
+            'images' => $this->getImages($this->id),
             'data' => null,
             'result' => $this->status($this->orderAddress),
             'entrances' => $this->entrances,

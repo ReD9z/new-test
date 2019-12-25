@@ -461,10 +461,10 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    // city: this.roleUserCity(),
-                    // user: this.roleUserId(),
-                    // dateStart: this.dateStartClient,
-                    // dateEnd: this.dateEndClient
+                    city: this.roleUserCity(),
+                    user: this.roleUserId(),
+                    dateStart: this.dateStartClient,
+                    dateEnd: this.dateEndClient
                 }
             })
             .then(

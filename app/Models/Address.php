@@ -4,8 +4,10 @@ namespace App\Models;
 use App\Models\Entrances;
 use App\Models\Areas;
 use App\Models\CitiesToWorks;
+use App\Models\Files;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use App\Models\ImagesToOrders;
 
 class Address extends Model
 {
@@ -150,6 +152,23 @@ class Address extends Model
             $entrances->address_id = $id;
             $entrances->save();
         }
+    }
+
+    public function getImages($id)
+    {
+        $entrances = Entrances::where([
+            ['address_id', $id], 
+            ['file_id', '!=', null]
+        ])->pluck('file_id')->all();
+
+        $address = ImagesToOrders::with('orders')->where([
+            ['files_id', '!=', null]
+        ])->get()->where('orders.address_id', $id)->pluck('files_id')->all();
+        $result = array_merge($entrances, $address);
+        
+        $files = Files::whereIn('id', $result)->get();
+        
+        return $files ? $files : null;
     }
 
     public static function editEntrances($data) {

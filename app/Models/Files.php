@@ -9,4 +9,12 @@ class Files extends Model
     public function comments() {
         return $this->hasMany('App\Models\CommentToFiles', 'files_id', 'id');
     }
+
+    public function address() {
+        return $this->hasMany('App\Models\ImagesToOrders', 'files_id', 'id');
+    }
+
+    public function entrances() {
+        return $this->hasMany('App\Models\Entrances', 'file_id', 'id');
+    }
 }
