@@ -121,20 +121,27 @@
                             <v-flex v-for="(file, key) in addOrderImages" :key="key" xs4 d-flex>
                                 <v-card flat tile class="d-flex pr-1 pb-1">
                                     <v-img :src="file.url" :lazy-src="file.url" aspect-ratio="1" class="grey lighten-2">
+                                        <template>
+                                            <v-layout v-show="file.entrances" fill-width align-center column ma-0>
+                                                <v-btn>
+                                                    Номер подъезда {{file.entrances ? file.entrances.number : null}}
+                                                </v-btn>
+                                            </v-layout>
+                                        </template>
                                         <template v-slot:placeholder>
-                                            <v-layout fill-height align-center justify-center ma-0 >
+                                            <v-layout left align-end ma-0>
                                                 <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
                                             </v-layout>
                                         </template>
                                         <template>
-                                            <v-layout fill-height right top ma-0>
+                                            <v-layout right align-start ma-0>
                                                 <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
                                                     <v-icon>close</v-icon>
                                                 </v-btn>
                                             </v-layout>
                                         </template>
                                         <template>
-                                            <v-layout fill-height left top ma-0 >
+                                            <v-layout>
                                                 <v-dialog v-model="dialogImg" width="600px">
                                                     <template v-slot:activator="{ on }">
                                                         <v-btn icon class="white--text" v-on="on" @click='filesImg(file)'><v-icon>search</v-icon></v-btn>
@@ -503,14 +510,9 @@ export default {
         removeImg(data) {
             this.loadImages = true;
             const index = Array.from(this.addOrderImages).indexOf(data.id);
-            console.log(index);
             axios.post('/api/files/remove', data)
             .then(
                 res => {
-                    // console.log(this.addOrderImages.map().indexOf(data.id));
-                    // this.initialize()
-                    // console.log(this.addOrderImages);
-                    // console.log(this.addOrderImages.indexOf(res.id));
                     this.addOrderImages.splice(index, 1);
                     this.loadImages = false;
                 }

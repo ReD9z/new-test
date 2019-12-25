@@ -441,6 +441,10 @@ export default {
             this.initialize();
         },
         refreshSearch() {
+            this.dateStartNew = null;
+            this.dateEndNew = null;
+            this.dateStartClient = null;
+            this.dateEndClient = null;
             this.loading = true;
             this.search = '';
             this.dateStartNew = null;
@@ -457,6 +461,8 @@ export default {
             }
         },
         initialize() {
+            this.loading = true;
+            
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
@@ -473,8 +479,6 @@ export default {
                     this.statusFilter = response.data.statusName;
                     this.formFilds = response.data;
                     this.clients = response.data.clients;
-
-                    console.log(response.data.tasks);
                     
                     this.filteredItems(this.desserts);
                     this.filteredClient(this.desserts); 

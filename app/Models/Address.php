@@ -166,7 +166,7 @@ class Address extends Model
         ])->get()->where('orders.address_id', $id)->pluck('files_id')->all();
         $result = array_merge($entrances, $address);
         
-        $files = Files::whereIn('id', $result)->get();
+        $files = Files::with('entrances')->whereIn('id', $result)->get();
         
         return $files ? $files : null;
     }

@@ -108,7 +108,12 @@ class TasksController extends Controller
 
         $addresses = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('id', $address)->get();
 
-        return TaskAddressResource::collection($addresses);
+        $collection = collect(TaskAddressResource::collection($addresses));
+        $collection = $collection->filter(function($value) {
+            return $value['status'] != 3;
+        });
+
+        return $collection;
     }
 
     public function taskEntrances($id)

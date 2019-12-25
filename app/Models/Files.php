@@ -15,6 +15,6 @@ class Files extends Model
     }
 
     public function entrances() {
-        return $this->hasMany('App\Models\Entrances', 'file_id', 'id');
+        return $this->hasOne('App\Models\Entrances', 'file_id', 'id');
     }
 }

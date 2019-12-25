@@ -15,6 +15,7 @@
         "laravel/passport": "^7.2",
         "laravel/tinker": "^1.0",
         "maatwebsite/excel": "^3.1",
+        "phpoffice/phpspreadsheet": "^1.10",
         "yandex/geo": "^1.2"
     },
     "require-dev": {

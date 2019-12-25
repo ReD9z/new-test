@@ -11,7 +11,7 @@ import VeeValidate, { Validator } from 'vee-validate';
 import VeeValidateLaravel from 'vee-validate-laravel';
 import ruVee from 'vee-validate/dist/locale/ru';
 import 'babel-polyfill';
-import VueFuse from 'vue-fuse';
+// import VueFuse from 'vue-fuse';
 
 
 Vue.use(Vuetify, {
@@ -30,7 +30,7 @@ Vue.use(Vuex);
 Validator.localize({ ru: ruVee })
 Vue.use(VeeValidate, { inject: false, locale: 'ru' })
 Vue.use(VeeValidateLaravel);
-Vue.use(VueFuse);
+// Vue.use(VueFuse);
 
 
 let token = window.localStorage.getItem('token');

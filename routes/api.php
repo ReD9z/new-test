@@ -18,13 +18,12 @@ Route::group(['middleware' => ['json.response']], function () {
     /******* Public routes *******/
     Route::post('login', 'Api\AuthController@login');
   
-    Route::get('taskAddress/{id}', 'Api\TasksController@taskAddress');
     /******* Private routes *******/
     Route::middleware('auth:api')->group(function () {
         Route::get('logout', 'Api\AuthController@logout');
         Route::post('files', 'Api\FilesUploadController@add');
         Route::post('files/remove', 'Api\FilesUploadController@remove');
-    
+        
         // Address
         Route::post('address', 'Api\AddressController@store'); // Add one item
         Route::get('address', 'Api\AddressController@index'); // Show list
@@ -33,6 +32,7 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::delete('address/{id}', 'Api\AddressController@destroy'); // Delete one item
         Route::post('address/excel', 'Api\AddressController@addExcelData'); 
         Route::post('address/excelExport', 'Api\AddressController@exportExcelData');
+        Route::get('taskAddress/{id}', 'Api\TasksController@taskAddress');
 
         // Users
         Route::post('users', 'Api\UsersController@store'); // Add one item
