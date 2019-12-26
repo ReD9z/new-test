@@ -3,7 +3,7 @@
     <v-toolbar color="#fff" fixed app clipped-righ>
         <v-toolbar-title>Заказ №{{order.id}}</v-toolbar-title>
         <v-spacer></v-spacer>
-            <v-btn color="green" large class="mb-2 white--text" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
+        <v-btn v-if="hideElem()" color="green" large class="mb-2 white--text" @click="save" :loading="loadingSaveBtn" :disabled="loadingSaveBtn">
             <v-icon left>add</v-icon> Сохранить
             <template v-slot:loaderSaveBtn>
                 <span class="custom-loader">
@@ -13,7 +13,7 @@
         </v-btn>
         <v-btn color="info" large class="mb-2 white--text" to="/orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
     </v-toolbar>
-    <v-card>
+    <v-card v-if="hideElem()">
         <v-card-text>
             <v-form ref="forms" v-model="valid" lazy-validation>
                 <v-layout row wrap>
@@ -205,8 +205,30 @@
     </v-toolbar>
     <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' v-model="selected" select-all :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
+        <template v-slot:headers="props">
+            <th v-if="hideElem()">
+                <v-checkbox
+                    primary
+                    hide-details
+                    @click.native="toggleAll"
+                    :input-value="props.all"
+                    :indeterminate="props.indeterminate"
+                    >
+                </v-checkbox>
+            </th>
+            <th v-for="header in props.headers"
+                :key="header.text"
+                :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
+                @click="changeSort(header.value)"
+            >
+                {{ header.text }}<v-icon small>arrow_upward</v-icon>
+            </th>
+            <th class="text-xs-left">
+                Действия
+            </th>
+        </template>
         <template v-slot:items="props">
-            <td>
+            <td v-if="hideElem()">
                 <v-checkbox
                     v-show="props.item.result !== 'Занят'"
                     v-model="props.selected"
@@ -237,7 +259,7 @@
                 <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
                     image
                 </v-icon>
-                <v-icon small class="mr-2" v-if="props.item.data !== null"  @click="deleteItem(props.item)">
+                <v-icon small class="mr-2" v-if="props.item.data !== null && hideElem()"  @click="deleteItem(props.item)">
                     delete
                 </v-icon>
             </td>
@@ -282,6 +304,9 @@ export default {
         formData: new FormData(),
         chips: [],
         chipsItem: [],
+        pagination: {
+            sortBy: 'id'
+        },
         valid: true,
         order: [],
         cityUser: null,
@@ -344,6 +369,14 @@ export default {
                 return false;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return true;
+            }
+        },
+        hideElem() {
+            if(this.isLoggedUser.clients) {
+                return false;
+            }
+            if(!this.isLoggedUser.clients) {
                 return true;
             }
         },
@@ -680,6 +713,9 @@ export default {
                 return false;
             }
         }
+    },
+    mounted() {
+        console.log(this);
     }
 }
 </script>

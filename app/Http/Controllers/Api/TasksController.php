@@ -101,19 +101,28 @@ class TasksController extends Controller
         $tasks = Tasks::with('orders.orderAddress.address')->where('id', $id)->first();
     
         $address = [];
-
-        foreach ($tasks->orders->orderAddress as $key => $value) {
-            $address[] = $value->address_id;
+        $getAddress = [];
+        
+        if($tasks['orders']) {
+            foreach ($tasks['orders']['orderAddress'] as $key => $value) {
+                $address[] = $value['address_id'];
+            }
         }
-
+        
         $addresses = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('id', $address)->get();
 
-        $collection = collect(TaskAddressResource::collection($addresses));
-        $collection = $collection->filter(function($value) {
-            return $value['status'] != 3;
-        });
+        $addressArray = collect(TaskAddressResource::collection($addresses));
 
-        return $collection;
+        if($addressArray) {
+            foreach ($addressArray as $key => $value) {
+                if($value['status'] != 3) {
+                    $getAddress[] = $value['id'];
+                }
+            }
+        }
+
+        $activeAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('id', $getAddress)->get();
+        return TaskAddressResource::collection($activeAddress);
     }
 
     public function taskEntrances($id)

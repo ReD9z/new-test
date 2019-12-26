@@ -89,19 +89,12 @@ router.beforeEach((to, from, next) => {
                 }
             }
             if (to.meta.managerAuth) {
-                if (store.getters.isUserRole === 'manager') {
-                    next()
-                }
+                next('/orders')
             }
 
             if (to.meta.clientAuth) {
                 if (store.getters.isUserRole === 'client') {
-                    if (to.path !== '/orders') {
-                        next('/orders');
-                    }
-                    else {
-                        next();
-                    }
+                    next()
                 }
             }
 
@@ -133,7 +126,7 @@ router.beforeEach((to, from, next) => {
                 if (to.path !== '/error') {
                     next('/error');
                 } else {
-                    next();
+                    next('/orders');
                 }
             }
         } else {

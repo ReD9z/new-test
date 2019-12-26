@@ -214,7 +214,7 @@ let routers =  [
             moderatorAuth: true,
             installerAuth: false,
             managerAuth: false,
-            clientAuth: false 
+            clientAuth: true
         },
         component: require('./views/OrdersToAddress.vue').default
     },

@@ -52,16 +52,16 @@
                                 :error-messages="errors.collect(param.value)" 
                                 v-validate="param.validate"
                             >
-                            <template v-if="param.value == 'client_id'" v-slot:append-outer>
-                                <v-btn
-                                    color="primary"
-                                    dark
-                                    small
-                                    icon
-                                    @click.stop="addClient = !addClient"
-                                >
-                                    <v-icon small>add</v-icon>
-                                </v-btn>
+                                <template v-if="param.value == 'client_id'" v-slot:append-outer>
+                                    <v-btn
+                                        color="primary"
+                                        dark
+                                        small
+                                        icon
+                                        @click.stop="addClient = !addClient"
+                                    >
+                                        <v-icon small>add</v-icon>
+                                    </v-btn>
                                 </template>
                             </v-autocomplete>
                         </div>
@@ -593,6 +593,6 @@ export default {
                 return false;
             }
         },
-    },
+    }
 }
 </script>

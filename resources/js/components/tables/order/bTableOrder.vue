@@ -129,7 +129,7 @@
             >
                 {{ header.text }}<v-icon small>arrow_upward</v-icon>
             </th>
-            <th class="text-xs-left" v-show="hideElem()">
+            <th class="text-xs-left">
                 Действия
             </th>
         </template>
@@ -140,11 +140,11 @@
                     <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
             </td>
-            <td class="justify-left layout" v-show="hideElem()">
+            <td class="justify-left layout">
                 <v-icon small class="mr-2" @click="redirectEdit(props.item.id)">
                     edit
                 </v-icon>
-                <v-icon small class="mr-2" @click="deleteItem(props.item)">
+                <v-icon v-show="hideElem()" small class="mr-2" @click="deleteItem(props.item)">
                     delete
                 </v-icon>
             </td>

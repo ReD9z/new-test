@@ -17,7 +17,7 @@ Route::group(['middleware' => ['json.response']], function () {
     
     /******* Public routes *******/
     Route::post('login', 'Api\AuthController@login');
-  
+    
     /******* Private routes *******/
     Route::middleware('auth:api')->group(function () {
         Route::get('logout', 'Api\AuthController@logout');
