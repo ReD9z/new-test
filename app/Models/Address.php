@@ -126,7 +126,7 @@ class Address extends Model
                 $status = 0;
             }
             else if($value->status == 3)
-                $status = 3;
+                $status = 0;
             else {
                 $status = 1;
             }
@@ -164,6 +164,26 @@ class Address extends Model
         $address = ImagesToOrders::with('orders')->where([
             ['files_id', '!=', null]
         ])->get()->where('orders.address_id', $id)->pluck('files_id')->all();
+        
+        $result = array_merge($entrances, $address);
+        
+        $files = Files::with('entrances')->whereIn('id', $result)->get();
+        
+        return $files ? $files : null;
+    }
+    
+    public function getImagesRole($id)
+    {
+         $entrances = Entrances::where([
+            ['address_id', $id], 
+            ['file_id', '!=', null],
+            ['status', '=', 3]
+        ])->pluck('file_id')->all();
+
+        $address = ImagesToOrders::with('orders')->where([
+            ['files_id', '!=', null]
+        ])->get()->where('orders.address_id', $id)->pluck('files_id')->all();
+        
         $result = array_merge($entrances, $address);
         
         $files = Files::with('entrances')->whereIn('id', $result)->get();

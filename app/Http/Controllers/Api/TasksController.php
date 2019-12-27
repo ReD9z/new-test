@@ -115,7 +115,7 @@ class TasksController extends Controller
 
         if($addressArray) {
             foreach ($addressArray as $key => $value) {
-                if($value['status'] != 3) {
+                if($value['status'] != 0) {
                     $getAddress[] = $value['id'];
                 }
             }

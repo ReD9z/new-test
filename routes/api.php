@@ -32,7 +32,6 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::delete('address/{id}', 'Api\AddressController@destroy'); // Delete one item
         Route::post('address/excel', 'Api\AddressController@addExcelData'); 
         Route::post('address/excelExport', 'Api\AddressController@exportExcelData');
-        Route::get('taskAddress/{id}', 'Api\TasksController@taskAddress');
 
         // Users
         Route::post('users', 'Api\UsersController@store'); // Add one item
@@ -132,6 +131,7 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::delete('tasks/{id}', 'Api\TasksController@destroy'); // Delete one item
         Route::get('tasks', 'Api\TasksController@index'); // Show list
         Route::get('task', 'Api\TasksController@task');
+        Route::get('taskAddress/{id}', 'Api\TasksController@taskAddress');
         Route::get('taskEntrances/{id}', 'Api\TasksController@taskEntrances');
        
 

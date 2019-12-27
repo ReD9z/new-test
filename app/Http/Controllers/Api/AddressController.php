@@ -10,8 +10,10 @@ use App\Models\Address;
 use App\Models\Areas;
 use App\Models\CitiesToWorks;
 use App\Http\Resources\Address as AddressResource;
+use App\Http\Resources\AddressRoleUser as AddressRoleUserResource;
 use App\Http\Resources\CitiesToWorks as CitiesToWorksResource;
 use App\Http\Resources\Areas as AreasResource;
+
 
 class AddressController extends Controller
 {
@@ -25,21 +27,22 @@ class AddressController extends Controller
         $toWorks = CitiesToWorks::get();
         $areas = Areas::with('cities')->where('city_id', $request->areaCity)->get();
         if($request->city) {
-            $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->where('city_id', $request->city)->get();
+            $address = AddressResource::collection(Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->where('city_id', $request->city)->get());
+        }
+        else if($request->user) {
+            $address = AddressRoleUserResource::collection(Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get());
         }
         else {
-            $address = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get();
+            $address = AddressResource::collection(Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get());
         }
         
         return response()->json(
             [
-                'errors' => [], 
-                'address' => AddressResource::collection($address), 
+                'address' => $address, 
                 'city' => CitiesToWorksResource::collection($toWorks), 
-                'area' => AreasResource::collection($areas),
-                'status' => 200
-            ], 
-        200);
+                'area' => AreasResource::collection($areas)
+            ]
+        );
     }
 
     /**

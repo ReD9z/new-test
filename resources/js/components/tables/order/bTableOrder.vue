@@ -141,8 +141,11 @@
                 </v-flex>
             </td>
             <td class="justify-left layout">
-                <v-icon small class="mr-2" @click="redirectEdit(props.item.id)">
+                <v-icon v-show="hideElem()" small class="mr-2" @click="redirectEdit(props.item.id)">
                     edit
+                </v-icon>
+                <v-icon v-show="!hideElem()" class="mr-2" @click="redirectEdit(props.item.id)">
+                    account_balance_wallet
                 </v-icon>
                 <v-icon v-show="hideElem()" small class="mr-2" @click="deleteItem(props.item)">
                     delete

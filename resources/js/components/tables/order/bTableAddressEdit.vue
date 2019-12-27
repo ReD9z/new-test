@@ -107,7 +107,7 @@
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>Изображения</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-icon right dark @click='pickImages'>control_point</v-icon>
+                <v-icon v-if="hideElem()" right dark @click='pickImages'>control_point</v-icon>
                 <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
                 <v-btn icon @click="close">
                     <v-icon>close</v-icon>
@@ -216,13 +216,12 @@
                     >
                 </v-checkbox>
             </th>
-            <th v-for="header in props.headers"
+            <th
+                v-for="header in props.headers"
                 :key="header.text"
                 :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
-            >
-                {{ header.text }}<v-icon small>arrow_upward</v-icon>
-            </th>
+            >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
             <th class="text-xs-left">
                 Действия
             </th>
@@ -357,8 +356,11 @@ export default {
     },
     methods: {
         roleUserCity() {
-            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
+            if(this.isLoggedUser.moderators) {
                 return this.cityUser = this.isLoggedUser.moderators.city_id;
+            }
+            if(this.isLoggedUser.managers) {
+                return this.cityUser = this.isLoggedUser.managers.city_id;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
                 return this.cityUser = null;
@@ -561,7 +563,8 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: this.roleUserCity()
+                    city: this.roleUserCity(),
+                    user: this.isLoggedUser.clients ? true : null,
                 }
             })
             .then(
@@ -588,7 +591,6 @@ export default {
                                 });
                             } 
                         });
-                        console.log(this.desserts);
                         this.filteredItems(this.desserts);
                         this.filtered(this.desserts);
                         this.filteredStatus(this.desserts); 
@@ -715,7 +717,7 @@ export default {
         }
     },
     mounted() {
-        console.log(this);
+        console.log(this.isLoggedUser);
     }
 }
 </script>
