@@ -60,14 +60,16 @@
                 remember_me: false
             }
         }),
+        computed: {
+            isLoggedUser: function(){ 
+                return this.$store.getters.isLoggedUser;
+            }
+        },
         methods: {
             remember() {
                 this.isActive = !this.isActive;
             },
             login() {
-                // генерация excel файла с переходами строк в адресе, 
-                // Скрыть удаление адресов и районов если они в связях с адресом
-                // доделать права пользователя на категории 
                 this.$validator.validateAll().then(() => {
                     if(this.$validator.errors.items.length == 0) {
                         this.loading = true;
@@ -76,9 +78,23 @@
                         let remember_me = this.user.remember_me;
                         this.$store.dispatch('login', { email, password, remember_me })
                         .then((res) => {
-                            this.loading = false
-                            this.$router.push('/')
-                            this.validationErrors=null
+                            const userRole = res.data.user.role;
+                            console.log(res);
+                            this.loading = false;
+                            // this.$router.push('/');
+                            this.validationErrors=null;
+                            if(userRole === 'admin' || userRole === 'moderator') {
+                                this.$router.push('/');
+                            }
+                            if(userRole === 'client') {
+                                this.$router.push('/orders');
+                            }
+                            if(userRole === 'manager') {
+                                this.$router.push('/tasksManager');
+                            }
+                            if(userRole === 'installer') {
+                                this.$router.push('/tasks');
+                            }
                         })
                         .catch((error) => {
                             if(error.response.status == 401) {

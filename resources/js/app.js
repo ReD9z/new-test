@@ -69,36 +69,14 @@ let router = new VueRouter({
 router.beforeEach((to, from, next) => {
     if(to.meta.requiresAuth) {
         if (store.getters.isLoggedIn) {
-            if(to.meta.adminAuth) {
-                if (store.getters.isUserRole === 'admin') {
-                    next()
+            if (!to.meta.managerAuth && store.getters.isUserRole === 'manager') {
+                if (to.path !== '/error') {
+                    next('/error');
+                } else {
+                    next();
                 }
             }
-            if (to.meta.moderatorAuth) {
-                if (store.getters.isUserRole === 'moderator') {
-                    next()
-                }
-            } 
-            if (to.meta.installerAuth) {
-                if (store.getters.isUserRole === 'installer') {
-                    if (to.path !== '/tasks') {
-                        next('/tasks');
-                    } else {
-                        next();
-                    }
-                }
-            }
-            if (to.meta.managerAuth) {
-                next('/orders')
-            }
-
-            if (to.meta.clientAuth) {
-                if (store.getters.isUserRole === 'client') {
-                    next()
-                }
-            }
-
-            if (!to.meta.managerAuth  && store.getters.isUserRole === 'manager') {
+            else if (!to.meta.moderatorAuth && store.getters.isUserRole === 'moderator') {
                 if (to.path !== '/error') {
                     next('/error');
                 } else {
@@ -106,7 +84,7 @@ router.beforeEach((to, from, next) => {
                 }
             }
 
-            if (!to.meta.moderatorAuth && store.getters.isUserRole === 'moderator') {
+            else if (!to.meta.installerAuth && store.getters.isUserRole === 'installer') {
                 if (to.path !== '/error') {
                     next('/error');
                 } else {
@@ -114,20 +92,14 @@ router.beforeEach((to, from, next) => {
                 }
             }
 
-            if (!to.meta.installerAuth && store.getters.isUserRole === 'installer') {
+            else if (!to.meta.clientAuth && store.getters.isUserRole === 'client') {
                 if (to.path !== '/error') {
                     next('/error');
                 } else {
                     next();
                 }
-            }
-
-            if (!to.meta.clientAuth && store.getters.isUserRole === 'client') {
-                if (to.path !== '/error') {
-                    next('/error');
-                } else {
-                    next('/orders');
-                }
+            } else {
+                next();
             }
         } else {
             next('/auth')

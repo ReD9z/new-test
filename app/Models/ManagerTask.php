@@ -1,12 +1,9 @@
 <?php
-
 namespace App\Models;
-
 use App\User;
 use App\Models\Clients;
 use App\Models\CitiesToWorks;
 use Illuminate\Database\Eloquent\Model;
-
 class ManagerTask extends Model
 {
     protected $fillable = [
@@ -18,15 +15,12 @@ class ManagerTask extends Model
         'comment',
         'result'
     ];
-
     public function clients() {
         return $this->belongsTo('App\Models\Clients', 'client_id');
     }
-
     public function managers() {
         return $this->belongsTo('App\Models\Managers', 'manager_id');
     }
-
     public function TaskEndDate($id)
     {
         $clients = ManagerTask::where('client_id', $id)->first();
@@ -37,16 +31,12 @@ class ManagerTask extends Model
         } else {
             $mostRecent = null;
         }
-
         return $mostRecent ? date("d.m.Y", $mostRecent) : null;
     }
-
     public static function mb_ucfirst($word)
     {
         return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
     }
-
-
     public static function createClient($city, $nameOrganization, $nameClient, $phone, $email)
     {
         $users = User::where('email', self::mb_ucfirst($email))->first();
@@ -66,7 +56,6 @@ class ManagerTask extends Model
             $toUsers->save();
             $toUsersId = $toUsers->id;
         }
-
         $citywork = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
         $toCityId = null;
         if($citywork) {
@@ -77,9 +66,7 @@ class ManagerTask extends Model
             $toWorks->save();
             $toCityId = $toWorks->id;
         }
-
         $toClientID = null;
-
         $clients = Clients::with('cities', 'users', 'comments')->where('users_id', $toUsersId)->first();
         if($clients) {
             $toClientID = $clients->id;
@@ -92,7 +79,6 @@ class ManagerTask extends Model
             $clientsNew->save();
             $toClientID = $clientsNew->id;
         }
-
         return $toClientID;
     }
 }

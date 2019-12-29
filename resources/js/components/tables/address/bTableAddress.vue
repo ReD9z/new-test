@@ -147,7 +147,7 @@
             <th
                 v-for="header in props.headers"
                 :key="header.text"
-                :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
+                :class="['column sortable', pagination.descending ? 'asc' : 'desc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
             >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
             <th class="text-xs-left">
@@ -182,11 +182,6 @@
         </template>
         <template v-slot:no-data>
             <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
-        </template>
-        <template v-slot:no-results>
-            <v-alert :value="true" color="error" icon="warning">
-                По запросу "{{ search }}" ничего не найдено.
-            </v-alert>
         </template>
     </v-data-table>
 </div>

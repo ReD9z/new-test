@@ -11,6 +11,7 @@ use App\Models\Orders;
 use App\Models\Entrances;
 use App\Models\TypesToWorks;
 use App\Models\Installers;
+use App\Models\AddressToOrders;
 use App\Http\Resources\Tasks as TasksResource;
 use App\Http\Resources\Orders as OrdersResource;
 use App\Http\Resources\TaskAddress as TaskAddressResource;
@@ -99,12 +100,16 @@ class TasksController extends Controller
     public function taskAddress($id)
     {
         $tasks = Tasks::with('orders.orderAddress.address')->where('id', $id)->first();
+
+     
+        $toOrders = AddressToOrders::where('order_id', '=', $tasks->orders_id)->get();
+       
     
         $address = [];
         $getAddress = [];
         
-        if($tasks['orders']) {
-            foreach ($tasks['orders']['orderAddress'] as $key => $value) {
+        if($toOrders) {
+            foreach ($toOrders as $key => $value) {
                 $address[] = $value['address_id'];
             }
         }

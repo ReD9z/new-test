@@ -18,6 +18,10 @@ Route::group(['middleware' => ['json.response']], function () {
     /******* Public routes *******/
     Route::post('login', 'Api\AuthController@login');
     
+    Route::get('task', 'Api\TasksController@task');
+    Route::get('taskAddress/{id}', 'Api\TasksController@taskAddress');
+    Route::get('taskEntrances/{id}', 'Api\TasksController@taskEntrances');
+    
     /******* Private routes *******/
     Route::middleware('auth:api')->group(function () {
         Route::get('logout', 'Api\AuthController@logout');
@@ -130,11 +134,8 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('tasks', 'Api\TasksController@store');  // Edit one item
         Route::delete('tasks/{id}', 'Api\TasksController@destroy'); // Delete one item
         Route::get('tasks', 'Api\TasksController@index'); // Show list
-        Route::get('task', 'Api\TasksController@task');
-        Route::get('taskAddress/{id}', 'Api\TasksController@taskAddress');
-        Route::get('taskEntrances/{id}', 'Api\TasksController@taskEntrances');
-       
-
+        
+        
         // TasksManager   
         Route::post('managerTask', 'Api\ManagerTaskController@store'); // Add one item
         Route::get('managerTask', 'Api\ManagerTaskController@show'); // Show one item
@@ -142,7 +143,7 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::delete('managerTask/{id}', 'Api\ManagerTaskController@destroy'); // Delete one item
         Route::get('managerTask', 'Api\ManagerTaskController@index'); // Show list
         Route::post('addExcelTask', 'Api\ManagerTaskController@addExcelTask'); // Show list
-
+        
         // EntrancesManager   
         Route::put('entrancesSave', 'Api\EntrancesController@store'); // Save one item
         Route::get('entrances/{id}', 'Api\EntrancesController@index');

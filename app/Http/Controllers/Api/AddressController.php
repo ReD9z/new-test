@@ -65,8 +65,6 @@ class AddressController extends Controller
         $address->coordinates = Address::getCoordinates($request->input('city').", " . $request->input('street') .", ". $request->input('house_number'));
         
         if($address->save()) {
-            $request->isMethod('post') ? $address::addEntrances($address) : null;
-            $request->isMethod('put') ? $address::editEntrances($address) : null;
             return new AddressResource($address);
         }
     }

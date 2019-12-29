@@ -49,13 +49,27 @@ class OrdersController extends Controller
         $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request['dateStart']));
         $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request['dateEnd']));
         $orders->save();
-        
+
+       
         foreach ($request['address'] as $key => $value) {
-            $torders = new AddressToOrders;
-            $torders->id = $request->input('id');
-            $torders->order_id = $orders->id;
-            $torders->address_id = $value['id'];
-            $torders->save();
+            if($request->isMethod('put')) {
+                $toOrders = AddressToOrders::where('id', '=', $request['order']['address']['id'])->first();
+                if(!$toOrders) {
+                    $torders = new AddressToOrders;
+                    $torders->id = $request->input('id');
+                    $torders->order_id = $orders->id;
+                    $torders->address_id = $value['id'];
+                    $torders->save();
+                    Address::editEntrances($value, $torders->id);
+                }
+            } else {
+                $torders = new AddressToOrders;
+                $torders->id = $request->input('id');
+                $torders->order_id = $orders->id;
+                $torders->address_id = $value['id'];
+                $torders->save();
+                Address::editEntrances($value, $torders->id);
+            }
         }
         
         return new OrdersResource($orders);

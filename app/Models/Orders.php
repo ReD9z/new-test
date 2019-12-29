@@ -12,7 +12,7 @@ class Orders extends Model
 
     public function orderAddress()
     {
-        return $this->hasMany('App\Models\AddressToOrders', 'order_id', 'id');
+        return $this->hasOne('App\Models\AddressToOrders', 'order_id', 'id');
     }
 
     public function tasks()

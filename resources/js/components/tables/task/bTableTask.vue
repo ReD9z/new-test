@@ -210,7 +210,7 @@
                 :key="header.text"
                 :class="[
                     'column sortable',
-                    pagination.descending ? 'desc' : 'asc', 
+                    pagination.descending ? 'asc' : 'desc', 
                     header.value === pagination.sortBy ? 'active' : '' , 
                     'text-xs-left', 
                     header.visibility

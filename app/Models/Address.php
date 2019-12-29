@@ -144,12 +144,13 @@ class Address extends Model
         return $this->hasMany('App\Models\Entrances', 'address_id', 'id');
     }
     
-    public static function addEntrances($data) {
+    public static function addEntrances($data, $id) {
         $number = (int)$data->number_entrances;
-        $id = $data->id;
+        $id_address = $data->id;
         for($i=0; $i < $number; $i++) {
             $entrances = new Entrances;
-            $entrances->address_id = $id;
+            $entrances->address_id = $id_address;
+            $entrances->address_to_orders_id = $id;
             $entrances->save();
         }
     }
@@ -191,20 +192,21 @@ class Address extends Model
         return $files ? $files : null;
     }
 
-    public static function editEntrances($data) {
-        $arr = Entrances::where('address_id', $data->id)->get();
-        $absNumber = abs((int)$data->number_entrances - count($arr));
-        $number = (int)$data->number_entrances;
-        $id = $data->id;
+    public static function editEntrances($data, $id) {
+        $arr = Entrances::where('address_id', $data['id'])->get();
+        $absNumber = abs((int)$data['number_entrances'] - count($arr));
+        $number = (int)$data['number_entrances'];
+        $idAddress = $data['id'];
         if(count($arr ) == 0) {
             for($i=0; $i < $number; $i++) {
                 $entrances = new Entrances;
                 $entrances->number = $i+1;
-                $entrances->address_id = $id;
+                $entrances->address_id = $idAddress;
+                $entrances->address_to_orders_id = $id;
                 $entrances->save();
             }
         }
-        else if((int)$data->number_entrances < count($arr)) {
+        else if((int)$data['number_entrances'] < count($arr)) {
             for($i=0; $i < $absNumber; $i++) {
                 $num = Entrances::where('address_id', $data->id)->get();
                 $address = $num[count($num)-1];
@@ -212,11 +214,12 @@ class Address extends Model
             }
         }
 
-        else if((int)$data->number_entrances > count($arr)) {
+        else if((int)$data['number_entrances'] > count($arr)) {
            for($i=0; $i < $absNumber; $i++) {
                 $entrances = new Entrances;
                 $entrances->number = count($arr) + ($i+1);
-                $entrances->address_id = $id;
+                $entrances->address_id = $idAddress;
+                $entrances->address_to_orders_id = $id;
                 $entrances->save();
             }
         }

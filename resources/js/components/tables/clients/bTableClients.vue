@@ -152,7 +152,7 @@
             <th
                 v-for="header in props.headers"
                 :key="header.text"
-                :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
+                :class="['column sortable', pagination.descending ? 'asc' : 'desc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
             >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
             <th class="text-xs-left">

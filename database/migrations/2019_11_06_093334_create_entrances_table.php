@@ -19,6 +19,8 @@ class CreateEntrancesTable extends Migration
             $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
             $table->bigInteger('file_id')->unsigned()->nullable();
             $table->foreign('file_id')->references('id')->on('files')->onDelete('cascade');
+            $table->bigInteger('address_to_orders_id')->unsigned()->nullable();
+            $table->foreign('address_to_orders_id')->references('id')->on('address_to_orders')->onDelete('cascade');
             $table->string('number')->nullable();
             $table->boolean('shield')->default(1);
             $table->boolean('glass')->default(1);

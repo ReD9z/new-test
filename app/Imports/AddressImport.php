@@ -29,7 +29,6 @@ class AddressImport implements ToCollection
                         'management_company' => $row[5],
                         'coordinates' => Address::getCoordinates($row[0].", " .$row[2] .", ".$row[3])
                     ]);
-                    Address::editEntrances($item);
                 }
             }
         }

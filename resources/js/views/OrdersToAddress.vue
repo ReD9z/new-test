@@ -15,7 +15,6 @@ export default {
                 {
                     text: 'Клиент',
                     align: 'left',
-                    sortable: true,
                     value: 'clients_id',
                     selectText: 'name',
                     TableGetIdName: 'name',
@@ -26,7 +25,6 @@ export default {
                 { 
                     text: 'Дата начала размещения', 
                     input: "dateStart",
-                    sortable: true,
                     close: false,
                     value: 'order_start_date',
                     validate: 'required'
@@ -34,7 +32,6 @@ export default {
                 { 
                     text: 'Дата конца размещения', 
                     input: "dateEnd",
-                    sortable: true,
                     close: false,
                     value: 'order_end_date',
                     validate: 'required'
@@ -63,27 +60,32 @@ export default {
                     input: "select",
                 },
                 { 
-                    text: 'Улица', 
+                    text: 'Улица',
+                    sortable: true, 
                     input: "text",
                     value: 'street' 
                 },
                 { 
-                    text: 'Номер дома', 
+                    text: 'Номер дома',
+                    sortable: true, 
                     input: "text",
                     value: 'house_number' 
                 },
                 { 
                     text: 'Количество подъездов', 
+                    sortable: true,
                     input: "text",
                     value: 'number_entrances' 
                 },
                 { 
                     text: 'Управляющая компания', 
+                    sortable: true,
                     input: "text",
                     value: 'management_company' 
                 },
                 { 
                     text: 'Статус', 
+                    sortable: true,
                     input: "text",
                     value: 'result' 
                 },

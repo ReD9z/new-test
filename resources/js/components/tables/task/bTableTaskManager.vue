@@ -220,7 +220,7 @@
             <th
                 v-for="header in props.headers"
                 :key="header.text"
-                :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
+                :class="['column sortable', pagination.descending ? 'asc' : 'desc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
             >
                 {{ header.text }}
@@ -454,10 +454,10 @@ export default {
         },
         changeSort(column) {
             if (this.pagination.sortBy === column) {
-                this.pagination.descending = !this.pagination.descending
+                this.pagination.descending = !this.pagination.descending;
             } else {
-                this.pagination.sortBy = column
-                this.pagination.descending = false
+                this.pagination.sortBy = column;
+                this.pagination.descending = false;
             }
         },
         initialize() {
