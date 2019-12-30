@@ -87,7 +87,7 @@ export default {
                     text: 'Статус', 
                     sortable: true,
                     input: "text",
-                    value: 'result' 
+                    value: 'resultStatus' 
                 },
                 { 
                     value: 'files', 

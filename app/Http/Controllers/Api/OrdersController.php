@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Orders;
 use App\Models\Address;
 use App\Models\AddressToOrders;
+use App\Models\Clients;
 use App\Http\Resources\Orders as OrdersResource;
+use App\Http\Resources\Clients as ClientsResource;
 
 class OrdersController extends Controller
 {
@@ -49,20 +51,9 @@ class OrdersController extends Controller
         $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request['dateStart']));
         $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request['dateEnd']));
         $orders->save();
-
        
-        foreach ($request['address'] as $key => $value) {
-            if($request->isMethod('put')) {
-                $toOrders = AddressToOrders::where('id', '=', $request['order']['address']['id'])->first();
-                if(!$toOrders) {
-                    $torders = new AddressToOrders;
-                    $torders->id = $request->input('id');
-                    $torders->order_id = $orders->id;
-                    $torders->address_id = $value['id'];
-                    $torders->save();
-                    Address::editEntrances($value, $torders->id);
-                }
-            } else {
+        if($request['address']) {
+            foreach ($request['address'] as $key => $value) {
                 $torders = new AddressToOrders;
                 $torders->id = $request->input('id');
                 $torders->order_id = $orders->id;

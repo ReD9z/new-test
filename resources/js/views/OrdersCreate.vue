@@ -93,7 +93,7 @@ export default {
                 { 
                     text: 'Статус', 
                     input: "text",
-                    value: 'result' 
+                    value: 'resultStatus' 
                 }
             ],
             search: true,

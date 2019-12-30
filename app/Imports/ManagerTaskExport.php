@@ -7,9 +7,8 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkReading, WithColumnFormatting
+class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkReading
 {
     /**
     * @param array $row
@@ -29,14 +28,6 @@ class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkRead
                 ]);
             }
         }
-    }
-
-    public function columnFormats(): array
-    {
-        return [
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'C' => NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE,
-        ];
     }
 
     public function batchSize(): int

@@ -203,7 +203,7 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' v-model="selected" select-all :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
+    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' v-model="selected" select-all :pagination.sync="pagination" item-key="id" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
             <th v-if="hideElem()">
@@ -229,7 +229,7 @@
         <template v-slot:items="props">
             <td v-if="hideElem()">
                 <v-checkbox
-                    v-show="props.item.result !== 'Занят'"
+                    v-show="props.item.resultStatus !== 'Занят'"
                     v-model="props.selected"
                     primary
                     hide-details
@@ -242,13 +242,13 @@
                         {{props.item[param.TableGetIdName]}}
                     </v-flex>
                     <v-flex v-else>
-                        <span v-if="param.value == 'result' && props.item[param.value] === 'Занят'" style="font-weight: bold; color:red">
+                        <span v-if="param.value == 'resultStatus' && props.item[param.value] === 'Занят'" style="font-weight: bold; color:red">
                             {{props.item[param.value]}}
                         </span>
-                        <span v-if="param.value == 'result' && props.item[param.value] === 'Свободен'" style="font-weight: bold; color:green">
+                        <span v-if="param.value == 'resultStatus' && props.item[param.value] === 'Свободен'" style="font-weight: bold; color:green">
                             {{props.item[param.value]}}
                         </span>
-                        <span v-if="param.value != 'result'">
+                        <span v-if="param.value != 'resultStatus'">
                             {{props.item[param.value]}}
                         </span>
                     </v-flex>
@@ -582,12 +582,12 @@ export default {
                                     let dateStart = vm.$moment(vm.dateStartFormatted, 'DD-MM-YYYY').unix() * 1000;
                                     let dateEnd = vm.$moment(vm.dateEndFormatted, 'DD-MM-YYYY').unix() * 1000;
                                     if((itemDateStart >= dateStart) && (itemDateStart <= dateEnd) || (itemDateEnd >= dateStart) && (itemDateEnd <= dateEnd)) {
-                                        item.result = 'Занят';
+                                        item.resultStatus = 'Занят';
                                         item.data = stats;
                                         item.files = stats.files;
                                         let index = vm.desserts.indexOf(item);
                                         Object.assign(vm.desserts[index], item);
-                                    } 
+                                    }
                                 });
                             } 
                         });
@@ -672,6 +672,7 @@ export default {
             this.$validator.reset()
         },
         save() {
+            let address = this.selected.filter(item => item.resultStatus === "Свободен");
             this.$validator.validateAll().then(() => {
                 if(this.$validator.errors.items.length == 0) {
                     this.loaderSaveBtn = true;
@@ -681,7 +682,7 @@ export default {
                         url: this.params.baseOrders,
                         data: {
                             order: this.editedItem,
-                            address: this.selected.filter(item => item.result !== 'Занято'),
+                            address: address,
                             dateStart: this.dateStartFormatted,
                             dateEnd: this.dateEndFormatted
                         }
@@ -690,7 +691,8 @@ export default {
                         this.initialize();
                         this.loaderSaveBtn = null;
                         this.loadingSaveBtn = false;
-                        this.forceRerender();  
+                        this.forceRerender(); 
+                        this.selected = [];
                     }).catch(error => {
                         console.log(error);
                     });

@@ -28,4 +28,21 @@ class AddressToOrders extends Model
     {
         DB::table('images_to_orders')->where('files_id', '=', $id)->delete();
     }
+
+    public function statusAddress($id)
+    {
+        $entrances = Entrances::where('address_to_orders_id', $id)->get();
+        $status = 0;
+        foreach ($entrances as $key => $value) {
+            if($value->status == 0) {
+                $status = 0;
+            }
+            else if($value->status == 3)
+                $status = 0;
+            else {
+                $status = 1;
+            }
+        }
+        return $status;
+    }
 }

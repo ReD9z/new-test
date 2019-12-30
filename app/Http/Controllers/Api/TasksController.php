@@ -19,6 +19,7 @@ use App\Http\Resources\TaskM as TaskMResource;
 use App\Http\Resources\Entrances as EntrancesResource;
 use App\Http\Resources\TypesToWorks as TypesToWorksResource;
 use App\Http\Resources\Installers as InstallersResource;
+use App\Http\Resources\AddressToOrdersTasks as AddressToOrdersTasksResource;
 
 class TasksController extends Controller
 {
@@ -100,23 +101,10 @@ class TasksController extends Controller
     public function taskAddress($id)
     {
         $tasks = Tasks::with('orders.orderAddress.address')->where('id', $id)->first();
-
      
-        $toOrders = AddressToOrders::where('order_id', '=', $tasks->orders_id)->get();
-       
-    
-        $address = [];
-        $getAddress = [];
-        
-        if($toOrders) {
-            foreach ($toOrders as $key => $value) {
-                $address[] = $value['address_id'];
-            }
-        }
-        
-        $addresses = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('id', $address)->get();
+        $toOrders = AddressToOrders::with('address')->where('order_id', '=', $tasks['orders_id'])->get();
 
-        $addressArray = collect(TaskAddressResource::collection($addresses));
+        $addressArray = collect(TaskAddressResource::collection($toOrders));
 
         if($addressArray) {
             foreach ($addressArray as $key => $value) {
@@ -125,14 +113,15 @@ class TasksController extends Controller
                 }
             }
         }
-
-        $activeAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('id', $getAddress)->get();
-        return TaskAddressResource::collection($activeAddress);
+        
+        $activeAddress = AddressToOrders::with('address')->whereIn('id', $getAddress)->get();
+        
+        return AddressToOrdersTasksResource::collection($activeAddress);
     }
 
     public function taskEntrances($id)
     {
-        $entrances = Entrances::with('address')->where('address_id', $id)->get();
+        $entrances = Entrances::with('address')->where('address_to_orders_id', $id)->get();
 
         return EntrancesResource::collection($entrances);
     }

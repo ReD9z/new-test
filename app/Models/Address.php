@@ -23,7 +23,7 @@ class Address extends Model
 
     public static function status($order)
     {
-        $status = 'Свободен';
+        $status = "Свободен";
         if($order) {
             $todayDate = Carbon::createFromFormat('d.m.Y', Carbon::parse(Carbon::today())->format('d.m.Y'))->timestamp;
             foreach ($order as $value) {
@@ -31,10 +31,10 @@ class Address extends Model
                 $itemDateEnd = Carbon::createFromFormat('d.m.Y', Carbon::parse($value['orders']['order_end_date'])->format('d.m.Y'))->timestamp;
 
                 if($todayDate >= $itemDateStart && $todayDate <= $itemDateEnd) {
-                    $status = 'Занят';
+                    $status = "Занят";
                 }
             }
-        }
+        } 
         
         return $status; 
     }

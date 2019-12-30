@@ -24,16 +24,21 @@ class Tasks extends Model
     public function getAddress($item)
     {
         $address = [];
-        foreach ($item as $key => $value) {
-            $address[] = "г." . $item[$key]['address']['cities']['name']
-            . ", " . $item[$key]['address']['areas']['name'] . ","
-            . " ул. " . $item[$key]['address']['street'] . ","
-            . " Дом: " . $item[$key]['address']['house_number'] . ","
-            . " Количество подъездов: " . $item[$key]['address']['number_entrances'] . ","
-            . " Управляющая компания: " . $item[$key]['address']['management_company'];
+        if($item) {
+            foreach ($item as $key => $value) {
+                $address[] = "г." . $item[$key]['address']['cities']['name']
+                . ", " . $item[$key]['address']['areas']['name'] . ","
+                . " ул. " . $item[$key]['address']['street'] . ","
+                . " Дом: " . $item[$key]['address']['house_number'] . ","
+                . " Количество подъездов: " . $item[$key]['address']['number_entrances'] . ","
+                . " Управляющая компания: " . $item[$key]['address']['management_company'];
+            }
+            return implode("\n", $address);
+        }else {
+            return null;
         }
 
-        return implode("\n", $address);
+      
     }
 
     public function countAdresses($address)

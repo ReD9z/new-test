@@ -149,7 +149,7 @@
         <template v-slot:items="props">
             <td>
                 <v-checkbox
-                    v-show="props.item.result !== 'Занят'"
+                    v-show="props.item.resultStatus !== 'Занят'"
                     v-model="props.selected"
                     primary
                     hide-details
@@ -160,13 +160,13 @@
                 <v-flex v-if="param.input !== 'images' && param.value !== 'params'">
                     <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
                     <v-flex v-else>
-                        <span v-if="param.value == 'result' && props.item[param.value] === 'Занят'" class="red--text font-weight-bold">
+                        <span v-if="param.value == 'resultStatus' && props.item[param.value] === 'Занят'" class="red--text font-weight-bold">
                             {{props.item[param.value]}}
                         </span>
-                        <span v-if="param.value == 'result' && props.item[param.value] === 'Свободен'" class="green--text font-weight-bold">
+                        <span v-if="param.value == 'resultStatus' && props.item[param.value] === 'Свободен'" class="green--text font-weight-bold">
                             {{props.item[param.value]}}
                         </span>
-                        <span v-if="param.value != 'result'">
+                        <span v-if="param.value != 'resultStatus'">
                             {{props.item[param.value]}}
                         </span>
                     </v-flex>
@@ -186,7 +186,6 @@
 </template>
 <script>
 import XLSX from 'xlsx';
-
 export default {
     inject: ['$validator'],
     data: vm => ({
@@ -279,7 +278,6 @@ export default {
         },
         formatDate (date) {
             if (!date) return null
-
             const [year, month, day] = date.split('-')
             return `${day}.${month}.${year}`
         },
@@ -400,12 +398,12 @@ export default {
                                     let dateStart = vm.$moment(vm.dateStartFormatted, 'DD-MM-YYYY').unix() * 1000;
                                     let dateEnd = vm.$moment(vm.dateEndFormatted, 'DD-MM-YYYY').unix() * 1000;
                                     if((itemDateStart >= dateStart) && (itemDateStart <= dateEnd) || (itemDateEnd >= dateStart) && (itemDateEnd <= dateEnd)) {
-                                        item.result = 'Занят';
+                                        item.resultStatus = 'Занят';
                                         item.data = stats;
                                         item.files = stats.files;
                                         let index = vm.desserts.indexOf(item);
                                         Object.assign(vm.desserts[index], item);
-                                    } 
+                                    }
                                 });
                             } 
                         });
