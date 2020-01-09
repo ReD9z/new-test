@@ -6,6 +6,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class AddressRoleUser extends JsonResource
 {
+    protected static $using;
+
+    public static function using($using)
+    {
+        static::$using = $using;
+    }
     /**
      * Transform the resource into an array.
      *
@@ -26,9 +32,10 @@ class AddressRoleUser extends JsonResource
             'management_company' => $this->management_company,
             'status' => $this->orderAddress,
             'coordinates' => $this->coordinates,
-            'images' => $this->getImagesRole($this->id),
+            'images' => $this->getImages($this->id, static::$using ? static::$using : null),
             'data' => null,
             'result' => $this->status($this->orderAddress),
+            'resultStatus' => 'Свободен',
             'entrances' => $this->entrances,
             'files' => null
         ];

@@ -155,12 +155,19 @@ class Address extends Model
         }
     }
 
-    public function getImages($id)
+    public function getImages($id, $order)
     {
+        $torders = AddressToOrders::where([['address_id', $id], ['order_id', $order]])->get();
+        $arr = [];
+        
+        foreach ($torders as $key => $value) {
+           $arr[] = $value->id;
+        }
+        
         $entrances = Entrances::where([
-            ['address_id', $id], 
             ['file_id', '!=', null]
-        ])->pluck('file_id')->all();
+        ])->whereIn('address_to_orders_id', $arr)->pluck('file_id')->all();
+
 
         $address = ImagesToOrders::with('orders')->where([
             ['files_id', '!=', null]
@@ -173,13 +180,18 @@ class Address extends Model
         return $files ? $files : null;
     }
     
-    public function getImagesRole($id)
+    public function getImagesRole($id, $order)
     {
-         $entrances = Entrances::where([
-            ['address_id', $id], 
-            ['file_id', '!=', null],
+        $torders = AddressToOrders::where([['address_id', $id], ['order_id', $order]])->get();
+        $arr = [];
+        
+        foreach ($torders as $key => $value) {
+           $arr[] = $value->id;
+        }
+        
+        $entrances = Entrances::where([
             ['status', '=', 3]
-        ])->pluck('file_id')->all();
+        ])->whereIn('address_to_orders_id', $arr)->pluck('file_id')->all();
 
         $address = ImagesToOrders::with('orders')->where([
             ['files_id', '!=', null]

@@ -203,7 +203,7 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' v-model="selected" select-all :pagination.sync="pagination" item-key="id" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
+    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' v-model="selected" select-all :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
             <th v-if="hideElem()">
@@ -559,12 +559,14 @@ export default {
         },
         initialize() {
             this.loading = true;
+            console.log(this.order);
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
                     city: this.roleUserCity(),
                     user: this.isLoggedUser.clients ? true : null,
+                    order: this.$route.params.id,
                 }
             })
             .then(
@@ -717,9 +719,6 @@ export default {
                 return false;
             }
         }
-    },
-    mounted() {
-        console.log(this.isLoggedUser);
     }
 }
 </script>
