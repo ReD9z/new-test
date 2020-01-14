@@ -5,9 +5,10 @@ namespace App\Imports;
 use App\Models\Address;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-
-class AddressImport implements ToCollection
+class AddressImport implements ToCollection, WithBatchInserts, WithChunkReading
 {
     /**
     * @param array $row
@@ -16,21 +17,33 @@ class AddressImport implements ToCollection
     */
     public function collection(Collection $rows)
     {
-        foreach ($rows as $key=>$row) 
+        foreach ($rows as $key => $row) 
         {
-            if($key != 0) {
-                if($row[0] != null && $row[1] != null && $row[2] != null && $row[3] != null && $row[4] != null && $row[5] != null) {
-                    $item = Address::create([
-                        'city_id' => Address::getCityId($row[0]),
-                        'area_id' => Address::getAreaId($row[1], $row[0]),
-                        'street' => $row[2],
-                        'house_number' => $row[3],
-                        'number_entrances' => $row[4],
-                        'management_company' => $row[5],
-                        'coordinates' => Address::getCoordinates($row[0].", " .$row[2] .", ".$row[3])
-                    ]);
-                }
+            if(!empty($row[0]) && !empty($row[1]) && !empty($row[2]) && !empty($row[3]) && !empty($row[4]) && !empty($row[5])) {
+                $city = Address::getCityId($row[0]);
+                $area = Address::getAreaId($row[1], $row[0]);
+                $coordinates = Address::getCoordinates($row[0].", " .$row[2] .", ".$row[3]);
+
+                Address::create([
+                    'city_id' => $city,
+                    'area_id' => $area,
+                    'street' => $row[2],
+                    'house_number' => $row[3],
+                    'number_entrances' => $row[4],
+                    'management_company' => $row[5],
+                    'coordinates' => null
+                ]);
             }
         }
+    }
+
+    public function batchSize(): int
+    {
+        return 5000;
+    }
+
+    public function chunkSize(): int
+    {
+        return 5000;
     }
 }

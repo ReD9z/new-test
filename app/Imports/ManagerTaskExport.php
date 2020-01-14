@@ -19,7 +19,7 @@ class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkRead
     {   
         foreach ($rows as $key => $row) 
         {
-            if($key != 0 && $row[0] != null) {
+            if($key != 0 && !empty($row[0])) {
                 $item = ManagerTask::create([
                     'task_date_completion' => is_numeric($row[1]) ? gmdate("Y-m-d H:i:s", ($row[1] - 25569) * 86400) : null,
                     'client_id' => ManagerTask::createClient($row[2], $row[3], $row[4], $row[5], $row[6]),

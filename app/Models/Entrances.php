@@ -32,9 +32,4 @@ class Entrances extends Model
     {
         return $this->hasOne('App\Models\Address', 'id', 'address_id');
     }
-
-    public function addressToOrders()
-    {
-        return $this->hasMany(addressToOrders::class);
-    }
 }

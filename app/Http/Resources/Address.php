@@ -6,14 +6,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class Address extends JsonResource
 {
-
-    protected static $using;
-
-    public static function using($using)
-    {
-        static::$using = $using;
-    }
-  
     /**
      * Transform the resource into an array.
      *
@@ -34,7 +26,7 @@ class Address extends JsonResource
             'management_company' => $this->management_company,
             'status' => $this->orderAddress,
             'coordinates' => $this->coordinates,
-            'images' => $this->getImages($this->id, static::$using),
+            'images' => $this->getImages($this->id),
             'data' => null,
             'result' => $this->status($this->orderAddress),
             'resultStatus' => 'Свободен',

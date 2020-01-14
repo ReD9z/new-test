@@ -56,14 +56,16 @@ class Address extends Model
     public static function getCityId($value)
     {
         $id = null;
-        $citywork = CitiesToWorks::where('name', self::mb_ucfirst($value))->first();
-        if (!empty($citywork)) {
-            $id = $citywork->id;
-        } else {
-            $toWorks = new CitiesToWorks;
-            $toWorks->name = self::mb_ucfirst($value);
-            $toWorks->save();
-            $id = $toWorks->id;
+        if($value) {
+            $citywork = CitiesToWorks::where('name', self::mb_ucfirst($value))->first();
+            if (!empty($citywork)) {
+                $id = $citywork->id;
+            } else {
+                $toWorks = new CitiesToWorks;
+                $toWorks->name = self::mb_ucfirst($value);
+                $toWorks->save();
+                $id = $toWorks->id;
+            }
         }
         return $id;
     }
@@ -71,35 +73,38 @@ class Address extends Model
     public static function getAreaId($value, $city)
     {
         $id = null;
-        $citywork = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
-        $city_id = null;
-        if(!empty($citywork)) {
-            $city_id = $citywork->id;
-        }else {
-            $toWorks = new CitiesToWorks;
-            $toWorks->name = self::mb_ucfirst($city);
-            $toWorks->save();
-            $city_id = $toWorks->id;
-        }
-        
-        $area = Areas::where('name', self::mb_ucfirst($value))->first();
-        if (!empty($area)) {
-            $areas_show = Areas::where([['name', '=', self::mb_ucfirst($value)],['city_id', '=', $city_id]])->first();
-            if(!empty($areas_show)) {
-                $id = $areas_show->id;
-            } else {
-                $areas = new Areas;
-                $areas->name = self::mb_ucfirst($value);
-                $areas->city_id = $city_id;
-                $areas->save();
-                $id = $areas->id;
+        if($city) {
+            $citywork = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
+            $city_id = null;
+            if(!empty($citywork)) {
+                $city_id = $citywork->id;
+            }else {
+                $toWorks = new CitiesToWorks;
+                $toWorks->name = self::mb_ucfirst($city);
+                $toWorks->save();
+                $city_id = $toWorks->id;
             }
-        } else {
-            $areas = new Areas;
-            $areas->name = self::mb_ucfirst($value);
-            $areas->city_id = $city_id;
-            $areas->save();
-            $id = $areas->id;
+            if($value) {
+                $area = Areas::where('name', self::mb_ucfirst($value))->first();
+                if (!empty($area)) {
+                    $areas_show = Areas::where([['name', '=', self::mb_ucfirst($value)],['city_id', '=', $city_id]])->first();
+                    if(!empty($areas_show)) {
+                        $id = $areas_show->id;
+                    } else {
+                        $areas = new Areas;
+                        $areas->name = self::mb_ucfirst($value);
+                        $areas->city_id = $city_id;
+                        $areas->save();
+                        $id = $areas->id;
+                    }
+                } else {
+                    $areas = new Areas;
+                    $areas->name = self::mb_ucfirst($value);
+                    $areas->city_id = $city_id;
+                    $areas->save();
+                    $id = $areas->id;
+                }
+            }
         }
         return $id;
     }
@@ -155,19 +160,12 @@ class Address extends Model
         }
     }
 
-    public function getImages($id, $order)
+    public function getImages($id)
     {
-        $torders = AddressToOrders::where([['address_id', $id], ['order_id', $order]])->get();
-        $arr = [];
-        
-        foreach ($torders as $key => $value) {
-           $arr[] = $value->id;
-        }
-        
         $entrances = Entrances::where([
+            ['address_id', $id], 
             ['file_id', '!=', null]
-        ])->whereIn('address_to_orders_id', $arr)->pluck('file_id')->all();
-
+        ])->pluck('file_id')->all();
 
         $address = ImagesToOrders::with('orders')->where([
             ['files_id', '!=', null]
@@ -180,18 +178,13 @@ class Address extends Model
         return $files ? $files : null;
     }
     
-    public function getImagesRole($id, $order)
+    public function getImagesRole($id)
     {
-        $torders = AddressToOrders::where([['address_id', $id], ['order_id', $order]])->get();
-        $arr = [];
-        
-        foreach ($torders as $key => $value) {
-           $arr[] = $value->id;
-        }
-        
-        $entrances = Entrances::where([
+         $entrances = Entrances::where([
+            ['address_id', $id], 
+            ['file_id', '!=', null],
             ['status', '=', 3]
-        ])->whereIn('address_to_orders_id', $arr)->pluck('file_id')->all();
+        ])->pluck('file_id')->all();
 
         $address = ImagesToOrders::with('orders')->where([
             ['files_id', '!=', null]
