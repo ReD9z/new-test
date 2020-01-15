@@ -328,6 +328,7 @@ export default {
             }
         },
         initialize() {
+            this.loading = true;
             axios({
                 method: 'get',
                 url: this.params.baseUrl,

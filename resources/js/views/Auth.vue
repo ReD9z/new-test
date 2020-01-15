@@ -76,12 +76,10 @@
                         let email = this.user.email;
                         let password = this.user.password;
                         let remember_me = this.user.remember_me;
-                        this.$store.dispatch('login', { email, password, remember_me })
+                        this.$store.dispatch('login', {email, password, remember_me})
                         .then((res) => {
                             const userRole = res.data.user.role;
-                            console.log(res);
                             this.loading = false;
-                            // this.$router.push('/');
                             this.validationErrors=null;
                             if(userRole === 'admin' || userRole === 'moderator') {
                                 this.$router.push('/');

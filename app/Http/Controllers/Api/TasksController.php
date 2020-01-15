@@ -106,6 +106,8 @@ class TasksController extends Controller
 
         $addressArray = collect(TaskAddressResource::collection($toOrders));
 
+        $getAddress = [];
+
         if($addressArray) {
             foreach ($addressArray as $key => $value) {
                 if($value['status'] != 0) {

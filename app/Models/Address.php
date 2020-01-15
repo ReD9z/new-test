@@ -56,7 +56,7 @@ class Address extends Model
     public static function getCityId($value)
     {
         $id = null;
-        if($value) {
+        if(!empty($value) && $value != " ") {
             $citywork = CitiesToWorks::where('name', self::mb_ucfirst($value))->first();
             if (!empty($citywork)) {
                 $id = $citywork->id;
@@ -73,7 +73,7 @@ class Address extends Model
     public static function getAreaId($value, $city)
     {
         $id = null;
-        if($city) {
+        if(!empty($city) && $city != " ") {
             $citywork = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
             $city_id = null;
             if(!empty($citywork)) {
@@ -84,7 +84,7 @@ class Address extends Model
                 $toWorks->save();
                 $city_id = $toWorks->id;
             }
-            if($value) {
+            if(!empty($value) && $value != " ") {
                 $area = Areas::where('name', self::mb_ucfirst($value))->first();
                 if (!empty($area)) {
                     $areas_show = Areas::where([['name', '=', self::mb_ucfirst($value)],['city_id', '=', $city_id]])->first();

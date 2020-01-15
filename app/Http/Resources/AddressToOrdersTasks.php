@@ -25,7 +25,7 @@ class AddressToOrdersTasks extends JsonResource
             'number_entrances' => $this->address->number_entrances,
             'management_company' => $this->address->management_company,
             'status' => $this->statusAddress($this->id),
-            'coordinates' => $this->address->coordinates
+            'coordinates' => $this->coordinates
         ];
     }
 }

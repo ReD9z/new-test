@@ -5,7 +5,6 @@ import axios from 'axios'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-
     state: {
         status: '',
         token: localStorage.getItem('token') || '',
@@ -75,7 +74,7 @@ export default new Vuex.Store({
             })
         },
     },
-    getters : {
+    getters: {
         isLoggedIn: state => !!state.token,
         isLoggedUser: state => state.user,
         isAuthStatus: state => state.status,

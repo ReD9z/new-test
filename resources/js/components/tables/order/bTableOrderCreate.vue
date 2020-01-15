@@ -144,7 +144,7 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' v-model="selected" item-key="name" select-all :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
+    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' v-model="selected" select-all :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:items="props">
             <td>

@@ -58,6 +58,7 @@ class OrdersController extends Controller
                 $torders->id = $request->input('id');
                 $torders->order_id = $orders->id;
                 $torders->address_id = $value['id'];
+                $torders->coordinates = Address::getCoordinates($value['city'].", " . $value['street'] .", ". $value['house_number']);
                 $torders->save();
                 Address::editEntrances($value, $torders->id);
             }

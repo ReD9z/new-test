@@ -260,9 +260,7 @@ export default {
                             await this.$validator.reset();
                             await this.$emit('update:addClient', false)
                             await this.$emit('update:clientNew', response.data.id)
-                            // console.log(this.clientNew);
                             this.dialog = false;
-                            // console.log(this.clientArr);
                         }
                     ).catch(error => {
                         if(error.response.status == 422) {

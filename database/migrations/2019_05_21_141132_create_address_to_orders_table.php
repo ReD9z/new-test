@@ -19,6 +19,7 @@ class CreateAddressToOrdersTable extends Migration
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->bigInteger('address_id')->unsigned()->nullable();
             $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
+            $table->string('coordinates')->nullable();
             $table->timestamps();
         });
     }
