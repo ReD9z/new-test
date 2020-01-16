@@ -25,11 +25,9 @@ class AddressController extends Controller
     public function index(Request $request)
     {
         $toWorks = CitiesToWorks::get();
-        $areas = Areas::with('cities')->where('city_id', $request->areaCity)->get();
-        if($request->city) {
-            $address = AddressResource::collection(Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->where('city_id', $request->city)->get());
-        }
-        else if($request->user) {
+        $areas = Areas::with('cities')->get();
+       
+        if($request->user) {
             $address = AddressRoleUserResource::collection(Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get());
         }
         else {

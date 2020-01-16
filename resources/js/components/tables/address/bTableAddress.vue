@@ -204,6 +204,7 @@ export default {
         defaultItem: {},
         selectCity: [],
         selectArea: [],
+        areaArray: [],
         loadingSaveBtn: false,
         loaderSaveBtn: null,
         dateToday: vm.formatDate(new Date().toISOString().substr(0, 10)),
@@ -242,10 +243,11 @@ export default {
             this.initialize();
         },
         'editedItem.city_id'(val) {
-            this.initialize();
+            this.selectArea = [];
+            this.selectArea = this.areaArray.filter((item) => {return item.city_id == val});
         }
     },
-    created () {
+    created() {
         this.initialize();
     },
     methods: {
@@ -331,20 +333,30 @@ export default {
             this.loading = true;
             axios({
                 method: 'get',
-                url: this.params.baseUrl,
-                params: {
-                    city: this.roleUserCity(),
-                    areaCity: this.editedItem.city_id,
-                }
+                url: this.params.baseUrl
             })
             .then(
                 response => {
                     this.desserts = response.data.address;
                     this.selectCity = response.data.city;
-                    this.selectArea = response.data.area;
+                    this.areaArray = response.data.area;
+                    if(this.isLoggedUser.moderators) {
+                        this.selectArea = [];
+                        this.editedItem.city_id = this.isLoggedUser.moderators.city_id;
+                        this.selectArea = this.areaArray.filter((item) => {return item.city_id == this.editedItem.city_id});
+                        this.selectCity = this.selectCity.filter((item) => {return item.id == this.isLoggedUser.moderators.city_id});
+                    }
+
+                    if(this.isLoggedUser.managers) {
+                        this.selectArea = [];
+                        this.editedItem.city_id = this.isLoggedUser.managers.city_id;
+                        this.selectArea = this.areaArray.filter((item) => {return item.city_id == this.editedItem.city_id});
+                        this.selectCity = this.selectCity.filter((item) => {return item.id == this.isLoggedUser.managers.city_id});
+                    }
                     
                     this.filteredItems(this.desserts);
                     this.filtered(this.desserts);
+ 
                     this.loading = false;
                 }
             ).catch(error => {
@@ -443,20 +455,11 @@ export default {
             this.$refs.images.value = '';
             this.formData.delete('file[]');
         },
-        dataAdd() {
-            if(this.isLoggedUser.managers) {
-                this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
-            }
-            if(this.isLoggedUser.moderators) {
-                this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
-            }
-        },
         close () {
             this.dialog = false
             this.dialogImages = false
             setTimeout(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
-                this.dataAdd();
                 this.editedIndex = -1
             }, 300)
             this.$validator.reset()
@@ -511,9 +514,6 @@ export default {
                 return false;
             }
         }
-    },
-    mounted() {
-        this.dataAdd();
     }
 }
 </script>
