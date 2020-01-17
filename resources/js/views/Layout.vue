@@ -106,6 +106,10 @@ export default {
                 role: {admin: 'admin', moderator: 'moderator'}
             },
             { 
+                title: 'Фотографии', icon: 'image', src: 'photoaddress',
+                role: {admin: 'admin', moderator: 'moderator', installer: 'manager'}
+            },
+            { 
                 title: 'Мои задачи', icon: 'list', src: 'tasksManager',
                 role: {installer: 'manager'}
             },

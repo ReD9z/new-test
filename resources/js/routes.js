@@ -232,6 +232,20 @@ let routers =  [
         },
         component: require('./views/TypesToWorks.vue').default
     },
+    {
+        path: '/photoaddress',
+        name: 'photoaddress',
+        meta: {
+            title: 'Фотографии',
+            requiresAuth: true,
+            adminAuth: true,
+            moderatorAuth: true,
+            installerAuth: false,
+            managerAuth: true,
+            clientAuth: false
+        },
+        component: require('./views/PhotoAddress.vue').default
+    },
 ];
 
 export default routers;
