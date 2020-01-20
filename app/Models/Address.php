@@ -173,14 +173,14 @@ class Address extends Model
         
         $result = array_merge($entrances, $address);
         
-        $files = Files::with('entrances')->whereIn('id', $result)->get();
+        $files = Files::with('entrances.orderAddress')->whereIn('id', $result)->get();
         
         return $files ? $files : null;
     }
     
     public function getImagesRole($id)
     {
-         $entrances = Entrances::where([
+        $entrances = Entrances::where([
             ['address_id', $id], 
             ['file_id', '!=', null],
             ['status', '=', 3]
@@ -192,7 +192,7 @@ class Address extends Model
         
         $result = array_merge($entrances, $address);
         
-        $files = Files::with('entrances')->whereIn('id', $result)->get();
+        $files = Files::with('entrances.orderAddress')->whereIn('id', $result)->get();
         
         return $files ? $files : null;
     }

@@ -629,7 +629,12 @@ export default {
                     .then(
                         res => {
                             if(res) {
-                                this.select.push({data: res.data, url: element.selectApi});
+                                this.select.push(
+                                    {
+                                        data: res.data, 
+                                        url: element.selectApi
+                                    }
+                                );
                             }
                         }
                     ).catch(
@@ -640,14 +645,26 @@ export default {
                 }
             });
         },
-        editItem (item) {
+        editItem(item) {
             let vm = this;
             this.editedItem = Object.assign({}, item);
             this.dateStart = this.$moment(vm.order.order_start_date, "DD-MM-YYYY").format("YYYY-MM-DD");
             this.dateEnd =  this.$moment(vm.order.order_end_date, "DD-MM-YYYY").format("YYYY-MM-DD");
         },
         editPhotos(item) {
-            this.addOrderImages =  item.images;
+            const images = item.images;
+            const filter = images.filter(img => {
+                if(img.entrances) {
+                    if(img.entrances.order_address.order_id == item.data.order_id) {
+                        return img;
+                    }
+                } 
+                if(!img.entrances) {
+                    return img;
+                }
+            });
+
+            this.addOrderImages = filter;
             this.addOrder = Object.assign({}, item.data);
             this.dialogImages = true;
         },

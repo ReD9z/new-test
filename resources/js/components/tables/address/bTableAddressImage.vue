@@ -53,42 +53,40 @@
             </v-toolbar>
             <!-- <v-progress-linear value="15" :indeterminate="true" v-show="loadImages" color="blue" class="ma-0"></v-progress-linear> -->
             <v-card-text>
-                <v-flex v-for="(param, key) in params.headers" :key="key" xs12>
-                    <v-flex xs12 v-if="param.input == 'images'">
-                        <v-layout row wrap>
-                            <v-flex v-for="(file, key) in addOrderImages" :key="key" xs4 d-flex>
-                                <v-card flat tile class="d-flex pr-1 pb-1">
-                                    <v-img :src="file.url" :lazy-src="file.url" aspect-ratio="1" class="grey lighten-2">
-                                        <template>
-                                            <v-layout v-show="file.entrances" fill-width align-center column ma-0>
-                                                <v-btn>
-                                                    Номер подъезда {{file.entrances ? file.entrances.number : null}}
-                                                </v-btn>
-                                            </v-layout>
-                                        </template>
-                                        <template v-slot:placeholder>
-                                            <v-layout left align-end ma-0>
-                                                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
-                                            </v-layout>
-                                        </template>
-                                        <template>
-                                            <v-layout>
-                                                <v-dialog v-model="dialogImg" width="600px">
-                                                    <template v-slot:activator="{ on }">
-                                                        <v-btn icon class="white--text" v-on="on" @click='filesImg(file)'><v-icon>search</v-icon></v-btn>
-                                                    </template>
-                                                    <v-card v-if="imgBig">
-                                                        <v-img :src="imgBig" :lazy-src="imgBig" aspect-ratio="1" class="grey lighten-2"></v-img>
-                                                    </v-card>
-                                                </v-dialog>
-                                            </v-layout>
-                                        </template>
-                                    </v-img>
-                                </v-card>
-                            </v-flex>
-                        </v-layout>
-                    </v-flex>
-                </v-flex>
+               
+                    <v-layout row wrap>
+                        <v-flex v-for="(file, key) in addOrderImages" :key="key" xs4 d-flex>
+                            <v-card flat tile class="d-flex pr-1 pb-1">
+                                <v-img :src="file.url" :lazy-src="file.url" aspect-ratio="1" class="grey lighten-2">
+                                    <template>
+                                        <v-layout v-show="file.entrances" fill-width align-center column ma-0>
+                                            <v-btn>
+                                                Номер подъезда {{file.entrances ? file.entrances.number : null}}
+                                            </v-btn>
+                                        </v-layout>
+                                    </template>
+                                    <template v-slot:placeholder>
+                                        <v-layout left align-end ma-0>
+                                            <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                        </v-layout>
+                                    </template>
+                                    <template>
+                                        <v-layout>
+                                            <v-dialog v-model="dialogImg" width="600px">
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn icon class="white--text" v-on="on" @click='filesImg(file)'><v-icon>search</v-icon></v-btn>
+                                                </template>
+                                                <v-card v-if="imgBig">
+                                                    <v-img :src="imgBig" :lazy-src="imgBig" aspect-ratio="1" class="grey lighten-2"></v-img>
+                                                </v-card>
+                                            </v-dialog>
+                                        </v-layout>
+                                    </template>
+                                </v-img>
+                            </v-card>
+                        </v-flex>
+                    </v-layout>
+                 
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
@@ -141,6 +139,9 @@ export default {
     data: (vm) => ({
         search: '',
         dialog: false,
+        imgBig: '',
+        addOrderImages: [],
+        dialogImg: false,
         loading: true,
         loadingExcel: false,
         excelDownload: false,
@@ -218,6 +219,10 @@ export default {
                 return this.cityUser = null;
             }
         },
+        filesImg(file) {
+            this.imgBig = '';
+            this.imgBig = file.url;
+        },
         showRoles() {
             if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
                 return false;
@@ -290,7 +295,7 @@ export default {
                     this.desserts = response.data.address;
                     this.selectCity = response.data.city;
                     this.areaArray = response.data.area;
-                    console.log(this.desserts);
+                    
                     if(this.isLoggedUser.moderators) {
                         this.selectArea = [];
                         this.editedItem.city_id = this.isLoggedUser.moderators.city_id;
@@ -381,7 +386,7 @@ export default {
             this.$refs.excel.click();
         },
         editPhotos(item) {
-            this.addOrderImages =  item.images;
+            this.addOrderImages = item.images;
             this.dialogImages = true;
         },
         editItem(item) {

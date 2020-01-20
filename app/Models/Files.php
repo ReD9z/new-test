@@ -14,6 +14,10 @@ class Files extends Model
         return $this->hasMany('App\Models\ImagesToOrders', 'files_id', 'id');
     }
 
+    public function getAddress() {
+        return $this->hasOne('App\Models\ImagesToOrders', 'files_id', 'id');
+    }
+
     public function entrances() {
         return $this->hasOne('App\Models\Entrances', 'file_id', 'id');
     }
