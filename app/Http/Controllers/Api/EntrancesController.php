@@ -23,18 +23,18 @@ class EntrancesController extends Controller
      */
     public function store(Request $request)
     {
-        $entrances = Entrances::with('files', 'address')->findOrFail($request->id);
+        $entrances = Entrances::with('files', 'address')->findOrFail($request->input('id'));
         $entrances->shield = $request->input('shield');
         $entrances->glass = $request->input('glass');
         $entrances->information = $request->input('information');
         $entrances->mood = $request->input('mood');
         $entrances->status = $request->input('status');
         if($request->input('image')) {
-            $entrances->file_id = $entrances::saveFile($request->input('image'));
+            $entrances->file_id = $entrances::saveFile($request->input('image'), $request->input('date'));
         }
 
-        if($entrances->save()) {
-            return new EntrancesResource($entrances);
-        }
+        // if($entrances->save()) {
+        //     return new EntrancesResource($entrances);
+        // }
     }
 }

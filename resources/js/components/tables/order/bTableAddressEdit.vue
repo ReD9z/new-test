@@ -142,12 +142,12 @@
                                         </template>
                                         <template>
                                             <v-layout>
-                                                <v-dialog v-model="dialogImg" width="600px">
+                                                <v-dialog v-model="dialogImg" width="1200px">
                                                     <template v-slot:activator="{ on }">
                                                         <v-btn icon class="white--text" v-on="on" @click='filesImg(file)'><v-icon>search</v-icon></v-btn>
                                                     </template>
                                                     <v-card v-if="imgBig">
-                                                        <v-img :src="imgBig" :lazy-src="imgBig" aspect-ratio="1" class="grey lighten-2"></v-img>
+                                                        <v-img :src="imgBig" :lazy-src="imgBig" aspect-ratio="1.7" class="grey lighten-2" contain></v-img>
                                                     </v-card>
                                                 </v-dialog>
                                             </v-layout>
@@ -267,7 +267,7 @@
             <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
     </v-data-table>
-    <b-maps :items="desserts" v-if="renderComponent"></b-maps>
+    <b-maps :items="mapItems" v-if="mapItems.length > 0"></b-maps>
 </v-flex>
 </template>
 <script>
@@ -310,6 +310,7 @@ export default {
         order: [],
         cityUser: null,
         selected: [],
+        mapItems: [],
         addOrder: []
     }),
     props: {
@@ -597,6 +598,7 @@ export default {
                         this.filteredStatus(this.desserts); 
                         this.loading = false;
                     }
+                    this.mapItems = this.desserts.filter(item=>item.data);
                 }
             ).catch(error => {
                 console.log(error);

@@ -142,7 +142,7 @@ export default {
                     },
                     { 
                         title: 'Менеджеры', icon: 'record_voice_over', src: 'managers', 
-                        role: {admin: 'admin'}
+                        role: {admin: 'admin', moderator: 'moderator'}
                     },
                     { 
                         title: 'Монтажники', icon: 'build', src: 'installers',

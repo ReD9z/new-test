@@ -44,59 +44,54 @@
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>Изображения</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <!-- <v-icon right dark @click='pickImages'>control_point</v-icon>
-                    <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
-                -->
                 <v-btn icon @click="close">
                     <v-icon>close</v-icon>
                 </v-btn> 
             </v-toolbar>
-            <!-- <v-progress-linear value="15" :indeterminate="true" v-show="loadImages" color="blue" class="ma-0"></v-progress-linear> -->
             <v-card-text>
                
-                    <v-layout row wrap>
-                        <v-flex v-for="(file, key) in addOrderImages" :key="key" xs4 d-flex>
-                            <v-card flat tile class="d-flex pr-1 pb-1">
-                                <v-img :src="file.url" :lazy-src="file.url" aspect-ratio="1" class="grey lighten-2">
-                                    <template>
-                                        <v-layout v-show="file.entrances" fill-width align-center column ma-0>
-                                            <v-btn>
-                                                Номер подъезда {{file.entrances ? file.entrances.number : null}}
-                                            </v-btn>
-                                        </v-layout>
-                                    </template>
-                                    <template v-slot:placeholder>
-                                        <v-layout left align-end ma-0>
-                                            <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
-                                        </v-layout>
-                                    </template>
-                                    <template>
-                                        <v-layout>
-                                            <v-dialog v-model="dialogImg" width="600px">
-                                                <template v-slot:activator="{ on }">
-                                                    <v-btn icon class="white--text" v-on="on" @click='filesImg(file)'><v-icon>search</v-icon></v-btn>
-                                                </template>
-                                                <v-card v-if="imgBig">
-                                                    <v-img :src="imgBig" :lazy-src="imgBig" aspect-ratio="1" class="grey lighten-2"></v-img>
-                                                </v-card>
-                                            </v-dialog>
-                                        </v-layout>
-                                    </template>
-                                </v-img>
-                            </v-card>
-                        </v-flex>
-                    </v-layout>
-                 
+                <v-layout row wrap>
+                    <v-flex v-for="(file, key) in addOrderImages" :key="key" xs4 d-flex>
+                        <v-card flat tile class="d-flex pr-1 pb-1">
+                            <v-img :src="file.url" :lazy-src="file.url" aspect-ratio="1" class="grey lighten-2">
+                                <template>
+                                    <v-layout v-show="file.entrances" fill-width align-center column ma-0>
+                                        <v-btn>
+                                            Номер подъезда {{file.entrances ? file.entrances.number : null}}
+                                        </v-btn>
+                                    </v-layout>
+                                </template>
+                                <template v-slot:placeholder>
+                                    <v-layout left align-end ma-0>
+                                        <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                    </v-layout>
+                                </template>
+                                <template>
+                                    <v-layout>
+                                        <v-dialog v-model="dialogImg" width="1200px">
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn icon class="white--text" v-on="on" @click='filesImg(file)'><v-icon>search</v-icon></v-btn>
+                                            </template>
+                                            <v-card v-if="imgBig">
+                                                <v-img :src="imgBig" :lazy-src="imgBig" aspect-ratio="1.7" class="grey lighten-2" contain></v-img>
+                                            </v-card>
+                                        </v-dialog>
+                                    </v-layout>
+                                </template>
+                            </v-img>
+                        </v-card>
+                    </v-flex>
+                </v-layout>
             </v-card-text>
         </v-card>
     </v-navigation-drawer>
-    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :headers="params.headers" :items="desserts" :loading="loading" item-key="name" class="elevation-1">
+    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
             <th
                 v-for="header in props.headers"
                 :key="header.text"
-                :class="['column sortable', pagination.descending ? 'dasc' : 'asc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
+                :class="['column sortable', pagination.descending ? 'asc' : 'desc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
             >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
             <th class="text-xs-left">
@@ -237,11 +232,12 @@ export default {
             this.search = '';
             this.initialize();
         },
-        toggleAll () {
+        toggleAll() {
             if (this.selected.length) this.selected = []
             else this.selected = this.desserts.slice()
         },
-        changeSort (column) {
+        changeSort(column) {
+            console.log(this.pagination.descending);
             if (this.pagination.sortBy === column) {
                 this.pagination.descending = !this.pagination.descending
             } else {

@@ -1,7 +1,7 @@
 <template>
     <div class="maps-wrap">
         <v-progress-linear height="5" v-show="mapLoader" indeterminate class="maps-loader"></v-progress-linear>
-        <div id="orderMaps" v-show="mapsShow"></div>
+        <div v-show="!mapLoader" id="orderMaps"></div>
     </div>
 </template>
 <style type="text/css">
@@ -26,40 +26,54 @@ export default {
         items: Array,
     },
     data: () => ({
-       mapLoader:true,
-       mapsShow:false 
+        mapLoader:true,
+        newItems: {
+            "type": "FeatureCollection",
+            "features" : []
+        },
+        mapsShow:false 
     }),
     methods: {
         initializeYandexMap() { 
             let vm = this;
+           
             ymaps.ready().done(function (ym) {
-                const myMap = new ym.Map('orderMaps', {
+                var myMap = new ymaps.Map('orderMaps', {
                     center: [64.25926230053398, 108.11586741406248],
                     zoom: 3
                 }, {
-                    searchControlProvider: 'yandex#search'
-                });
-            
-                vm.items.forEach((element) => {
-                    if(element.data != null) {
-                        vm.mapsShow = true;
-                        const myPlacemark = new ymaps.Placemark(element.data.coordinates.split(', '), {
-                            preset: 'islands#blueDotIcon',
-                            balloonContent: element.city + ", " + element.street + ", " + element.house_number,
-                            draggable: true,
-                        });
-                        vm.mapLoader = false;
-                        myMap.geoObjects.add(myPlacemark);    
-                        
-                    }
-                    if(vm.mapsShow == false) {
-                        vm.mapLoader = false;
-                    }
-                });
+                        searchControlProvider: 'yandex#search'
+                }),
+                objectManager = new ymaps.ObjectManager();
+                myMap.geoObjects.add(objectManager);
+              
+                objectManager.add(vm.newItems);
+                vm.mapLoader = false;
             });
+            
         }
     },
     created () {
+        this.items.forEach((item, key) => {
+            this.newItems.features.push(
+                {
+                    "type": "Feature",
+                    "id": key,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": item.data.coordinates.split(', ')
+                    },
+                    "properties": {
+                        "balloonContent": item.city + ", " + item.street + ", " + item.house_number,
+                        "clusterCaption": "Метка с iconContent",
+                        "hintContent": item.city + ", " + item.street + ", " + item.house_number,
+                    },
+                    "options": {
+                        "preset": "islands#blueIcon"
+                    }
+                },
+            );
+        });
         if(this.items.length == 0) {
             this.mapLoader = false;
         } 
@@ -68,6 +82,7 @@ export default {
         document.head.appendChild(scriptYandexMap);
 
         scriptYandexMap.addEventListener("load", this.initializeYandexMap);
+        // console.log(this.newItems);
     
     }
     

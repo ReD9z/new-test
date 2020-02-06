@@ -405,7 +405,6 @@ export default {
         },
         downloadExcel() {
             if(this.desserts.length > 0) {
-                console.log(this.desserts);
                 let map = this.desserts.map((item)=> {
                     return {
                         "Название организации клиента": item.orders,

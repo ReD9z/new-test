@@ -23,8 +23,8 @@ class TaskM extends JsonResource
             'types_id' => $this->types_to_works_id,
             'types' => $this->types ? $this->types->title : null,
             'task_date_completion' => date("d.m.Y", strtotime($this->task_date_completion)),
-            'number_addresses' => $this->orders ? count($this->orders->orderAddress) : null,
-            'number_entrances' => $this->orders ? $this->countAdresses($this->orders->orderAddress) : null,
+            'number_addresses' => $this->orders ? count($this->orders->orderManyAddress) : null,
+            'number_entrances' => $this->orders ? $this->countAdresses($this->orders->orderManyAddress) : null,
             'comment' => $this->comment
         ];
     }

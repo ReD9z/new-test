@@ -220,6 +220,7 @@ export default {
         await this.initialize();
         await this.selectStatus();
         await this.getFiltered();
+        console.log(this.isLoggedUser);
     },
     methods: {
         roleUserCity() {

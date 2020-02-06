@@ -21,6 +21,7 @@ class Entrances extends JsonResource
             'street' => $this->address->street,
             'file_id' => $this->file_id,
             'urlFile' => $this->files ? $this->files->url : null,
+            'fileDate' => $this->files ? $this->files->date : null,
             'number' => $this->number,
             'shield' => $this->shield,
             'glass' => $this->glass,

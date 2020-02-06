@@ -8,8 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Entrances extends Model
 {
-    public static function saveFile($file) {
-        $image = $file; 
+    public static function saveFile($file, $date) {
+        $im = new \Imagick();
+        
+        $im->readImageBlob($file);
+
+        $im->setImageFormat("jpg");
+
+        $image = 'data:image/jpg;base64,'.base64_encode($im);
+
         preg_match("/data:image\/(.*?);/",$image,$image_extension); 
         $image = preg_replace('/data:image\/(.*?);base64,/','',$image);
         $image = str_replace(' ', '+', $image);
@@ -20,6 +27,7 @@ class Entrances extends Model
         
         $uploadfile = new Files();
         $uploadfile->url = $path;
+        $uploadfile->date = $date;
         $uploadfile->save();
         return $uploadfile->id;
     }

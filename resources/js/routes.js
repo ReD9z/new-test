@@ -168,10 +168,10 @@ let routers =  [
             title: 'Менеджеры',
             requiresAuth: true,
             adminAuth: true,
-            moderatorAuth: false,
+            moderatorAuth: true,
             installerAuth: false,
             managerAuth: false,
-            clientAuth: false   
+            clientAuth: false  
         },
         component: require('./views/Managers.vue').default
     },
@@ -206,7 +206,6 @@ let routers =  [
     {
         path: '/orders-address/:id',
         name: 'orders-address',
-        props: true,
         meta: {
             title: 'Адреса заказов',
             requiresAuth: true,
