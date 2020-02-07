@@ -352,8 +352,8 @@ export default {
     async created () {
         await this.initializeOrder();
         await this.initialize();
-        await this.selectStatus();
         await this.getFiltered();
+        await this.selectStatus();
     },
     methods: {
         roleUserCity() {
@@ -597,6 +597,9 @@ export default {
                         this.filtered(this.desserts);
                         this.filteredStatus(this.desserts); 
                         this.loading = false;
+                    }
+                    if(this.isLoggedUser.clients) {
+                        this.desserts = this.desserts.filter(item => item.data);
                     }
                     this.mapItems = this.desserts.filter(item=>item.data);
                 }

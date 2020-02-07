@@ -183,7 +183,7 @@ class Address extends Model
         $entrances = Entrances::where([
             ['address_id', $id], 
             ['file_id', '!=', null],
-            ['status', '=', 3]
+            ['status', '!=', 0]
         ])->pluck('file_id')->all();
 
         $address = ImagesToOrders::with('orders')->where([

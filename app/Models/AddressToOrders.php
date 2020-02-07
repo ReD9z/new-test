@@ -45,4 +45,22 @@ class AddressToOrders extends Model
         }
         return $status;
     }
+    
+    public function getImages($id)
+    {
+        $entrances = Entrances::where([
+            ['address_id', $id], 
+            ['file_id', '!=', null]
+        ])->pluck('file_id')->all();
+
+        $address = ImagesToOrders::with('orders')->where([
+            ['files_id', '!=', null]
+        ])->get()->where('orders.address_id', $id)->pluck('files_id')->all();
+        
+        $result = array_merge($entrances, $address);
+        
+        $files = Files::with('entrances.orderAddress')->whereIn('id', $result)->get();
+        
+        return $files ? $files : null;
+    }
 }

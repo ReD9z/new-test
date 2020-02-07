@@ -146,6 +146,6 @@ Route::group(['middleware' => ['json.response']], function () {
         
         // EntrancesManager   
         Route::get('entrances/{id}', 'Api\EntrancesController@index');
+        Route::put('entrancesSave', 'Api\EntrancesController@store'); // Save one item
     });
-    Route::put('entrancesSave', 'Api\EntrancesController@store'); // Save one item
 });
