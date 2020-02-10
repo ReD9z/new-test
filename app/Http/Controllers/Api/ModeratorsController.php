@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Moderators;
+use App\Models\ModeratorAddresses;
 use App\Http\Resources\Moderators as ModeratorsResource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -19,7 +20,7 @@ class ModeratorsController extends Controller
     */
     public function index(Request $request)
     {
-        $moderators = Moderators::with('users', 'cities')->get();
+        $moderators = Moderators::with('users', 'cities', 'addresses.city')->get();
     
         return ModeratorsResource::collection($moderators);
     }
@@ -34,37 +35,53 @@ class ModeratorsController extends Controller
     {
         $users = $request->isMethod('put') ? User::findOrFail($request->users_id) : new User;
 
-        if($request->isMethod('post')) {
-            $users->id = $request->input('id');
-        }
+        // if($request->isMethod('post')) {
+        //     $users->id = $request->input('id');
+        // }
         
-        $this->validate($request, [
-            'email' => 'unique:users',
-            'email' => Rule::unique('users')->ignore($request->users_id),
-        ]);
+        // $this->validate($request, [
+        //     'email' => 'unique:users',
+        //     'email' => Rule::unique('users')->ignore($request->users_id),
+        // ]);
 
-        $users->name = $request->input('name');
-        $users->email = $request->input('email');
-        $users->phone = $request->input('phone');
-        $users->login = $request->input('login');
-        $users->role = 'moderator';
+        // $users->name = $request->input('name');
+        // $users->email = $request->input('email');
+        // $users->phone = $request->input('phone');
+        // $users->login = $request->input('login');
+        // $users->role = 'moderator';
         
-        if(!empty($request->input('password'))) {
-            $users->password = bcrypt($request->input('password'));
-            $token = $users->createToken('Laravel Password Grant Client')->accessToken;
-        }
+        // if(!empty($request->input('password'))) {
+        //     $users->password = bcrypt($request->input('password'));
+        //     $token = $users->createToken('Laravel Password Grant Client')->accessToken;
+        // }
     
-        if($users->save()) { 
-            $moderators = $request->isMethod('put') ? Moderators::findOrFail($request->id) : new Moderators;
-            if($request->isMethod('post')) {
-                $moderators->id = $request->input('id');
-            }
-            $moderators->users_id = $users->id;
-            $moderators->city_id = $request->input('city_id');
-        }
+        // if($users->save()) { 
+            $moderator = $request->isMethod('put') ? Moderators::findOrFail($request->id) : new Moderators;
+            // if($request->isMethod('post')) {
+            //     $moderator->id = $request->input('id');
+            // }
+            // $moderator->users_id = $users->id;
+        // }
      
-        if($moderators->save()) {
-            return new ModeratorsResource($moderators);
+        if($moderator->save()) {
+            $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->get();
+            dd($moderatorAddress);
+            // $moderatorAddress = ;
+            
+            // $entrances = Entrances::where([
+            //     ['address_id', $id], 
+            //     ['file_id', '!=', null]
+            // ])->pluck('file_id')->all();
+            // if($request->address) {
+            //     ModeratorAddresses::where('moderator_id', $id)->get();
+            //     foreach ($address as $key => $value) {
+            //         // $address = ModeratorAddresses::where('moderator_id', $id)->get();
+            //     }
+            //     // foreach ($variable as $key => $value) {
+            //     //     # code...
+            //     // }
+            // }
+            return new ModeratorsResource($moderator);
         }        
     }
 

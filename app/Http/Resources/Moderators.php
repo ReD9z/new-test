@@ -21,6 +21,7 @@ class Moderators extends JsonResource
             'email' => $this->users ? $this->users->email : null,
             'phone' => $this->users ? $this->users->phone : null,
             'login' => $this->users ? $this->users->login : null,
+            'address' => $this->getAddress($this->id),
             'city_id' => $this->city_id,
             'city' => $this->users ? $this->cities->name : null
         ];

@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-4 mt-4">
         <div class="col-md-12 mb-4 mt-4">
-            <b-table :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin'})"></b-table>
+            <b-address-moderator :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin'})"></b-address-moderator>
         </div>
     </div>
 </template>
@@ -44,10 +44,9 @@ export default {
                     align: 'left',
                     sortable: true,
                     validate: 'required',
-                    value: 'city_id',
+                    value: 'address',
                     selectText: 'name',
                     TableGetIdName: 'city',
-                    selectApi: '/api/cities_to_works',
                     input: "select",
                 },
                 {

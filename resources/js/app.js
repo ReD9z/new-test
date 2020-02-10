@@ -54,6 +54,7 @@ Vue.component('b-table-clients', require('./components/tables/clients/bTableClie
 Vue.component('b-add-client', require('./components/bAddClient.vue').default);
 Vue.component('b-task-manager', require('./components/tables/task/bTableTaskManager.vue').default);
 Vue.component('b-address-images', require('./components/tables/address/bTableAddressImage.vue').default);
+Vue.component('b-address-moderator', require('./components/tables/bTableModerator.vue').default);
 
 let router = new VueRouter({
     mode: 'history',
