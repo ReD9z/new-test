@@ -35,52 +35,67 @@ class ModeratorsController extends Controller
     {
         $users = $request->isMethod('put') ? User::findOrFail($request->users_id) : new User;
 
-        // if($request->isMethod('post')) {
-        //     $users->id = $request->input('id');
-        // }
+        if($request->isMethod('post')) {
+            $users->id = $request->input('id');
+        }
         
-        // $this->validate($request, [
-        //     'email' => 'unique:users',
-        //     'email' => Rule::unique('users')->ignore($request->users_id),
-        // ]);
+        $this->validate($request, [
+            'email' => 'unique:users',
+            'email' => Rule::unique('users')->ignore($request->users_id),
+        ]);
 
-        // $users->name = $request->input('name');
-        // $users->email = $request->input('email');
-        // $users->phone = $request->input('phone');
-        // $users->login = $request->input('login');
-        // $users->role = 'moderator';
+        $users->name = $request->input('name');
+        $users->email = $request->input('email');
+        $users->phone = $request->input('phone');
+        $users->login = $request->input('login');
+        $users->role = 'moderator';
         
-        // if(!empty($request->input('password'))) {
-        //     $users->password = bcrypt($request->input('password'));
-        //     $token = $users->createToken('Laravel Password Grant Client')->accessToken;
-        // }
+        if(!empty($request->input('password'))) {
+            $users->password = bcrypt($request->input('password'));
+            $token = $users->createToken('Laravel Password Grant Client')->accessToken;
+        }
     
-        // if($users->save()) { 
+        if($users->save()) { 
             $moderator = $request->isMethod('put') ? Moderators::findOrFail($request->id) : new Moderators;
-            // if($request->isMethod('post')) {
-            //     $moderator->id = $request->input('id');
-            // }
-            // $moderator->users_id = $users->id;
-        // }
+            if($request->isMethod('post')) {
+                $moderator->id = $request->input('id');
+            }
+            $moderator->users_id = $users->id;
+        }
      
         if($moderator->save()) {
-            $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->get();
-            dd($moderatorAddress);
+            if(count($request->address) != 0) {
+                $arr = [];
+                foreach ($request->address as $key => $value) {
+                    
+                    if(!isset($value['moderator'])) {
+                        $newModeratorAddress = new ModeratorAddresses;
+                        $newModeratorAddress->moderator_id = $moderator->id;
+                        $newModeratorAddress->city_id = $value['id'];
+                        $newModeratorAddress->save();
+                    }
+                    if(isset($value['address'])) {
+                        // dd($value['address']);
+                        $arr[] = $value['address'];
+                    }
+                    // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)
+                }
+                dd($arr);
+                // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->whereNotIn('id', $arr);
+                // $moderatorAddress->delete();
+                // dd($request->address);
+                // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->get();
+                // foreach ($variable as $key => $value) {
+                //     # code...
+                // }
+                // dd($moderatorAddress);
+                // $newModeratorAddress = new ModeratorAddresses;
+                // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->get();
+                // dd($arr);
+            }
+            // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->get();
             // $moderatorAddress = ;
             
-            // $entrances = Entrances::where([
-            //     ['address_id', $id], 
-            //     ['file_id', '!=', null]
-            // ])->pluck('file_id')->all();
-            // if($request->address) {
-            //     ModeratorAddresses::where('moderator_id', $id)->get();
-            //     foreach ($address as $key => $value) {
-            //         // $address = ModeratorAddresses::where('moderator_id', $id)->get();
-            //     }
-            //     // foreach ($variable as $key => $value) {
-            //     //     # code...
-            //     // }
-            // }
             return new ModeratorsResource($moderator);
         }        
     }
