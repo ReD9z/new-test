@@ -74,15 +74,13 @@ class ModeratorsController extends Controller
                         $newModeratorAddress->city_id = $value['id'];
                         $newModeratorAddress->save();
                     }
-                    if(isset($value['address'])) {
-                        // dd($value['address']);
-                        $arr[] = $value['address'];
-                    }
+
+                    $arr[] = $value['id'];
                     // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)
                 }
-                dd($arr);
-                // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->whereNotIn('id', $arr);
-                // $moderatorAddress->delete();
+                // dd($arr);
+                $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->whereNotIn('city_id', $arr);
+                $moderatorAddress->delete();
                 // dd($request->address);
                 // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->get();
                 // foreach ($variable as $key => $value) {

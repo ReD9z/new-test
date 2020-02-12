@@ -16,12 +16,18 @@ class CitiesToWorksController extends Controller
      */
     public function index(Request $request)
     {
-        if($request->city) {
-            $toWorks = CitiesToWorks::where('id', $request->city)->get();
+        if(json_decode($request->city)) {
+            $arr = [];
+            foreach (json_decode($request->city) as $key => $value) {
+                $arr[] = $value->city_id;
+            }
+            $toWorks = CitiesToWorks::whereIn('id', $arr)->get();   
         }
-        else {
-            $toWorks = CitiesToWorks::get();
+
+        if(!json_decode($request->city)) {
+            $toWorks = CitiesToWorks::get();   
         }
+       
         return CitiesToWorksResource::collection($toWorks);
     }
 

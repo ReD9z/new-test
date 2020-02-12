@@ -19,7 +19,18 @@ class ManagersController extends Controller
      */
     public function index(Request $request)
     {
-        $managers = Managers::with('users', 'cities', 'moderator.users')->get();   
+        if(json_decode($request->city)) {
+            $arr = [];
+            foreach (json_decode($request->city) as $key => $value) {
+                $arr[] = $value->city_id;
+            }
+            $managers = Managers::with('users', 'cities', 'moderator.users')->whereIn('city_id', $arr)->get();   
+        }
+
+        if(!json_decode($request->city)) {
+            $managers = Managers::with('users', 'cities', 'moderator.users')->get();   
+        }
+       
         return ManagersResource::collection($managers);
     }
 

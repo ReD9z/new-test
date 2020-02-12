@@ -19,12 +19,18 @@ class InstallersController extends Controller
      */
     public function index(Request $request)
     {
-        if($request->user) {
-            $installers = Installers::with('users', 'cities', 'moderator.users')->where('moderator_id', $request->user)->get(); 
+        if(json_decode($request->city)) {
+            $arr = [];
+            foreach (json_decode($request->city) as $key => $value) {
+                $arr[] = $value->city_id;
+            }
+            $installers = Installers::with('users', 'cities', 'moderator.users')->whereIn('city_id', $arr)->get();   
         }
-        else {
-            $installers = Installers::with('users', 'cities', 'moderator.users')->get(); 
+
+        if(!json_decode($request->city)) {
+            $installers = Installers::with('users', 'cities', 'moderator.users')->get();   
         }
+        
         return InstallersResource::collection($installers);
     }
 
