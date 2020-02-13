@@ -71,7 +71,6 @@ export default {
                     input: "textarea",
                     sortable: true,
                     value: 'comment',
-                    validate: 'required',
                     role: vm.$store.getters.isUserRole
                 }
             ],

@@ -205,7 +205,8 @@ export default {
         },
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
-                return this.cityUser = this.isLoggedUser.moderators.city_id;
+                this.cityUser = this.isLoggedUser.moderators.addresses;
+                return this.cityUser;
             }
             if(this.isLoggedUser.managers) {
                 return this.cityUser = this.isLoggedUser.managers.city_id;
@@ -237,7 +238,6 @@ export default {
             else this.selected = this.desserts.slice()
         },
         changeSort(column) {
-            console.log(this.pagination.descending);
             if (this.pagination.sortBy === column) {
                 this.pagination.descending = !this.pagination.descending
             } else {
@@ -284,7 +284,10 @@ export default {
             this.loading = true;
             axios({
                 method: 'get',
-                url: this.params.baseUrl
+                url: this.params.baseUrl,
+                params: {
+                    city: JSON.stringify(this.roleUserCity())
+                }
             })
             .then(
                 response => {

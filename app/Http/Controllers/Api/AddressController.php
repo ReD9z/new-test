@@ -28,10 +28,32 @@ class AddressController extends Controller
         $areas = Areas::with('cities')->get();
        
         if($request->user) {
-            $address = AddressRoleUserResource::collection(Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get());
+            if(json_decode($request->city)) {
+                $arr = [];
+                foreach (json_decode($request->city) as $key => $value) {
+                    $arr[] = $value->city_id;
+                }
+                $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('city_id', $arr)->get();   
+            }
+
+            if(!json_decode($request->city)) {
+                $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get();   
+            }
+            $address = AddressRoleUserResource::collection($toAddress);
         }
         else {
-            $address = AddressResource::collection(Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get());
+            if(json_decode($request->city)) {
+                $arr = [];
+                foreach (json_decode($request->city) as $key => $value) {
+                    $arr[] = $value->city_id;
+                }
+                $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('city_id', $arr)->get();   
+            }
+
+            if(!json_decode($request->city)) {
+                $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get();   
+            }
+            $address = AddressResource::collection($toAddress);
         }
         
         return response()->json(

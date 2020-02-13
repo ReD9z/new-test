@@ -20,11 +20,28 @@ class OrdersController extends Controller
     */
     public function index(Request $request)
     {
-        if($request->city) {
-            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('clients.city_id', $request->city); 
+        if(json_decode($request->city)) {
+            $arr = [];
+            foreach (json_decode($request->city) as $key => $value) {
+                $arr[] = $value->city_id;
+            }
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->whereIn('clients.city_id', $arr); 
+        }
+        else if(!json_decode($request->city)) {
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get();  
         }
         else if($request->client) {
-            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('clients_id', $request->client); 
+            if(json_decode($request->city)) {
+                $arr = [];
+                foreach (json_decode($request->city) as $key => $value) {
+                    $arr[] = $value->city_id;
+                }
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->whereIn('clients.city_id', $arr)->where('clients_id', $request->client); 
+            }
+
+            if(!json_decode($request->city)) {
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('clients_id', $request->client);  
+            }
         }
         else {
             $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get(); 

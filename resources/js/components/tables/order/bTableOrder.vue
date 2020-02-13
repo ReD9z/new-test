@@ -225,7 +225,8 @@ export default {
     methods: {
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
-                return this.cityUser = this.isLoggedUser.moderators.city_id;
+                this.cityUser = this.isLoggedUser.moderators.addresses;
+                return this.cityUser;
             }
             if(this.isLoggedUser.managers) {
                 return this.cityUser = this.isLoggedUser.managers.city_id;
@@ -341,7 +342,7 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: this.roleUserCity(),
+                    city: JSON.stringify(this.roleUserCity()),
                     client: this.roleUserId()
                 }
             })

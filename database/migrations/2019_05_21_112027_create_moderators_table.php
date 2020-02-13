@@ -17,8 +17,6 @@ class CreateModeratorsTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('users_id')->unsigned()->nullable();
             $table->foreign('users_id')->references('id')->on('users')->onDelete('cascade');
-            $table->bigInteger('city_id')->unsigned()->nullable();
-            $table->foreign('city_id')->references('id')->on('cities_to_works')->onDelete('cascade');
             $table->timestamps();
         });
     }
