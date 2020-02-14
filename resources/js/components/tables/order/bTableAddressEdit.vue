@@ -22,22 +22,19 @@
                             <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
                         <div v-if="param.input == 'select'" xs12>
-                            <div v-for="item in select" :key="item[0]">
-                                <div v-if="item.url == param.selectApi">
-                                    <v-autocomplete
-                                        :items="item.data"
-                                        v-model="editedItem[param.value]"
-                                        :item-text="param.selectText"
-                                        :data-vv-as="'`'+param.text+'`'" 
-                                        :data-vv-name="param.value" 
-                                        :error-messages="errors.collect(param.value)" 
-                                        v-validate="param.validate"
-                                        item-value="id"
-                                        :label="param.text"
-                                        >
-                                    </v-autocomplete>
-                                </div>
-                            </div>
+                            <v-autocomplete
+                                :items="select"
+                                v-model="editedItem[param.value]"
+                                :item-text="param.selectText"
+                                :data-vv-as="'`'+param.text+'`'" 
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate"
+                                return-object
+                                item-value="id"
+                                :label="param.text"
+                            >
+                            </v-autocomplete>
                         </div>
                     </v-flex>
                     <v-flex v-for="(param, key) in params.headerOrders" v-if="param.input == 'dateStart'"  :key="`T-${key}`" xs12 lg6>
@@ -311,6 +308,7 @@ export default {
         cityUser: null,
         selected: [],
         mapItems: [],
+        cityClient: null,
         addOrder: []
     }),
     props: {
@@ -343,6 +341,15 @@ export default {
             this.initialize();
         }, 300),
         chips() {
+            this.initialize();
+        },
+        'editedItem.client'(item) {
+            this.cityClient = null;
+            if(item) {
+                let arr = [];
+                arr.push({'city_id': item.city_id});
+                this.cityClient = arr;
+            }
             this.initialize();
         },
         chipsStatus() {
@@ -564,7 +571,7 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: this.roleUserCity(),
+                    city: JSON.stringify(this.cityClient),
                     user: this.isLoggedUser.clients ? true : null,
                     order: this.$route.params.id,
                 }
@@ -634,12 +641,7 @@ export default {
                     .then(
                         res => {
                             if(res) {
-                                this.select.push(
-                                    {
-                                        data: res.data, 
-                                        url: element.selectApi
-                                    }
-                                );
+                                this.select = res.data;
                             }
                         }
                     ).catch(

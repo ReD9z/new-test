@@ -42,6 +42,8 @@
                             <v-text-field 
                                 :type="param.value" 
                                 v-model="editedItem[param.value]" 
+                                autocomplete="new-password"     
+                                name="new-password"
                                 :label="param.text" 
                                 v-validate="editedItem[param.value] ? {required:true, regex:/^\S*$/ , min:6} : ''"
                                 :data-vv-name="param.value" 

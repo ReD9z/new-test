@@ -15,7 +15,7 @@ export default {
                 {
                     text: 'Клиент',
                     align: 'left',
-                    value: 'clients_id',
+                    value: 'client',
                     selectText: 'name',
                     TableGetIdName: 'name',
                     selectApi: '/api/clients',
