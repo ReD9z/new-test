@@ -327,15 +327,19 @@ export default {
         dialog (val) {
             val || this.close()
         },
-        dateStart(val) {
+        dateStart(val, old) {
             this.dateStartFormatted = this.formatDate(this.dateStart);
-            this.initialize();
-            this.selected = [];
+            if(old) {
+                this.initialize();
+                this.selected = [];
+            }
         },
-        dateEnd(val) {
+        dateEnd(val, old) {
             this.dateEndFormatted = this.formatDate(this.dateEnd);
-            this.initialize();
-            this.selected = [];
+            if(old) {
+                this.initialize();
+                this.selected = [];
+            }
         },
         search : _.debounce(function () {
             this.initialize();
@@ -344,13 +348,7 @@ export default {
             this.initialize();
         },
         'editedItem.client'(item) {
-            this.cityClient = null;
-            if(item) {
-                let arr = [];
-                arr.push({'city_id': item.city_id});
-                this.cityClient = arr;
-            }
-            this.initialize();
+            this.cityGet(item);
         },
         chipsStatus() {
             this.initialize();
@@ -363,6 +361,16 @@ export default {
         await this.selectStatus();
     },
     methods: {
+        cityGet(item) {
+            if(!this.isLoggedUser.clients) {
+                if(item) {
+                    let arr = [];
+                    arr.push({'city_id': item.city_id});
+                    this.cityClient = arr;
+                    this.initialize();
+                }   
+            }
+        },
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
                 return this.cityUser = this.isLoggedUser.moderators.city_id;
@@ -605,10 +613,24 @@ export default {
                         this.filteredStatus(this.desserts); 
                         this.loading = false;
                     }
+                    console.log(this.order);
                     if(this.isLoggedUser.clients) {
-                        this.desserts = this.desserts.filter(item => item.data);
+                        this.desserts = this.desserts.filter(item => 
+                            {
+                                if(item.data) {
+                                    console.log(this.order.id);
+                                  console.log(item.data.order_id == this.order.id);
+                                    if(item.data.order_id === this.order.id) {
+                                        return item;
+                                    }
+                                    // item.data.orders.order_id == this.order.id;
+                                    // console.log(item.data.orders.order_id == this.order.id);
+                                }
+                            }
+                        );
                     }
-                    this.mapItems = this.desserts.filter(item=>item.data);
+
+                    this.mapItems = this.desserts.filter(item => item.data);
                 }
             ).catch(error => {
                 console.log(error);
