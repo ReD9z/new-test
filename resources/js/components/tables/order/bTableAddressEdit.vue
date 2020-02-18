@@ -613,18 +613,13 @@ export default {
                         this.filteredStatus(this.desserts); 
                         this.loading = false;
                     }
-                    console.log(this.order);
                     if(this.isLoggedUser.clients) {
                         this.desserts = this.desserts.filter(item => 
                             {
                                 if(item.data) {
-                                    console.log(this.order.id);
-                                  console.log(item.data.order_id == this.order.id);
                                     if(item.data.order_id === this.order.id) {
                                         return item;
                                     }
-                                    // item.data.orders.order_id == this.order.id;
-                                    // console.log(item.data.orders.order_id == this.order.id);
                                 }
                             }
                         );

@@ -20,7 +20,21 @@
                         <div v-if="param.input == 'text'">
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
-                        <div v-if="param.input == 'select'">
+                        <div v-if="param.TableGetIdName == 'moderator'">
+                            <v-autocomplete
+                                :items="moderators"
+                                v-model="editedItem[param.value]"
+                                :item-text="param.selectText"
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate"
+                                item-value="id"
+                                :label="param.text"
+                                :data-vv-as="'`'+param.text+'`'"
+                                >
+                            </v-autocomplete>
+                        </div>
+                         <div v-if="param.TableGetIdName == 'city'">
                             <v-autocomplete
                                 :items="cities"
                                 v-model="editedItem[param.value]"
@@ -29,11 +43,8 @@
                                 :error-messages="errors.collect(param.value)" 
                                 v-validate="param.validate"
                                 item-value="id"
-                                chips
-                                multiple
                                 :label="param.text"
                                 :data-vv-as="'`'+param.text+'`'"
-                                return-object
                             >
                             </v-autocomplete>
                         </div>
@@ -41,8 +52,10 @@
                             <v-text-field 
                                 :type="param.value" 
                                 v-model="editedItem[param.value]" 
+                                autocomplete="new-password"     
+                                name="new-password"
                                 :label="param.text" 
-                                v-validate="editedItem[param.value] ? {required:true, regex:/^\S*$/ , min:6} : ''"
+                                v-validate="editedItem[param.value] ? {required:true, regex:/^\S*$/, min:6} : ''"
                                 :data-vv-name="param.value" 
                                 :error-messages="errors.collect(param.value)" 
                                 :data-vv-as="'`'+param.text+'`'"
@@ -84,18 +97,9 @@
         </template>
         <template v-slot:items="props">
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
-                <v-flex v-if="param.TableGetIdName !== 'address'">
-                    <v-flex v-if="param.selectText">
-                        {{props.item[param.TableGetIdName]}}
-                    </v-flex>
-                    <v-flex v-else>
-                        {{props.item[param.value]}}
-                    </v-flex>
-                </v-flex>
-                <v-flex v-if="param.TableGetIdName === 'address'">
-                    <v-flex v-for="(item, key) in props.item[param.TableGetIdName]" :key="key">
-                       {{item.name}}
-                    </v-flex>
+                <v-flex v-if="param.input !== 'images'">
+                    <v-flex v-if="param.selectText">{{props.item[param.TableGetIdName]}}</v-flex>
+                    <v-flex v-else>{{props.item[param.value]}}</v-flex>
                 </v-flex>
             </td>
             <td class="justify-left layout">
@@ -138,8 +142,9 @@ export default {
             sortBy: 'id'
         },
         selected: [],
-        cities: [],
         cityUser: null,
+        moderators: [],
+        cities: [],
         userId: null
     }),
     props: {
@@ -160,18 +165,26 @@ export default {
         dialog (val) {
             val || this.close()
         },
+        'editedItem.city_id'(val) {
+            let arr = [];
+            arr.push({'city_id': val});
+            this.cityUser = arr;
+            this.selectModerator();
+        },
         search: _.debounce(function () {
             this.initialize()
         }, 400)
     },
     async created () {
+        await this.selectModerator();
+        await this.selectCities();
         await this.initialize();
-        await this.selectStatus();
     },
     methods: {
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
-                return this.cityUser = this.isLoggedUser.moderators.city_id;
+                this.cityUser = this.isLoggedUser.moderators.addresses;
+                return this.cityUser;
             }
             if(this.isLoggedUser.managers) {
                 return this.cityUser = this.isLoggedUser.managers.city_id;
@@ -230,13 +243,12 @@ export default {
                 this.pagination.descending = false
             }
         },
-        initialize () {
+        initialize() {
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    user: this.roleUserId(),
-                    city: this.roleUserCity()
+                    city: JSON.stringify(this.roleUserCity())
                 }
             })
             .then(
@@ -249,26 +261,44 @@ export default {
                 console.log(error);
             })
         },
-        selectStatus() {
+        selectModerator() {
             axios({
                 method: 'get',
-                url: '/api/cities_to_works',
+                url: '/api/moderators',
                 params: {
-                    user: this.roleUserId(),
-                    city: this.roleUserCity()
+                    city: JSON.stringify(this.cityUser)
                 }
             })
             .then(
-                res => {
-                    if(res) {
-                        this.cities = res.data;
+                response => {
+                    if(response) {
+                        this.moderators = [];
+                        this.moderators = response.data;
+                        console.log(response.data);
                     }
                 }
             ).catch(
                 error => {
                     console.log(error);
                 }
-            );  
+            ); 
+        },
+        selectCities() {
+            axios({
+                method: 'get',
+                url: '/api/cities_to_works',
+            })
+            .then(
+                response => {
+                    if(response) {
+                        this.cities = response.data
+                    }
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            ); 
         },
         editItem (item) {
             this.editedIndex = this.desserts.indexOf(item);

@@ -19,12 +19,18 @@ class ClientsController extends Controller
     */
     public function index(Request $request)
     {
-        if($request->city) {
-            $clients = Clients::with('cities', 'users', 'comments')->where('city_id', $request->city)->get();
+        if(json_decode($request->city)) {
+            $arr = [];
+            foreach (json_decode($request->city) as $key => $value) {
+                $arr[] = $value->city_id;
+            }
+            $clients = Clients::with('cities', 'users', 'comments')->whereIn('city_id', $arr)->get();   
         }
-        else {
-            $clients = Clients::with('cities', 'users' , 'comments')->get();
+
+        if(!json_decode($request->city)) {
+            $clients = Clients::with('cities', 'users' , 'comments')->get();  
         }
+
         return ClientsResource::collection($clients);
     }
 

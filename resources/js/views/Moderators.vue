@@ -46,7 +46,7 @@ export default {
                     validate: 'required',
                     value: 'address',
                     selectText: 'name',
-                    TableGetIdName: 'city',
+                    TableGetIdName: 'address',
                     input: "select",
                 },
                 {

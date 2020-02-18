@@ -229,7 +229,9 @@ export default {
                 return this.cityUser;
             }
             if(this.isLoggedUser.managers) {
-                return this.cityUser = this.isLoggedUser.managers.city_id;
+                let arr = [];
+                arr.push({'city_id': this.isLoggedUser.managers.city_id});
+                return this.cityUser = arr;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
                 return this.cityUser = null;

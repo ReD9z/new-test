@@ -363,10 +363,14 @@ export default {
         },
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
-                return this.isLoggedUser.moderators.city_id;
+                this.cityUser = this.isLoggedUser.moderators.addresses;
+                return this.cityUser;
             }
             if(this.isLoggedUser.managers) {
-                return this.isLoggedUser.managers.city_id;
+                let arr = [];
+                arr.push({'city_id': this.isLoggedUser.managers.city_id});
+                return this.cityUser = arr;
+
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
                 return null;
@@ -435,9 +439,9 @@ export default {
                 params: {
                     dateStart: this.dateStartFormatted,
                     dateEnd: this.dateEndFormatted,
-                    city: this.roleUserCity(),
+                    city: JSON.stringify(this.roleUserCity()),
                     user: this.roleUserId(),
-                    cityOrder: this.roleUserCity(),   
+                    cityOrder: JSON.stringify(this.roleUserCity()),   
                 }
             })
             .then(

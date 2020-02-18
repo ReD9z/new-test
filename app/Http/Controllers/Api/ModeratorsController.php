@@ -20,7 +20,17 @@ class ModeratorsController extends Controller
     */
     public function index(Request $request)
     {
-        $moderators = Moderators::with('users', 'cities', 'addresses.city')->get();
+        if(json_decode($request->city)) {
+            $arr = [];
+            foreach (json_decode($request->city) as $key => $value) {
+                $arr[] = $value->city_id;
+            }
+            $moderators = Moderators::with('users', 'addresses')->get();
+        }
+
+        if(!json_decode($request->city)) {
+            $moderators = Moderators::with('users', 'addresses')->get();  
+        }
     
         return ModeratorsResource::collection($moderators);
     }
@@ -76,23 +86,10 @@ class ModeratorsController extends Controller
                     }
 
                     $arr[] = $value['id'];
-                    // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)
                 }
-                // dd($arr);
                 $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->whereNotIn('city_id', $arr);
                 $moderatorAddress->delete();
-                // dd($request->address);
-                // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->get();
-                // foreach ($variable as $key => $value) {
-                //     # code...
-                // }
-                // dd($moderatorAddress);
-                // $newModeratorAddress = new ModeratorAddresses;
-                // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->get();
-                // dd($arr);
             }
-            // $moderatorAddress = ModeratorAddresses::where('moderator_id', $moderator->id)->get();
-            // $moderatorAddress = ;
             
             return new ModeratorsResource($moderator);
         }        

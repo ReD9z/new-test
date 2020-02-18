@@ -28,7 +28,6 @@ Vue.use(Vuex);
 Validator.localize({ ru: ruVee })
 Vue.use(VeeValidate, { inject: false, locale: 'ru' })
 Vue.use(VeeValidateLaravel);
-// Vue.use(VueFuse);
 
 
 let token = window.localStorage.getItem('token');
@@ -55,6 +54,7 @@ Vue.component('b-add-client', require('./components/bAddClient.vue').default);
 Vue.component('b-task-manager', require('./components/tables/task/bTableTaskManager.vue').default);
 Vue.component('b-address-images', require('./components/tables/address/bTableAddressImage.vue').default);
 Vue.component('b-address-moderator', require('./components/tables/bTableModerator.vue').default);
+Vue.component('b-address-manager', require('./components/tables/bTableManager.vue').default);
 
 let router = new VueRouter({
     mode: 'history',

@@ -253,7 +253,9 @@ export default {
                 return this.cityUser = this.isLoggedUser.moderators.city_id;
             }
             if(this.isLoggedUser.managers) {
-                return this.cityUser = this.isLoggedUser.managers.city_id;
+                let arr = [];
+                arr.push({'city_id': this.isLoggedUser.managers.city_id});
+                return this.cityUser = arr;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
                 return this.cityUser = null;
@@ -318,7 +320,7 @@ export default {
                 url: this.params.baseUrl,
                 params: {
                     user: this.roleUserId(),
-                    city: this.roleUserCity()
+                    city: JSON.stringify(this.roleUserCity())
                 }
             })
             .then(
@@ -458,7 +460,7 @@ export default {
                         url: element.selectApi,
                         params: {
                             user: this.roleUserId(),
-                            city: this.roleUserCity()
+                            city: JSON.stringify(this.roleUserCity())
                         }
                     })
                     .then(
