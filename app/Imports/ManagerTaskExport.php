@@ -3,6 +3,9 @@
 namespace App\Imports;
 
 use App\Models\ManagerTask;
+use App\User;
+use App\Models\Clients;
+use App\Models\CitiesToWorks;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
@@ -20,13 +23,28 @@ class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkRead
         foreach ($rows as $key => $row) 
         {
             if($key != 0 && !empty($row[0])) {
-                $client = ManagerTask::createClient($row[2], $row[3], $row[4], $row[5], $row[6]);
+                $cityName = $row[2];
+                $nameOrganization = $row[3]; 
+                $nameClient = $row[4]; 
+                $phone = $row[5]; 
+                $email = $row[6];
+                $cityId = null;
+
+                $userId = User::createUser($nameClient, $phone, $email);
+
+                if($cityName) {
+                    $cityId = CitiesToWorks::createCity($cityName);
+                }
+
+                $client = Clients::createClient($cityId, $userId, $nameOrganization);
+
                 $item = ManagerTask::create([
                     'task_date_completion' => is_numeric($row[1]) ? gmdate("Y-m-d H:i:s", ($row[1] - 25569) * 86400) : null,
-                    'client_id' => $client,
+                    'client_id' => null,
                     'status' => $row[1] ? 2 : 1,
                     'comment' => $row[7]
                 ]);
+                
             }
         }
     }
@@ -38,6 +56,6 @@ class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkRead
 
     public function chunkSize(): int
     {
-        return 10000000000;
+        return 1000000000;
     }
 }

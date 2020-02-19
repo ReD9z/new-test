@@ -7,6 +7,13 @@ use Illuminate\Support\Facades\DB;
 
 class Clients extends Model
 {
+    protected $fillable = [
+        'users_id',
+        'city_id',
+        'legal_name',
+        'actual_title'
+    ];
+
     public function cities() {
         return $this->belongsTo('App\Models\CitiesToWorks', 'city_id');
     }
@@ -49,5 +56,29 @@ class Clients extends Model
     public static function editComment($id, $comment)
     {
         DB::table('comment_to_files')->where('id',  $id)->update(['comment' => $comment]);
+    }
+
+    public static function mb_ucfirst($word)
+    {
+        return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
+    }
+
+    public static function createClient($cityId, $userId, $nameOrganization)
+    {
+        $clientId = null;
+        
+        $clients = Clients::with('cities', 'users', 'comments')->where('users_id', $userId)->first();
+        if(!$clients) {
+            $clients = Clients::create([
+                'users_id' => $userId ? $userId : null,
+                'city_id' => $cityId ? $cityId : null,
+                'legal_name' => $nameOrganization ? self::mb_ucfirst($nameOrganization) : null,
+                'actual_title' => $nameOrganization ? self::mb_ucfirst($nameOrganization) : null
+            ]);
+        } else {
+            $clientId = $clients->id;
+        }
+        
+        return $clientId;
     }
 }

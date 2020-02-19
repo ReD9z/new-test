@@ -33,57 +33,9 @@ class ManagerTask extends Model
         }
         return $mostRecent ? date("d.m.Y", $mostRecent) : null;
     }
+
     public static function mb_ucfirst($word)
     {
         return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
-    }
-    public static function createClient($city, $nameOrganization, $nameClient, $phone, $email)
-    {
-        $toUsersId = null;
-        if(!empty($email) && $email != " "){
-            $users = User::where('email', self::mb_ucfirst($email))->first();
-            if($users) {
-                $toUsersId = $users->id;
-            }else {
-                $toUsers = new User;
-                $toUsers->name = $nameClient;
-                $toUsers->email = $email;
-                $toUsers->phone = $phone;
-                $toUsers->login = null;
-                $toUsers->role = 'client';
-                $toUsers->password = null;
-                $token = $toUsers->createToken('Laravel Password Grant Client')->accessToken;
-                $toUsers->save();
-                $toUsersId = $toUsers->id;
-            }
-        }
-        $toCityId = null;
-        if(!empty($email) && $email != " "){ 
-            $citywork = CitiesToWorks::where('name', self::mb_ucfirst($city))->first();
-            if($citywork) {
-                $toCityId = $citywork->id;
-            } else {
-                $toWorks = new CitiesToWorks;
-                $toWorks->name = self::mb_ucfirst($city);
-                $toWorks->save();
-                $toCityId = $toWorks->id;
-            }
-        }
-        $toClientID = null;
-        if($toUsersId) {
-            $clients = Clients::with('cities', 'users', 'comments')->where('users_id', $toUsersId)->first();
-            if($clients) {
-                $toClientID = $clients->id;
-            } else {
-                $clientsNew = new Clients;
-                $clientsNew->users_id = $toUsersId;
-                $clientsNew->city_id = $toCityId;
-                $clientsNew->legal_name = self::mb_ucfirst($nameOrganization);
-                $clientsNew->actual_title = self::mb_ucfirst($nameOrganization);
-                $clientsNew->save();
-                $toClientID = $clientsNew->id;
-            }
-        }
-        return $toClientID;
     }
 }

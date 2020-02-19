@@ -57,4 +57,28 @@ class User extends Authenticatable
     {
         return $this->hasOne('App\Models\Clients', 'users_id', 'id');
     }
+
+    public static function mb_ucfirst($word)
+    {
+        return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
+    }
+
+    public static function createUser($nameClient, $phone, $email)
+    {
+        $userId = null;
+        $users = User::where('email', self::mb_ucfirst($email))->first();
+        if(!$users) {
+            $user = User::create([
+                'name' => $nameClient ? $nameClient : null,
+                'email' => $email ? $email : null,
+                'phone' => $phone ? $phone : null,
+                'role' => 'client',
+            ]);
+            $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+            $userId = $user->id;
+        } else {
+            $userId = $users->id;
+        }
+        return $userId;
+    }
 }
