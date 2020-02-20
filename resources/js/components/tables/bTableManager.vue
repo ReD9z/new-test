@@ -169,6 +169,7 @@ export default {
             let arr = [];
             arr.push({'city_id': val});
             this.cityUser = arr;
+            console.log(this.cityUser);
             this.selectModerator();
         },
         search: _.debounce(function () {

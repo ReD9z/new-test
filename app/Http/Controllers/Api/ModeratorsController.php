@@ -25,7 +25,15 @@ class ModeratorsController extends Controller
             foreach (json_decode($request->city) as $key => $value) {
                 $arr[] = $value->city_id;
             }
-            $moderators = Moderators::with('users', 'addresses')->get();
+            // dd($arr);
+            $moderators = Moderators::with('users')->join('addresses', 'moderators.id', '=', 'addresses.city_id')->where('addresses.city_id', '=', 1)->get();
+            // dd($moderators);
+            // return response()->json([
+            //     'tasks' => ManagerTaskResource::collection($collection), 
+            //     'clients' => ClientsResource::collection($clients),
+            //     'managers' => ManagersResource::collection($managers),
+            //     'statusName' => $status
+            // ]);
         }
 
         if(!json_decode($request->city)) {

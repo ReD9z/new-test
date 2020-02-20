@@ -32,9 +32,5 @@ class EntrancesController extends Controller
         if($request->input('image')) {
             $entrances->file_id = $entrances::saveFile($request->input('image'), $request->input('date'));
         }
-
-        // if($entrances->save()) {
-        //     return new EntrancesResource($entrances);
-        // }
     }
 }

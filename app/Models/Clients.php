@@ -69,12 +69,13 @@ class Clients extends Model
         
         $clients = Clients::with('cities', 'users', 'comments')->where('users_id', $userId)->first();
         if(!$clients) {
-            $clients = Clients::create([
+            $client = Clients::create([
                 'users_id' => $userId ? $userId : null,
                 'city_id' => $cityId ? $cityId : null,
                 'legal_name' => $nameOrganization ? self::mb_ucfirst($nameOrganization) : null,
                 'actual_title' => $nameOrganization ? self::mb_ucfirst($nameOrganization) : null
             ]);
+            $clientId = $client->id;
         } else {
             $clientId = $clients->id;
         }
