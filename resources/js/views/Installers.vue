@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-4 mt-4">
         <div class="col-md-12 mb-4 mt-4">
-            <b-table :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator'})"></b-table>
+            <b-address-installer :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator'})"></b-address-installer>
         </div>
     </div>
 </template>

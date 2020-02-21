@@ -19,7 +19,7 @@ class Moderators extends Model
     public function addresses() {
         return $this->hasMany('App\Models\ModeratorAddresses', 'moderator_id');
     }
-
+    
     public function getAddress($id)
     {
         $address = ModeratorAddresses::where('moderator_id', $id)->get();

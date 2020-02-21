@@ -9,6 +9,7 @@ use App\Models\ModeratorAddresses;
 use App\Http\Resources\Moderators as ModeratorsResource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\User;
 
 class ModeratorsController extends Controller
@@ -20,23 +21,13 @@ class ModeratorsController extends Controller
     */
     public function index(Request $request)
     {
-        if(json_decode($request->city)) {
-            $arr = [];
-            foreach (json_decode($request->city) as $key => $value) {
-                $arr[] = $value->city_id;
-            }
-            // dd($arr);
-            $moderators = Moderators::with('users')->join('addresses', 'moderators.id', '=', 'addresses.city_id')->where('addresses.city_id', '=', 1)->get();
-            // dd($moderators);
-            // return response()->json([
-            //     'tasks' => ManagerTaskResource::collection($collection), 
-            //     'clients' => ClientsResource::collection($clients),
-            //     'managers' => ManagersResource::collection($managers),
-            //     'statusName' => $status
-            // ]);
+        if($request->city){
+            $moderators = Moderators::with('addresses')->whereHas('addresses', function($query) use ($request) {
+                $query->where('city_id', '=', $request->city);
+            })->get();
         }
 
-        if(!json_decode($request->city)) {
+        if(!$request->city) {
             $moderators = Moderators::with('users', 'addresses')->get();  
         }
     
