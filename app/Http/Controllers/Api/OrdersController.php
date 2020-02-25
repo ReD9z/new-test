@@ -62,9 +62,11 @@ class OrdersController extends Controller
         
         if(!$request->isMethod('put')) {
             $orders->id = $request->input('id');
+            $orders->clients_id = $request['order']['clients_id']['id'];
+        } else {
+            $orders->clients_id = $request['order']['clients_id'];
         }
         
-        $orders->clients_id = $request['order']['clients_id'];
         $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request['dateStart']));
         $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request['dateEnd']));
         $orders->save();

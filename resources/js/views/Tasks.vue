@@ -57,6 +57,16 @@ export default {
                 },
                 {
                     input: "select",
+                    value: "photo_date",
+                    tableValue: 'photoDate',
+                    childField: 'title',
+                    text: 'Показывать дату на фото',
+                    validate: 'required',
+                    sortable: true,
+                    role: vm.$store.getters.isUserRole
+                },
+                {
+                    input: "select",
                     value: "status",
                     tableValue: 'statusName',
                     childField: 'title',

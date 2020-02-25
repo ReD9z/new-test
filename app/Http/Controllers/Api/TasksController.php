@@ -47,15 +47,17 @@ class TasksController extends Controller
                     $ordersId[] = $ordersArray[$key]['id'];
                 }
             }
-            if($request->cityOrder) {
+            if(empty($request->cityOrder)) {
                 $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where('clients.city_id', $request->cityOrder)->where('tasks','=', null);
-            } else {
+            } 
+            if(!empty($request->cityOrder)) {
                 $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where('tasks','=', null);
             }
         } else {
-            if($request->cityOrder) {
+            if(empty($request->cityOrder)) {
                 $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('clients.city_id', $request->cityOrder)->where('tasks','=', null);
-            } else {
+            } 
+            if(!empty($request->cityOrder)) {
                 $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
             }
         }
@@ -64,38 +66,57 @@ class TasksController extends Controller
             ['id' => 2, 'title' => 'Завершена']
         ];
 
-        if($request->city) {
+        $photoDate = [
+            ['id' => 1, 'title' => 'Да'], 
+            ['id' => 2, 'title' => 'Нет']
+        ];
+
+        if(empty($request->city)) {
             $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installers.city_id', $request->city); 
         }
-        else if($request->user) {
+        if(empty($request->user)) {
             $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installer_id', $request->user); 
         }
-        else {
+        if(!empty($request->city) || !empty($request->user)) {
             $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get(); 
         }
-
+    
         return response()->json([
             'tasks' => TasksResource::collection($tasks), 
             'types' => TypesToWorksResource::collection($types), 
             'orders' => OrdersResource::collection($orders),
             'installers' => InstallersResource::collection($installers),
-            'statusName' => $status
+            'statusName' => $status,
+            'photoDate' => $photoDate
         ]);
     }
 
     public function task(Request $request)
     {
         if($request->city) {
-            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installers.city_id', $request->city); 
+            $tasks = Tasks::with(['orders.orderAddress.address.entrances' => function ($query) {
+                $query->where('status', '!=', 3);
+            }, 'installers.users', 'types', 'orders.clients', 'orders.orderAddress.address.entrances.files'])->get()->where('installers.city_id', $request->city);
         }
         else if($request->user) {
-            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installer_id', $request->user); 
+            $tasks = Tasks::with(['orders.orderAddress.address.entrances' => function ($query) {
+                $query->where('status', '!=', 3);
+            }, 'installers.users', 'types', 'orders.clients', 'orders.orderAddress.address.entrances.files'])->get()->where('installer_id', $request->user);
         }
         else {
-            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get(); 
+            $tasks = Tasks::with(['orders.orderAddress.address.entrances' => function ($query) {
+                $query->where('status', '!=', 3);
+            }, 'installers.users', 'types', 'orders.clients', 'orders.orderAddress.address.entrances.files'])->get();
         }
 
-        return TaskMResource::collection($tasks);
+        $collection = collect($tasks);
+        $collection = $collection->filter(function($value) {
+            if(count($value['orders']['orderAddress']['address']['entrances']) > 0) {
+                return $value;
+            };
+        });
+
+        return TaskMResource::collection($collection);
     }
     
     public function taskAddress($id)
@@ -144,6 +165,7 @@ class TasksController extends Controller
         $tasks->types_to_works_id = $request->input('types_to_works_id');
         $tasks->status = $request->input('status');
         $tasks->task_date_completion = date("Y-m-d 00:00:00", strtotime($request->input('task_date_completion')));
+        $tasks->photo_date = $request->input('photo_date');
         $tasks->comment = $request->input('comment');
          
         if($tasks->save()) {

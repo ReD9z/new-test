@@ -285,9 +285,11 @@ export default {
         },
         editedItem: {
             status: 1,
+            photo_date: 1
         },
         defaultItem: { 
-            status: 1
+            status: 1,
+            photo_date: 1
         } 
     }),
     props: {
@@ -446,6 +448,7 @@ export default {
             })
             .then(
                 response => {
+                    console.log(response.data);
                     this.desserts = response.data.tasks;
                     this.formFilds = response.data;
                     this.filteredItems(this.desserts);

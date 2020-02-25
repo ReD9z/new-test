@@ -21,7 +21,8 @@ class CreateTasksTable extends Migration
             $table->foreign('installer_id')->references('id')->on('installers')->onDelete('cascade');
             $table->bigInteger('types_to_works_id')->unsigned()->nullable();
             $table->foreign('types_to_works_id')->references('id')->on('types_to_works')->onDelete('cascade');
-            $table->bigInteger('status')->nullable();
+            $table->bigInteger('status')->nullable()->default(1);
+            $table->bigInteger('photo_date')->nullable()->default(1);
             $table->datetime('task_date_completion')->nullable();
             $table->string('comment')->nullable();
             $table->timestamps();

@@ -25,6 +25,7 @@ class TaskM extends JsonResource
             'task_date_completion' => date("d.m.Y", strtotime($this->task_date_completion)),
             'number_addresses' => $this->orders ? count($this->orders->orderManyAddress) : null,
             'number_entrances' => $this->orders ? $this->countAdresses($this->orders->orderManyAddress) : null,
+            'photo_date' => $this->photo_date,
             'comment' => $this->comment
         ];
     }

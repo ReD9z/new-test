@@ -438,7 +438,6 @@ export default {
                 })
                 .then(
                     response => {
-                        // Обновлять при сохранении select с адресами
                         let array = response.data.data;
                         if(array != undefined) {
                             vm.desserts.push(array);
