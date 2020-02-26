@@ -48,6 +48,7 @@ class CitiesToWorksController extends Controller
 
         $toWorks->id = $request->input('id');
         $toWorks->name = mb_ucfirst($request->input('name'));
+        $toWorks->coordinates = CitiesToWorks::getCoordinates(mb_ucfirst($request->input('name')));
     
         if($toWorks->save()) {
             return new CitiesToWorksResource($toWorks);

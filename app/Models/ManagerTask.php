@@ -15,12 +15,15 @@ class ManagerTask extends Model
         'comment',
         'result'
     ];
+
     public function clients() {
         return $this->belongsTo('App\Models\Clients', 'client_id');
     }
+
     public function managers() {
         return $this->belongsTo('App\Models\Managers', 'manager_id');
     }
+    
     public function TaskEndDate($id)
     {
         $clients = ManagerTask::where('client_id', $id)->first();

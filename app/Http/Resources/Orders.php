@@ -20,6 +20,7 @@ class Orders extends JsonResource
             'orderClient' => $this->clients ? 'Заказ #'.$this->id.' - '.$this->clients->users->name : null,
             'clients_name' => $this->clients ? $this->clients->users->name : null,
             'city_id' => $this->clients ? $this->clients->city_id : null,
+            'city' => $this->clients ? $this->clients->cities->coordinates : null,
             'clients_id' => $this->clients_id,
             'client' => $this->clients,
             'task' => $this->tasks,

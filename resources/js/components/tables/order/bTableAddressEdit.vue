@@ -104,6 +104,23 @@
             <v-toolbar color="pink" dark>
                 <v-toolbar-title>Изображения</v-toolbar-title>
                 <v-spacer></v-spacer>
+                <v-progress-circular
+                    :rotate="360"
+                    :size="50"
+                    :width="6"
+                    color="silver"
+                    :value="statusEnded"
+                >
+                    {{statusEnded}}
+                </v-progress-circular>
+                <v-spacer></v-spacer>
+                <v-btn
+                    color="blue-grey"
+                    class="white--text"
+                >
+                    Скачать
+                    <v-icon right dark>cloud_upload</v-icon>
+                </v-btn>
                 <v-icon v-if="hideElem()" right dark @click='pickImages'>control_point</v-icon>
                 <input type="file" ref="images" name='file' accept="image/*" style="display: none" @change="elementLoadToFileImage" multiple>
                 <v-btn icon @click="close">
@@ -264,7 +281,7 @@
             <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
     </v-data-table>
-    <b-maps :items="mapItems" v-if="mapItems.length > 0"></b-maps>
+    <b-maps :items="mapItems" v-if="mapItems.length > 0" :city="editedItem.city"></b-maps>
 </v-flex>
 </template>
 <script>
@@ -285,6 +302,7 @@ export default {
         desserts: [],
         renderComponent: true,
         editedIndex: -1,
+        statusEnded: 0,
         editedItem: {},
         defaultItem: {},
         select: [],
@@ -677,16 +695,30 @@ export default {
         },
         editPhotos(item) {
             const images = item.images;
-            const filter = images.filter(img => {
+            const numberEntrances = item.number_entrances;
+            let number = 0;
+            // console.log(this.statusEnded);
+            // console.log(item);
+            const filter = images.filter((img, key) => {
                 if(img.entrances) {
+                    // console.log(img.entrances.status);
                     if(img.entrances.order_address.order_id == item.data.order_id) {
                         return img;
                     }
                 } 
                 if(!img.entrances) {
+                    number = number + key;
                     return img;
                 }
             });
+
+            // if (this.value === 100) {
+            //     return (this.value = 0)
+            // }
+            // this.value += 10
+
+            // console.log(number);
+            // this.statusEnded = Math.round(100 / number);
 
             this.addOrderImages = filter;
             this.addOrder = Object.assign({}, item.data);

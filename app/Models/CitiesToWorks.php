@@ -8,7 +8,8 @@ class CitiesToWorks extends Model
 {
     protected $fillable = [
         'id',
-        'name'
+        'name',
+        'coordinates'
     ];
      public static function mb_ucfirst($word)
     {
@@ -27,5 +28,13 @@ class CitiesToWorks extends Model
             $cityId = $citywork->id;
         }
         return $cityId;
+    }
+    public static function getCoordinates($value)
+    {
+        $api = new \Yandex\Geo\Api();
+        $api->setQuery($value);
+        $api->setLimit(1)->setLang(\Yandex\Geo\Api::LANG_RU)->load();
+        $response = $api->getResponse();
+        return $response->getLatitude().', '.$response->getLongitude();
     }
 }

@@ -24,6 +24,7 @@
 export default {
     props: {
         items: Array,
+        city: String
     },
     data: () => ({
         mapLoader:true,
@@ -36,11 +37,10 @@ export default {
     methods: {
         initializeYandexMap() { 
             let vm = this;
-           
             ymaps.ready().done(function (ym) {
                 var myMap = new ymaps.Map('orderMaps', {
-                    center: [64.25926230053398, 108.11586741406248],
-                    zoom: 3
+                    center: vm.city.split(', '),
+                    zoom:11
                 }, {
                         searchControlProvider: 'yandex#search'
                 }),
@@ -69,7 +69,7 @@ export default {
                         "hintContent": item.city + ", " + item.street + ", " + item.house_number,
                     },
                     "options": {
-                        "preset": "islands#blueIcon"
+                        "preset": item.entrancesStatus == 1 ? "islands#redIcon" : "islands#greenIcon"
                     }
                 },
             );

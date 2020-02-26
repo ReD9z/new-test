@@ -29,6 +29,7 @@ class AddressRoleUser extends JsonResource
             'images' => $this->getImagesRole($this->id),
             'data' => null,
             'result' => $this->status($this->orderAddress),
+            'entrancesStatus' => $this->entrancesStatus($this->entrances),
             'entrances' => $this->entrances,
             'files' => null
         ];

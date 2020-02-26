@@ -16,6 +16,7 @@ class CreateCitiesToWorksTable extends Migration
         Schema::create('cities_to_works', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name')->nullable();
+            $table->string('coordinates')->nullable();
             $table->timestamps();
         });
     }

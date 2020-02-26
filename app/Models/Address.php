@@ -183,7 +183,11 @@ class Address extends Model
         $entrances = Entrances::where([
             ['address_id', $id], 
             ['file_id', '!=', null],
-            ['status', '!=', 0]
+            ['status', '=', 3],
+            ['shield', '=', 3],
+            ['glass', '=', 3],
+            ['information', '=', 3],
+            ['mood', '=', 3]
         ])->pluck('file_id')->all();
 
         $address = ImagesToOrders::with('orders')->where([
@@ -195,6 +199,20 @@ class Address extends Model
         $files = Files::with('entrances.orderAddress')->whereIn('id', $result)->get();
         
         return $files ? $files : null;
+    }
+
+    public function entrancesStatus($entrances)
+    {
+        $status = 1;
+        foreach ($entrances as $key => $value) {
+            if($value->status == 3) {
+                $status = 3;
+            }
+            else{
+                $status = 1;
+            }
+        }
+        return $status;
     }
 
     public static function editEntrances($data, $id) {
