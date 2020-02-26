@@ -718,7 +718,7 @@ export default {
             // this.value += 10
 
             // console.log(number);
-            // this.statusEnded = Math.round(100 / number);
+            this.statusEnded = Math.round(100 / Math.ceil(numberEntrances / number));
 
             this.addOrderImages = filter;
             this.addOrder = Object.assign({}, item.data);
