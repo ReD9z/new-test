@@ -26,6 +26,7 @@ class AddressRoleUser extends JsonResource
             'management_company' => $this->management_company,
             'status' => $this->orderAddress,
             'coordinates' => $this->coordinates,
+            'addressName' => "г.{$this->cities->name}, ул.{$this->street}, {$this->house_number}",
             'images' => $this->getImagesRole($this->id),
             'data' => null,
             'result' => $this->status($this->orderAddress),

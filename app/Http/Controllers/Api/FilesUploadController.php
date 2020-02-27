@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use App\Models\Files;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Response;
+use File;
+use ZipArchive;
 
 class FilesUploadController extends Controller
 {
@@ -30,6 +33,27 @@ class FilesUploadController extends Controller
         
         return response()->json(['errors' => [], 'files' => $loadfile, 'status' => 200], 200);
     }
+
+    public function downloadFiles(Request $request)
+    {
+        $zip = new ZipArchive;
+        $names = str_replace("/", "-", $request->all()['addressName']);
+        $fileName = "files/{$names}.zip";
+        File::delete($fileName);
+        // response()->delete(public_path($fileName), $names);
+   
+        if ($zip->open(public_path($fileName), ZipArchive::CREATE) === TRUE)
+        {
+            foreach ($request->all()['images'] as $key => $value) {
+                $zip->addFile(public_path($value['url'], str_replace("/storage/upload/", "", $value['url'])), str_replace("/storage/upload/", "", $value['url']));
+            }
+            
+            $zip->close();
+        }
+
+        return response()->download(public_path($fileName), $names);
+    }
+
 
     public function remove(Request $request)
     {

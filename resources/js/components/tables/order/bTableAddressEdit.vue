@@ -115,10 +115,14 @@
                 </v-progress-circular>
                 <v-spacer></v-spacer>
                 <v-btn
+                    :loading="downLoadFile"
+                    :disabled="downLoadFile"
                     color="blue-grey"
                     class="white--text"
+                    v-if="addOrderImages.length > 0"
+                    @click="downloadFiles(addOrderImages)"
                 >
-                    Скачать
+                    Скачать отчет
                     <v-icon right dark>cloud_upload</v-icon>
                 </v-btn>
                 <v-icon v-if="hideElem()" right dark @click='pickImages'>control_point</v-icon>
@@ -307,6 +311,7 @@ export default {
         defaultItem: {},
         select: [],
         addOrderImages: [],
+        getAddress: {},
         dateStartFormatted: null,
         dateEndFormatted: null,
         keywords: '',
@@ -326,6 +331,7 @@ export default {
         cityUser: null,
         selected: [],
         mapItems: [],
+        downLoadFile: false,
         cityClient: null,
         addOrder: []
     }),
@@ -554,6 +560,29 @@ export default {
                 }
             );
         },
+        downloadFiles(item) {
+            this.downLoadFile = true;
+            axios({
+                method: 'post',
+                url: '/api/downloadFiles',
+                data: this.getAddress,
+                responseType: 'blob',
+            }).then(
+                res => {
+                    const url = window.URL.createObjectURL(new Blob([res.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', this.getAddress.addressName + '.zip'); //or any other extension
+                    document.body.appendChild(link);
+                    link.click();
+                    this.downLoadFile = false;
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            );
+        },
         refreshSearch() {
             this.chips = [];
             this.loading = true;
@@ -694,31 +723,22 @@ export default {
             this.dateEnd =  this.$moment(vm.order.order_end_date, "DD-MM-YYYY").format("YYYY-MM-DD");
         },
         editPhotos(item) {
+            this.getAddress = item;
             const images = item.images;
-            const numberEntrances = item.number_entrances;
-            let number = 0;
-            // console.log(this.statusEnded);
-            // console.log(item);
-            const filter = images.filter((img, key) => {
+            const numberEntrances = Number(item.number_entrances);
+            const filter = images.filter(img => {
                 if(img.entrances) {
-                    // console.log(img.entrances.status);
                     if(img.entrances.order_address.order_id == item.data.order_id) {
                         return img;
                     }
                 } 
                 if(!img.entrances) {
-                    number = number + key;
                     return img;
                 }
             });
 
-            // if (this.value === 100) {
-            //     return (this.value = 0)
-            // }
-            // this.value += 10
-
-            // console.log(number);
-            this.statusEnded = Math.round(100 / Math.ceil(numberEntrances / number));
+            let number = filter.filter(item => item.entrances != null).length;
+            this.statusEnded = Math.round(100 / (numberEntrances / number));
 
             this.addOrderImages = filter;
             this.addOrder = Object.assign({}, item.data);
