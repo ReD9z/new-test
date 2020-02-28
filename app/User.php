@@ -68,14 +68,14 @@ class User extends Authenticatable
         $userId = null;
         $users = User::where('email', self::mb_ucfirst($email))->first();
         if(!$users) {
-            $user = User::create([
-                'name' => $nameClient ? $nameClient : null,
-                'email' => $email ? $email : null,
-                'phone' => $phone ? $phone : null,
-                'role' => 'client',
-            ]);
-            $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-            $userId = $user->id;
+            $newUsers = new User;
+            $newUsers->name =  $nameClient;
+            $newUsers->email = $email;
+            $newUsers->phone = $phone;
+            $newUsers->role = 'client';
+            $token = $newUsers->createToken('Laravel Password Grant Client')->accessToken;
+            $newUsers->save();
+            $userId = $newUsers->id;
         } else {
             $userId = $users->id;
         }

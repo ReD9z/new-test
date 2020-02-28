@@ -483,6 +483,7 @@ export default {
                     this.filteredItems(this.desserts);
                     this.filteredClient(this.desserts); 
                     this.filteredStatus(this.desserts);
+                    console.log(this.desserts);
                     this.loading = false;
                 }
             ).catch(error => {

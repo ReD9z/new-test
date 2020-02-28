@@ -17,7 +17,7 @@ export default {
                     align: 'left',
                     sortable: true,
                     value: 'client_id',
-                    childField: 'name',
+                    childField: 'legal_name',
                     tableValue: 'clients',
                     input: "select",
                     validate: 'required'

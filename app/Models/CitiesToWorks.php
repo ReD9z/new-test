@@ -22,6 +22,7 @@ class CitiesToWorks extends Model
         if(!$citywork) {
             $cities = CitiesToWorks::create([
                 'name' => $cityName ? self::mb_ucfirst($cityName) : null,
+                'coordinates' => $cityName ? self::getCoordinates(self::mb_ucfirst($cityName)) : null
             ]);
             $cityId = $cities->id;
         } else {

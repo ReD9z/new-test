@@ -35,13 +35,13 @@ class ManagerTaskController extends Controller
         ];
 
         if($request->city) {
-            $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get()->where('managers.city_id', $request->city); 
+            $tasks = ManagerTask::with('clients.users', 'managers.users', 'managers')->get()->where('managers.city_id', $request->city); 
         }
         else if($request->user) {
-            $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get()->where('manager_id', $request->user); 
+            $tasks = ManagerTask::with('clients.users', 'managers.users', 'managers')->get()->where('manager_id', $request->user); 
         }
         else {
-            $tasks = ManagerTask::with('clients', 'managers.users', 'managers')->get(); 
+            $tasks = ManagerTask::with('clients.users', 'managers.users', 'managers')->get(); 
         }
 
         $collection = collect($tasks);

@@ -26,17 +26,18 @@ class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkRead
                 $cityName = $row[2];
                 $nameOrganization = $row[3]; 
                 $nameClient = $row[4]; 
-                $phone = $row[5] ? $row[5] : null; 
-                $email = $row[6] ? $row[6] : null;
+                $phone = $row[5]; 
+                $email = $row[6];
 
                 $cityId = null;
                 $client = null;
                 $userId = null;
 
-                if($email) {
-                    $userId = User::createUser($nameOrganization, $phone, $email);
-                }
 
+                if($nameOrganization) {
+                    $userId = User::createUser($nameClient, $phone, $email);
+                }
+        
                 if($cityName) {
                     $cityId = CitiesToWorks::createCity($cityName);
                 }

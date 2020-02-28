@@ -16,8 +16,8 @@ export default {
                     text: 'Клиент',
                     align: 'left',
                     value: 'client',
-                    selectText: 'name',
-                    TableGetIdName: 'name',
+                    selectText: 'legal_name',
+                    TableGetIdName: 'legal_name',
                     selectApi: '/api/clients',
                     input: "select",
                     validate: 'required'

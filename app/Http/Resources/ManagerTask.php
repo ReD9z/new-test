@@ -23,7 +23,7 @@ class ManagerTask extends JsonResource
             'task_date_completion' => $this->task_date_completion ? date("d.m.Y", strtotime($this->task_date_completion)) : null,
             'comment' => $this->comment,
             'email' => $this->clients ? $this->clients->users ? $this->clients->users->email : null : null,
-            'phone' => $this->clients ? $this->clients->users ? $this->clients->users->phone: null  : null,
+            'phone' => $this->clients ? $this->clients->users ? $this->clients->users->phone : null : null,
             'task_date_ended' => $this->TaskEndDate($this->client_id),
             'result' => $this->result,
             'created_at' => $this->clients ? date("d.m.Y", strtotime($this->clients->created_at)) : null,

@@ -257,9 +257,9 @@ export default {
         }
     },
     created () {
-        this.initialize();
-        this.selectStatus();
         this.initializeOrder();
+        this.selectStatus();
+        this.initialize();
         this.getFiltered();
     },
     methods: {

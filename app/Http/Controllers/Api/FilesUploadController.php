@@ -40,7 +40,6 @@ class FilesUploadController extends Controller
         $names = str_replace("/", "-", $request->all()['addressName']);
         $fileName = "files/{$names}.zip";
         File::delete($fileName);
-        // response()->delete(public_path($fileName), $names);
    
         if ($zip->open(public_path($fileName), ZipArchive::CREATE) === TRUE)
         {

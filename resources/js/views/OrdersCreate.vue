@@ -17,8 +17,8 @@ export default {
                     align: 'left',
                     sortable: true,
                     value: 'clients_id',
-                    selectText: 'name',
-                    TableGetIdName: 'name',
+                    selectText: 'legal_name',
+                    TableGetIdName: 'legal_name',
                     selectApi: '/api/clients',
                     input: "select",
                     validate: 'required'

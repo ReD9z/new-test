@@ -379,10 +379,10 @@ export default {
         }
     },
     async created () {
-        await this.initializeOrder();
         await this.initialize();
-        await this.getFiltered();
+        await this.initializeOrder();
         await this.selectStatus();
+        await this.getFiltered();
     },
     methods: {
         cityGet(item) {
@@ -572,7 +572,7 @@ export default {
                     const url = window.URL.createObjectURL(new Blob([res.data]));
                     const link = document.createElement('a');
                     link.href = url;
-                    link.setAttribute('download', this.getAddress.addressName + '.zip'); //or any other extension
+                    link.setAttribute('download', this.getAddress.addressName + '.zip');
                     document.body.appendChild(link);
                     link.click();
                     this.downLoadFile = false;
@@ -622,6 +622,7 @@ export default {
         },
         initialize() {
             this.loading = true;
+            console.log("wegweg");
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
