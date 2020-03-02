@@ -108,15 +108,15 @@ class TasksController extends Controller
                 $query->where('status', '!=', 3);
             }, 'installers.users', 'types', 'orders.clients', 'orders.orderAddress.address.entrances.files'])->get();
         }
-
-        $collection = collect($tasks);
+    
+        $collection = collect(TaskMResource::collection($tasks));
         $collection = $collection->filter(function($value) {
-            if(count($value['orders']['orderAddress']['address']['entrances']) > 0) {
+            if($value['number_addresses'] > 0) {
                 return $value;
             };
         });
 
-        return TaskMResource::collection($collection);
+        return $collection;
     }
     
     public function taskAddress($id)

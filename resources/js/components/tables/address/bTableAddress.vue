@@ -469,13 +469,14 @@ export default {
             }, 300)
             this.$validator.reset()
         },
-        async save () {
+        save () {
             let vm = this;
-            this.loaderSaveBtn = true;
-            this.loadingSaveBtn = true;
-            
-            await this.$validator.validateAll().then(() => {
+
+            this.$validator.validateAll().then(() => {
                 if(this.$validator.errors.items.length == 0) {
+                    this.loaderSaveBtn = true;
+                    this.loadingSaveBtn = true;
+            
                     let method = null;
                     if (this.editedIndex > -1) {
                         method = 'put'
@@ -500,6 +501,8 @@ export default {
                             this.$refs.forms.reset();
                         }
                     ).catch(error => {
+                        this.loaderSaveBtn = null;
+                        this.loadingSaveBtn = false;
                         console.log(error);
                     }) 
                 } else {

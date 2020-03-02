@@ -29,6 +29,10 @@ class AddressToOrders extends Model
         DB::table('images_to_orders')->where('files_id', '=', $id)->delete();
     }
 
+    public function entrances() {
+        return $this->hasMany('App\Models\Entrances', 'address_to_orders_id');
+    }
+
     public function statusAddress($id)
     {
         $entrances = Entrances::where('address_to_orders_id', $id)->get();

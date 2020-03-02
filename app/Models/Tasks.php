@@ -41,14 +41,31 @@ class Tasks extends Model
       
     }
 
-    public function countAdresses($address)
+    public function countEntrances($id)
     {
-        $count = 0;
-        foreach ($address as $key => $value) {
-            $count = $count + $value->address->number_entrances;
-        }
-        return $count;
+        $torders = AddressToOrders::with('address', 'orders', 'files', 'entrances')->where('order_id', $id)->pluck('id')->all();
+     
+        $entrances = Entrances::with('address')->where('status', '!=', 3)->whereIn('address_to_orders_id', $torders)->get();
+        
+        return count($entrances);
     }
+    
+    public function countAdresses($id)
+    {
+        $torders = AddressToOrders::where('order_id', $id)->with(['entrances' => function ($query) {
+                $query->where('status', '!=', 3);
+        }, 'address', 'orders', 'files'])->get();
+        
+        $collection = collect($torders);
+        $collection = $collection->filter(function($value) {
+            if(count($value['entrances']) > 0) {
+                return $value;
+            };
+        });
+        
+        return count($collection);
+    }
+
 
     public function orderTask($id)
     {

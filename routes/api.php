@@ -132,7 +132,7 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::put('tasks', 'Api\TasksController@store');  // Edit one item
         Route::delete('tasks/{id}', 'Api\TasksController@destroy'); // Delete one item
         Route::get('tasks', 'Api\TasksController@index'); // Show list
-        Route::get('task', 'Api\TasksController@task');
+       
         Route::get('taskAddress/{id}', 'Api\TasksController@taskAddress');
         Route::get('taskEntrances/{id}', 'Api\TasksController@taskEntrances');
         
@@ -148,4 +148,5 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::get('entrances/{id}', 'Api\EntrancesController@index');
         Route::put('entrancesSave', 'Api\EntrancesController@store'); // Save one item
     });
+     Route::get('task', 'Api\TasksController@task');
 });
