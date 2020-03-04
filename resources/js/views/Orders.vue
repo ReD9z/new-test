@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-4 mt-4">
         <div class="col-md-12 mb-4 mt-4">
-            <b-table-order :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator', client:'client'})"></b-table-order>
+            <b-table-order :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator', client:'client', manager:'manager'})"></b-table-order>
         </div>
     </div>
 </template>

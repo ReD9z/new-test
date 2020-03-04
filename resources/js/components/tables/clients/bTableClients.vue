@@ -250,7 +250,7 @@ export default {
         },
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
-                return this.cityUser = this.isLoggedUser.moderators.city_id;
+                return this.cityUser = this.isLoggedUser.moderators.addresses;
             }
             if(this.isLoggedUser.managers) {
                 let arr = [];

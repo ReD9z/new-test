@@ -140,7 +140,7 @@ let routers =  [
             title: 'Клиенты',
             requiresAuth: true,
             adminAuth: true,
-            moderatorAuth: false,
+            moderatorAuth: true,
             installerAuth: false,
             managerAuth: true,
             clientAuth: true   
@@ -184,7 +184,7 @@ let routers =  [
             adminAuth: true,
             moderatorAuth: true,
             installerAuth: false,
-            managerAuth: false,
+            managerAuth: true,
             clientAuth: true 
         },
         component: require('./views/Orders.vue').default
@@ -198,7 +198,7 @@ let routers =  [
             adminAuth: true,
             moderatorAuth: true,
             installerAuth: false,
-            managerAuth: false,
+            managerAuth: true,
             clientAuth: false 
         },
         component: require('./views/OrdersCreate.vue').default
@@ -212,7 +212,7 @@ let routers =  [
             adminAuth: true,
             moderatorAuth: true,
             installerAuth: false,
-            managerAuth: false,
+            managerAuth: true,
             clientAuth: true
         },
         component: require('./views/OrdersToAddress.vue').default

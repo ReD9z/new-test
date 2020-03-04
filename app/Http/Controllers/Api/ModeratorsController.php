@@ -21,14 +21,12 @@ class ModeratorsController extends Controller
     */
     public function index(Request $request)
     {
-        if($request->city){
-            $moderators = Moderators::with('addresses')->whereHas('addresses', function($query) use ($request) {
-                $query->where('city_id', '=', $request->city);
-            })->get();
+        if($request->user) {
+            $moderators = Moderators::with('users', 'addresses')->where('id', $request->user)->get();
         }
-
-        if(!$request->city) {
-            $moderators = Moderators::with('users', 'addresses')->get();  
+        
+        if(!$request->user) {
+            $moderators = Moderators::with('users', 'addresses')->get();
         }
     
         return ModeratorsResource::collection($moderators);

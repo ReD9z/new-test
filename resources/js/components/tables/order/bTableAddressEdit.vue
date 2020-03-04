@@ -29,11 +29,21 @@
                                 :data-vv-as="'`'+param.text+'`'" 
                                 :data-vv-name="param.value" 
                                 :error-messages="errors.collect(param.value)" 
+                                :disabled="loadClient"
                                 v-validate="param.validate"
                                 return-object
                                 item-value="id"
                                 :label="param.text"
                             >
+                            <template v-slot:append-outer>
+                                <v-progress-circular
+                                    v-show="loadClient"
+                                    :size="28"
+                                    :width="2"
+                                    indeterminate
+                                    color="red"
+                                ></v-progress-circular>
+                            </template>
                             </v-autocomplete>
                         </div>
                     </v-flex>
@@ -316,6 +326,7 @@ export default {
         dateEndFormatted: null,
         keywords: '',
         deleteImage: false,
+        loadClient: false,
         dateStart: null,
         dateEnd: null,
         loadingSaveBtn: false,
@@ -396,14 +407,16 @@ export default {
             }
         },
         roleUserCity() {
-            if(this.isLoggedUser.moderators) {
-                return this.cityUser = this.isLoggedUser.moderators.city_id;
-            }
             if(this.isLoggedUser.managers) {
-                return this.cityUser = this.isLoggedUser.managers.city_id;
+                let arr = [];
+                arr.push({'city_id': this.isLoggedUser.managers.city_id});
+                return this.cityClient = arr;
+            }
+            if(this.isLoggedUser.moderators) {
+                return this.cityUser = this.isLoggedUser.moderators.addresses;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
-                return this.cityUser = null;
+                return this.cityClient = null;
             }
         },
         showRoles() {
@@ -445,7 +458,7 @@ export default {
                     method: 'get',
                     url: item.api,
                     params: {
-                        city: this.roleUserCity()
+                        city: JSON.stringify(this.roleUserCity())
                     }
                 })
                 .then(
@@ -622,7 +635,6 @@ export default {
         },
         initialize() {
             this.loading = true;
-            console.log("wegweg");
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
@@ -694,28 +706,33 @@ export default {
             })
         },
         selectStatus() {
-            this.params.headerOrders.forEach(element => {
-                if(element.selectApi != undefined) {
-                    axios({
-                        method: 'get',
-                        url: element.selectApi,
-                        params: {
-                            city: this.roleUserCity()
-                        }
-                    })
-                    .then(
-                        res => {
-                            if(res) {
-                                this.select = res.data;
+            this.loadClient = true;
+            if(this.hideElem()) {
+                this.params.headerOrders.forEach(element => {
+                    if(element.selectApi != undefined) {
+                        axios({
+                            method: 'get',
+                            url: element.selectApi,
+                            params: {
+                                city: JSON.stringify(this.roleUserCity())
                             }
-                        }
-                    ).catch(
-                        error => {
-                            console.log(error);
-                        }
-                    ); 
-                }
-            });
+                        })
+                        .then(
+                            res => {
+                                if(res) {
+                                    this.select = res.data;
+                                    this.loadClient = false;
+                                }
+                            }
+                        ).catch(
+                            error => {
+                                console.log(error);
+                                this.loadClient = false;
+                            }
+                        ); 
+                    }
+                });
+            }
         },
         editItem(item) {
             let vm = this;

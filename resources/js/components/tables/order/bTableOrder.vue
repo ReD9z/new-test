@@ -217,6 +217,7 @@ export default {
         }
     },
     async created () {
+        await this.roleUserCity();
         await this.initialize();
         await this.selectStatus();
         await this.getFiltered();
@@ -270,7 +271,7 @@ export default {
                     method: 'get',
                     url: item.api,
                     params: {
-                        city: this.roleUserCity(),
+                        city: JSON.stringify(this.roleUserCity()),
                     }
                 })
                 .then(

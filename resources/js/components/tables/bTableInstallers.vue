@@ -174,6 +174,8 @@ export default {
         }, 400)
     },
     async created () {
+        await this.roleUserCity();
+        await this.roleUserId();
         await this.selectModerator();
         await this.selectCities();
         await this.initialize();
@@ -264,7 +266,7 @@ export default {
                 method: 'get',
                 url: '/api/moderators',
                 params: {
-                    city: this.cityUser
+                    user: this.userId
                 }
             })
             .then(
@@ -284,6 +286,9 @@ export default {
             axios({
                 method: 'get',
                 url: '/api/cities_to_works',
+                params: {
+                    city: JSON.stringify(this.roleUserCity())
+                }
             })
             .then(
                 response => {

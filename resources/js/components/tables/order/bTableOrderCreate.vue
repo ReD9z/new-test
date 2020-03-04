@@ -31,9 +31,19 @@
                                 :error-messages="errors.collect(param.value)" 
                                 v-validate="param.validate"
                                 return-object
+                                :disabled="loadClient"
                                 item-value="id"
                                 :label="param.text"
                             >
+                                <template v-slot:append-outer>
+                                    <v-progress-circular
+                                        v-show="loadClient"
+                                        :size="28"
+                                        :width="2"
+                                        indeterminate
+                                        color="red"
+                                    ></v-progress-circular>
+                                </template>
                             </v-autocomplete>
                         </div>
                     </v-flex>
@@ -206,6 +216,7 @@ export default {
         formData: new FormData(),
         chips: [],
         chipsItem: [],
+        loadClient: false,
         valid: true,
         order: [],
         selected: [],
@@ -257,6 +268,7 @@ export default {
         }
     },
     created () {
+        this.roleUserCity();
         this.initializeOrder();
         this.selectStatus();
         this.initialize();
@@ -264,9 +276,13 @@ export default {
     },
     methods: {
         roleUserCity() {
-            if(this.isLoggedUser.moderators || this.isLoggedUser.managers) {
-                // return this.cityUser = this.isLoggedUser.moderators.city_id;
-                return this.cityUser = null;
+            if(this.isLoggedUser.moderators) {
+                return this.cityUser = this.isLoggedUser.moderators.addresses;
+            }
+            if(this.isLoggedUser.managers) {
+                let arr = [];
+                arr.push({'city_id': this.isLoggedUser.managers.city_id});
+                return this.cityUser = arr;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
                 return this.cityUser = null;
@@ -308,7 +324,7 @@ export default {
                         method: 'get',
                         url: item.api,
                         params: {
-                            city: this.roleUserCity()
+                            city: JSON.stringify(this.roleUserCity())
                         }
                     })
                     .then(
@@ -388,7 +404,7 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: JSON.stringify(this.cityClient)
+                    city: JSON.stringify(this.roleUserCity())
                 }
             })
             .then(
@@ -445,24 +461,27 @@ export default {
             return `${month}.${day}.${year}`
         },
         selectStatus() {
+            this.loadClient = true;
             this.params.headerOrders.forEach(element => {
                 if(element.selectApi != undefined) {
                     axios({
                         method: 'get',
                         url: element.selectApi,
                         params: {
-                            city: this.roleUserCity()
+                            city: JSON.stringify(this.roleUserCity())
                         }
                     })
                     .then(
                         res => {
                             if(res) {
                                 this.select = res.data;
+                                this.loadClient = false;
                             }
                         }
                     ).catch(
                         error => {
                             console.log(error);
+                            this.loadClient = false;
                         }
                     ); 
                 }
@@ -502,7 +521,6 @@ export default {
                 if(this.$validator.errors.items.length == 0) {
                     this.loaderSaveBtn = true;
                     this.loadingSaveBtn = true;
-                  
                     axios({
                         method: 'post',
                         url: this.params.baseOrders,

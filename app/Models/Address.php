@@ -184,10 +184,10 @@ class Address extends Model
             ['address_id', $id], 
             ['file_id', '!=', null],
             ['status', '=', 3],
-            ['shield', '=', 3],
-            ['glass', '=', 3],
-            ['information', '=', 3],
-            ['mood', '=', 3]
+            ['shield', '=', 1],
+            ['glass', '=', 1],
+            ['information', '=', 1],
+            ['mood', '=', 1]
         ])->pluck('file_id')->all();
 
         $address = ImagesToOrders::with('orders')->where([

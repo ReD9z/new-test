@@ -84,7 +84,7 @@ export default {
                 [
                     { 
                         title: 'Клиенты', icon: 'how_to_reg', src: 'clients',
-                        role: {admin: 'admin'}
+                        role: {admin: 'admin', moderator: 'moderator'}
                     },
                     { 
                         title: 'Адреса', icon: 'room', src: 'address',
@@ -120,6 +120,10 @@ export default {
             { 
                 title: 'Мои заказы', icon: 'credit_card', src: 'orders',
                 role: {client: 'client'}
+            },
+            { 
+                title: 'Заказы', icon: 'credit_card', src: 'orders',
+                role: {manager: 'manager'}
             },
             { 
                 title: 'Мои клиенты', icon: 'how_to_reg', src: 'clients',
