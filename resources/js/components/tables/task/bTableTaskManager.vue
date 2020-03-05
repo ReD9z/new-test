@@ -298,6 +298,7 @@ export default {
         menu2: false,
         menu4: false,
         menu5: false,
+        userId: null
     }),
     props: {
         params: Object
@@ -419,6 +420,7 @@ export default {
                 return this.isLoggedUser.installers.id;
             }
             if(this.isLoggedUser.managers) {
+                this.userId = this.isLoggedUser.managers.id;
                 return this.isLoggedUser.managers.id;
             }
             if(!this.isLoggedUser.moderators || !this.isLoggedUser.installers || !this.isLoggedUser.managers) {
@@ -462,7 +464,6 @@ export default {
         },
         initialize() {
             this.loading = true;
-            
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
@@ -501,10 +502,15 @@ export default {
             this.dateStartClient = null;
             this.dateEndClient = null;
             let files = this.$refs.excelTask.files[0];
-            
             this.formData.append('file', files);
-            await axios.post('/api/addExcelTask', this.formData, {
-                headers: {'Content-Type': 'multipart/form-data'}
+            await axios({
+                method: 'post',
+                url: '/api/addExcelTask',
+                data: this.formData,
+                headers: {'Content-Type': 'multipart/form-data'},
+                params: {
+                    user: this.userId
+                }
             })
             .then(
                 response => {
@@ -512,9 +518,12 @@ export default {
                     this.loadingExcelTask = false;
                     this.initialize();
                 }
-            ).catch(error => {
-                console.log(error);
-            });
+            ).catch(
+                error => {
+                    console.log(error);
+                    this.loadingExcelTask = false;
+                }
+            ); 
         },
         editItem (item) {
             this.editedIndex = this.desserts.indexOf(item);

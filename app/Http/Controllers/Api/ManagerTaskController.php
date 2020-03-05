@@ -95,7 +95,7 @@ class ManagerTaskController extends Controller
 
     public function addExcelTask(Request $request)
     {
-        Excel::import(new ManagerTaskExport, $request->file('file'));
+        Excel::import(new ManagerTaskExport($request->user), $request->file('file'));
     }
 
     /**

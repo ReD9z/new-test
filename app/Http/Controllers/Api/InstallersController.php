@@ -30,6 +30,14 @@ class InstallersController extends Controller
         if(!json_decode($request->city)) {
             $installers = Installers::with('users', 'cities', 'moderator.users')->get();   
         }
+
+        if($request->user) {
+            $installers = Installers::with('users', 'cities', 'moderator.users')->where('moderator_id', $request->user)->get();   
+        }
+
+        if(!$request->user) {
+            $installers = Installers::with('users', 'cities', 'moderator.users')->get();   
+        }
         
         return InstallersResource::collection($installers);
     }

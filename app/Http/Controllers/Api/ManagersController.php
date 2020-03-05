@@ -30,6 +30,14 @@ class ManagersController extends Controller
         if(!json_decode($request->city)) {
             $managers = Managers::with('users', 'cities', 'moderator.users')->get();   
         }
+
+        if($request->user) {
+            $managers = Managers::with('users', 'cities', 'moderator.users')->where('moderator_id', $request->user)->get();   
+        }
+
+        if(!$request->user) {
+            $managers = Managers::with('users', 'cities', 'moderator.users')->get();   
+        }
        
         return ManagersResource::collection($managers);
     }

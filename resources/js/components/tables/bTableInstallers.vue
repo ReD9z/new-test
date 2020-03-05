@@ -248,7 +248,7 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: JSON.stringify(this.roleUserCity())
+                    user: this.userId
                 }
             })
             .then(
