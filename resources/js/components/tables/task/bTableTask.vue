@@ -448,7 +448,6 @@ export default {
             })
             .then(
                 response => {
-                    console.log(response.data);
                     this.desserts = response.data.tasks;
                     this.formFilds = response.data;
                     this.filteredItems(this.desserts);
@@ -485,7 +484,7 @@ export default {
                 })
                 .then(
                     response => {
-                        this.desserts.splice(index, 1);
+                        this.initialize();
                     }
                 ).catch(error => {
                     console.log(error);

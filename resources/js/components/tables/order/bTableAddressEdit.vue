@@ -635,11 +635,12 @@ export default {
         },
         initialize() {
             this.loading = true;
+            
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: JSON.stringify(this.cityClient),
+                    city: JSON.stringify(this.roleUserCity()),
                     user: this.isLoggedUser.clients ? true : null,
                     order: this.$route.params.id,
                 }

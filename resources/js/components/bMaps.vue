@@ -40,7 +40,7 @@ export default {
             ymaps.ready().done(function (ym) {
                 var myMap = new ymaps.Map('orderMaps', {
                     center: vm.city.split(', '),
-                    zoom:11
+                    zoom:8
                 }, {
                         searchControlProvider: 'yandex#search'
                 }),

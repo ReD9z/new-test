@@ -34,7 +34,6 @@ class TasksController extends Controller
         $orders = [];
 
         $types = TypesToWorks::get(); 
-        $installers = Installers::with('users', 'cities', 'moderator.users')->get();
         $ordersArray = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
 
         if($request->dateStart || $request->dateEnd) {
@@ -47,17 +46,28 @@ class TasksController extends Controller
                     $ordersId[] = $ordersArray[$key]['id'];
                 }
             }
-            if(empty($request->cityOrder)) {
-                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where('clients.city_id', $request->cityOrder)->where('tasks','=', null);
-            } 
-            if(!empty($request->cityOrder)) {
+            if(json_decode($request->cityOrder)) {
+                $arr = [];
+                foreach (json_decode($request->cityOrder) as $key => $value) {
+                    $arr[] = $value->city_id;
+                }
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->whereIn('clients.city_id', $arr)->where('tasks','=', null);
+            }
+    
+            if(!json_decode($request->cityOrder)) {
                 $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->whereIn('id', $ordersId)->get()->where('tasks','=', null);
             }
+    
         } else {
-            if(empty($request->cityOrder)) {
-                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('clients.city_id', $request->cityOrder)->where('tasks','=', null);
-            } 
-            if(!empty($request->cityOrder)) {
+            if(json_decode($request->cityOrder)) {
+                $arr = [];
+                foreach (json_decode($request->cityOrder) as $key => $value) {
+                    $arr[] = $value->city_id;
+                }
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->whereIn('clients.city_id', $arr)->where('tasks','=', null);
+            }
+    
+            if(!json_decode($request->cityOrder)) {
                 $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->where('tasks','=', null);
             }
         }
@@ -71,16 +81,14 @@ class TasksController extends Controller
             ['id' => 2, 'title' => 'Нет']
         ];
 
-        if(empty($request->city)) {
-            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installers.city_id', $request->city); 
-        }
-        if(empty($request->user)) {
-            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installer_id', $request->user); 
-        }
-        if(!empty($request->city) || !empty($request->user)) {
+        if($request->user) {
+            $installers = Installers::with('users', 'cities', 'moderator.users')->where('moderator_id', $request->user)->get();
+            $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get()->where('installers.moderator_id', $request->user); 
+        } else {
+            $installers = Installers::with('users', 'cities', 'moderator.users')->get();
             $tasks = Tasks::with('orders.clients',  'orders.orderAddress.address.entrances.files', 'installers.users', 'types')->get(); 
         }
-    
+
         return response()->json([
             'tasks' => TasksResource::collection($tasks), 
             'types' => TypesToWorksResource::collection($types), 
