@@ -60,12 +60,39 @@
                         data-vv-name="password" 
                         :error-messages="errors.collect('password')"
                         v-model="editedItem.password" 
+                        v-validate="editedItem.password ? {required:true, regex:/^\S*$/ , min:6} : ''"
                         label="Пароль" 
                         xs12 
                         class="pa-2"
                         required
                     >
-                    </v-text-field>     
+                    </v-text-field> 
+                    <v-autocomplete
+                        :items="moderator[0]"
+                        v-model="editedItem.moderator_id"
+                        item-text="name"
+                        item-value="id"
+                        class="pa-2"
+                        label="Модератор"
+                        data-vv-as="`Модератор`" 
+                        data-vv-name="moderator_id" 
+                        :error-messages="errors.collect('moderator_id')"
+                    >
+                    </v-autocomplete> 
+                </v-flex>
+                <v-flex xs12 sm6>
+                    <v-autocomplete
+                        :items="manager[0]"
+                        v-model="editedItem.manager_id"
+                        item-text="name"
+                        item-value="id"
+                        class="pa-2"
+                        label="Менеджер"
+                        data-vv-as="`Менеджер`" 
+                        data-vv-name="manager_id" 
+                        :error-messages="errors.collect('manager_id')"
+                    >
+                    </v-autocomplete>    
                     <v-autocomplete
                         :items="select[0]"
                         v-model="editedItem.city_id"
@@ -160,8 +187,6 @@
                         required
                     >
                     </v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6>
                     <v-text-field 
                         data-vv-as="`Расчётный счёт`" 
                         data-vv-name="settlement_account" 
@@ -218,6 +243,8 @@ export default {
         valid: true,
         select: [],
         client: [],
+        moderator: [],
+        manager: [],
         loadingSaveBtn: false,
         loaderSaveBtn: null,
         editedItem: {
@@ -237,7 +264,14 @@ export default {
             settlement_account: ''
         }
     }),
+    computed: {
+        isLoggedUser: function(){ 
+            return this.$store.getters.isLoggedUser;
+        }
+    },
     async created () {
+        await this.moderatorSelect();
+        await this.managerSelect();
         await this.citySelect();
     },
     methods: { 
@@ -285,10 +319,55 @@ export default {
                 }
             });
         },
+        roleUserCity() {
+            if(this.isLoggedUser.moderators) {
+               return this.cityUser = this.isLoggedUser.moderators.addresses;
+            }
+            if(this.isLoggedUser.managers) {
+                let arr = [];
+                arr.push({'city_id': this.isLoggedUser.managers.city_id});
+                return this.cityUser = arr;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return this.cityUser = null;
+            }
+        },
+        getModeratorId() {
+            if(this.isLoggedUser.moderators) {
+                return this.isLoggedUser.moderators.id;
+            } 
+            else {
+                return null
+            }
+        },
+        getManagerId() {
+            if(this.isLoggedUser.managers) {
+                return this.isLoggedUser.managers.id;
+            } 
+            else {
+                return null
+            }
+        },
+        roleUserId() {
+            if(this.isLoggedUser.moderators) {
+                return this.userId = this.isLoggedUser.moderators.id;
+            }
+            if(this.isLoggedUser.managers) {
+                return this.userId = this.isLoggedUser.managers.moderator_id;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
+                return this.userId = null;
+            }
+        },
         citySelect() {
             axios({
                 method: 'get',
                 url: '/api/cities_to_works',
+                params: {
+                    // user: this.roleUserId(),
+                    city: JSON.stringify(this.roleUserCity()),
+                    // moderator: this.getModeratorId(),
+                }
             })
             .then(
                 res => {
@@ -302,6 +381,65 @@ export default {
                 }
             ); 
         },
+        moderatorSelect() {
+            axios({
+                method: 'get',
+                url: '/api/moderators',
+                params: {
+                    user: this.roleUserId(),
+                    // city: JSON.stringify(this.roleUserCity()),
+                    moderator: this.getModeratorId(),
+                }
+            })
+            .then(
+                res => {
+                    if(res) {
+                        this.moderator.push(res.data);
+                    }
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            ); 
+        },
+        managerSelect() {
+            axios({
+                method: 'get',
+                url: '/api/managers',
+                params: {
+                    user: this.roleUserId(),
+                    moderator: this.getModeratorId(),
+                    // city: JSON.stringify(this.roleUserCity()),
+                    manager: this.getManagerId()
+                }
+            })
+            .then(
+                res => {
+                    if(res) {
+                        this.manager.push(res.data);
+                    }
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            ); 
+        },
+        dataAdd() {
+            if(this.isLoggedUser.managers) {
+                this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
+                this.editedItem['moderator_id'] = this.isLoggedUser.managers.moderator_id;
+                this.editedItem['manager_id'] = this.isLoggedUser.managers.id;
+            }
+            if(this.isLoggedUser.moderators) {
+                this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;
+                this.editedItem['moderator_id'] = this.isLoggedUser.moderators.id;
+            }
+        },
+    },
+    mounted() {
+        this.dataAdd();
     }
 }
 </script>    

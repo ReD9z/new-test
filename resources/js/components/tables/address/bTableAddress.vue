@@ -345,13 +345,7 @@ export default {
                     this.desserts = response.data.address;
                     this.selectCity = response.data.city;
                     this.areaArray = response.data.area;
-                    if(this.isLoggedUser.moderators) {
-                        this.selectArea = [];
-                        this.editedItem.city_id = this.isLoggedUser.moderators.city_id;
-                        this.selectArea = this.areaArray.filter((item) => {return item.city_id == this.editedItem.city_id});
-                        this.selectCity = this.selectCity.filter((item) => {return item.id == this.isLoggedUser.moderators.city_id});
-                    }
-
+                 
                     if(this.isLoggedUser.managers) {
                         this.selectArea = [];
                         this.editedItem.city_id = this.isLoggedUser.managers.city_id;
@@ -471,7 +465,6 @@ export default {
         },
         save () {
             let vm = this;
-
             this.$validator.validateAll().then(() => {
                 if(this.$validator.errors.items.length == 0) {
                     this.loaderSaveBtn = true;

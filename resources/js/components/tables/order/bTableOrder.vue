@@ -248,8 +248,7 @@ export default {
         hideElem() {
             if(this.isLoggedUser.clients) {
                 return false;
-            }
-            if(!this.isLoggedUser.clients) {
+            } else {
                 return true;
             }
         },

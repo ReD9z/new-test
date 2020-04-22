@@ -19,18 +19,21 @@ class ClientsController extends Controller
     */
     public function index(Request $request)
     {
-        if(json_decode($request->city)) {
+        if($request->moderator) {
+            $clients = Clients::with('cities', 'users', 'comments', 'moderator', 'manager')->where('moderator_id', $request->moderator)->get();   
+        }
+        else if($request->manager) {
+            $clients = Clients::with('cities', 'users', 'comments', 'moderator', 'manager')->where('manager_id', $request->manager)->get();   
+        }
+        else if(json_decode($request->city)) {
             $arr = [];
             foreach (json_decode($request->city) as $key => $value) {
                 $arr[] = $value->city_id;
             }
-            $clients = Clients::with('cities', 'users', 'comments')->whereIn('city_id', $arr)->get();   
+            $clients = Clients::with('cities', 'users', 'comments','moderator')->whereIn('city_id', $arr)->get();   
+        } else  {
+            $clients = Clients::with('cities', 'users' , 'comments', 'moderator', 'manager')->get();  
         }
-
-        if(!json_decode($request->city)) {
-            $clients = Clients::with('cities', 'users' , 'comments')->get();  
-        }
-
         return ClientsResource::collection($clients);
     }
 
@@ -87,7 +90,8 @@ class ClientsController extends Controller
             $clients->cor_score = $request->input('cor_score');
             $clients->settlement_account = $request->input('settlement_account');
             $clients->bank_name = $request->input('bank_name');
-
+            $clients->moderator_id = $request->input('moderator_id');
+            $clients->manager_id = $request->input('manager_id');
            
             if($clients->save()) {
                 return new ClientsResource($clients);

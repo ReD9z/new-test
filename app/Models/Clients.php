@@ -11,7 +11,9 @@ class Clients extends Model
         'users_id',
         'city_id',
         'legal_name',
-        'actual_title'
+        'actual_title',
+        'manager_id',
+        'moderator_id'
     ];
 
     public function cities() {
@@ -28,6 +30,14 @@ class Clients extends Model
 
     public function comments() {
         return $this->hasMany('App\Models\CommentToFiles', 'client_id', 'id');
+    }
+
+    public function moderator() {
+        return $this->hasOne('App\Models\Moderators', 'id', 'moderator_id');
+    }
+
+    public function manager() {
+        return $this->hasOne('App\Models\Managers', 'id', 'manager_id');
     }
 
     public static function saveTableFiles($files, $id, $comment)
@@ -63,7 +73,7 @@ class Clients extends Model
         return mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr(mb_convert_case($word, MB_CASE_LOWER, 'UTF-8'), 1, mb_strlen($word), 'UTF-8');
     }
 
-    public static function createClient($cityId, $userId, $nameOrganization)
+    public static function createClient($cityId, $userId, $nameOrganization, $manager, $moderator)
     {
         $clientId = null;
         
@@ -72,6 +82,8 @@ class Clients extends Model
             $client = Clients::create([
                 'users_id' => $userId ? $userId : null,
                 'city_id' => $cityId ? $cityId : null,
+                'moderator_id' => $manager,
+                'manager_id' =>  $moderator,
                 'legal_name' => $nameOrganization ? self::mb_ucfirst($nameOrganization) : null,
                 'actual_title' => $nameOrganization ? self::mb_ucfirst($nameOrganization) : null
             ]);

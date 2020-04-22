@@ -90,6 +90,12 @@ export default {
                     value: 'resultStatus' 
                 },
                 { 
+                    text: 'Изображения', 
+                    sortable: true,
+                    input: "img",
+                    value: 'img' 
+                },
+                { 
                     value: 'files', 
                     sortable: false,
                     input: "images",

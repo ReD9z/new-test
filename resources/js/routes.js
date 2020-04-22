@@ -53,7 +53,7 @@ let routers =  [
             title: 'Задачи менеджерам',
             requiresAuth: true,
             adminAuth: true,
-            moderatorAuth: false,
+            moderatorAuth: true,
             installerAuth: false,
             managerAuth: true,
             clientAuth: false
@@ -126,7 +126,7 @@ let routers =  [
             title: 'Районы',
             requiresAuth: true,
             adminAuth: true,
-            moderatorAuth: false,
+            moderatorAuth: true,
             installerAuth: false,
             managerAuth: false,
             clientAuth: false  

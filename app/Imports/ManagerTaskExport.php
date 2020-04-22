@@ -10,30 +10,37 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Illuminate\Support\Facades\Auth;
 
 class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkReading
 {
-    protected $user;
-
-    function __construct($user) {
-        $this->user = $user;
-    }
-
+ 
     public function collection(Collection $rows)
     {   
+        $manager = null;
+        $moderator = null;
+
+        if(Auth::user()->managers) {
+            $manager = Auth::user()->managers->id;
+            $moderator = Auth::user()->managers->moderator_id;
+        }
+        if(Auth::user()->moderators) {
+            $moderator = Auth::user()->moderators->id;
+        }
         foreach ($rows as $key => $row) 
         {
-            if($key != 0 && !empty($row[0]) && !empty($row[1]) && !empty($row[2]) && !empty($row[3]) && !empty($row[4])) {
-                $cityName = $row[2];
-                $nameOrganization = $row[3]; 
-                $nameClient = $row[4]; 
-                $phone = $row[5]; 
-                $email = $row[6];
+            if($key != 0 && !empty($row[0]) && (!empty($row[7]) || !empty($row[5]))) {
+                $cityName = !empty($row[2]) ? $row[2] : null;
+                $nameOrganization = !empty($row[3]) ? $row[3] : null; 
+                $nameClient = !empty($row[4]) ? $row[4] : null; 
+                $phone = !empty($row[5]) ? $row[5] : null; 
+                $email = !empty($row[6]) ? $row[6] : null;
+                $date = !empty($row[1]) ? $row[1] : null;
+                $comment = !empty($row[7]) ? $row[7] : null;
 
                 $cityId = null;
                 $client = null;
                 $userId = null;
-
 
                 if($nameOrganization) {
                     $userId = User::createUser($nameClient, $phone, $email);
@@ -44,15 +51,15 @@ class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkRead
                 }
 
                 if($userId) {
-                    $client = Clients::createClient($cityId, $userId, $nameOrganization);
+                    $client = Clients::createClient($cityId, $userId, $nameOrganization, $manager, $moderator);
                 }
 
                 ManagerTask::create([
-                    'task_date_completion' => is_numeric($row[1]) ? gmdate("Y-m-d H:i:s", ($row[1] - 25569) * 86400) : null,
+                    'task_date_completion' => is_numeric($date) ? gmdate("Y-m-d H:i:s", ($date - 25569) * 86400) : null,
                     'client_id' => $client,
-                    'manager_id' => $this->user,
-                    'status' => $row[1] ? 2 : 1,
-                    'comment' => $row[7]
+                    'manager_id' => $manager,
+                    'status' =>  $date ? 2 : 1,
+                    'comment' => $comment
                 ]);
                 
             }

@@ -27,7 +27,7 @@ class Tasks extends JsonResource
             'task_date_completion' => date("d.m.Y", strtotime($this->task_date_completion)),
             'comment' => $this->comment,
             'status' => $this->status,
-            'photo_date' => $this->photo_date == 1,
+            'photo_date' => $this->photo_date == 1 ? $this->photo_date : 2,
             'photoDate' => $this->photo_date == 1 ? 'Да' : 'Нет',
             'statusName' => $this->status == '1' ? 'В работе' : 'Завершена',
         ];

@@ -193,6 +193,22 @@ export default {
                 return this.cityUser = null;
             }
         },
+        getModeratorId() {
+            if(this.isLoggedUser.moderators) {
+                return this.isLoggedUser.moderators.id;
+            } 
+            else {
+                return null
+            }
+        },
+        getManagerId() {
+            if(this.isLoggedUser.managers) {
+                return this.isLoggedUser.managers.id;
+            } 
+            else {
+                return null
+            }
+        },
         roleUserId() {
             if(this.isLoggedUser.moderators) {
                 return this.userId = this.isLoggedUser.moderators.id;
@@ -248,7 +264,7 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    user: this.userId
+                    moderator: this.getModeratorId(),
                 }
             })
             .then(

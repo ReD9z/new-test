@@ -250,7 +250,7 @@ export default {
         },
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
-                return this.cityUser = this.isLoggedUser.moderators.addresses;
+               return this.cityUser = this.isLoggedUser.moderators.addresses;
             }
             if(this.isLoggedUser.managers) {
                 let arr = [];
@@ -261,11 +261,30 @@ export default {
                 return this.cityUser = null;
             }
         },
+        getModeratorId() {
+            if(this.isLoggedUser.moderators) {
+                return this.isLoggedUser.moderators.id;
+            } 
+            else {
+                return null
+            }
+        },
+        getManagerId() {
+            if(this.isLoggedUser.managers) {
+                return this.isLoggedUser.managers.id;
+            } 
+            else {
+                return null
+            }
+        },
         roleUserId() {
             if(this.isLoggedUser.moderators) {
                 return this.userId = this.isLoggedUser.moderators.id;
             }
-            if(!this.isLoggedUser.moderators) {
+            if(this.isLoggedUser.managers) {
+                return this.userId = this.isLoggedUser.managers.moderator_id;
+            }
+            if(!this.isLoggedUser.moderators || !this.isLoggedUser.managers) {
                 return this.userId = null;
             }
         },
@@ -319,8 +338,10 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    user: this.roleUserId(),
-                    city: JSON.stringify(this.roleUserCity())
+                    // user: this.roleUserId(),
+                    // city: JSON.stringify(this.roleUserCity()),
+                    moderator: this.getModeratorId(),
+                    manager: this.getManagerId()
                 }
             })
             .then(
@@ -460,7 +481,9 @@ export default {
                         url: element.selectApi,
                         params: {
                             user: this.roleUserId(),
-                            city: JSON.stringify(this.roleUserCity())
+                            city: JSON.stringify(this.roleUserCity()),
+                            moderator: this.getModeratorId(),
+                            manager: this.getManagerId()
                         }
                     })
                     .then(
@@ -584,6 +607,8 @@ export default {
         dataAdd() {
             if(this.isLoggedUser.managers) {
                 this.editedItem['city_id'] = this.isLoggedUser.managers.city_id;
+                this.editedItem['moderator_id'] = this.isLoggedUser.managers.moderator_id;
+                this.editedItem['manager_id'] = this.isLoggedUser.managers.id;
             }
             if(this.isLoggedUser.moderators) {
                 this.editedItem['city_id'] = this.isLoggedUser.moderators.city_id;

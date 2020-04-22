@@ -1,7 +1,7 @@
 <template>
     <div class="card mb-4 mt-4">
         <div class="col-md-12 mb-4 mt-4">
-            <b-task-manager :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator', installer: 'installer', manager: 'manager'})"></b-task-manager>
+            <b-task-manager :params="params" v-show="roleUser(isLoggedUser.role, {admin: 'admin', moderator: 'moderator', manager: 'manager'})"></b-task-manager>
         </div>
     </div>
 </template>
@@ -12,8 +12,23 @@ export default {
             baseUrl: '/api/managerTask',
             excelTask: true,
             headers: [
+                { 
+                    text: 'Дата звонка', 
+                    input: "date",
+                    sortable: true,
+                    close: false,
+                    value: 'task_date_completion',
+                    tableValue: 'task_date_completion'
+                },
+                { 
+                    text: 'Город', 
+                    sortable: true,
+                    close: false,
+                    tableValue: 'city',
+                    value: 'city'
+                },
                 {
-                    text: 'ФИО клиента',
+                    text: 'Контактное лицо',
                     align: 'left',
                     sortable: true,
                     value: 'client_id',
@@ -22,26 +37,26 @@ export default {
                     input: "select",
                     validate: 'required'
                 },
+                // { 
+                //     text: 'Дата создания клинта', 
+                //     sortable: true,
+                //     close: false,
+                //     tableValue: 'created_at',
+                //     value: 'created_at'
+                // },
                 { 
-                    text: 'Дата создания клинта', 
-                    sortable: true,
-                    close: false,
-                    tableValue: 'created_at',
-                    value: 'created_at'
-                },
-                { 
-                    text: 'Email клиента', 
-                    sortable: true,
-                    close: false,
-                    tableValue: 'email',
-                    value: 'email'
-                },
-                { 
-                    text: 'Телефон клиента', 
+                    text: 'Телефон', 
                     sortable: true,
                     tableValue: 'phone',
                     close: false,
                     value: 'phone'
+                },
+                { 
+                    text: 'Почта', 
+                    sortable: true,
+                    close: false,
+                    tableValue: 'email',
+                    value: 'email'
                 },
                 {
                     text: 'Менеджер',
@@ -52,20 +67,19 @@ export default {
                     tableValue: 'managers',
                     input: "select"
                 },
+                // { 
+                //     text: 'Дата последнего звонка', 
+                //     sortable: true,
+                //     close: false,
+                //     tableValue: 'task_date_ended',
+                //     value: 'task_date_ended'
+                // },
                 { 
-                    text: 'Дата звонка', 
-                    input: "date",
+                    text: 'Комментарий', 
+                    input: "text",
+                    tableValue: 'comment',
                     sortable: true,
-                    close: false,
-                    value: 'task_date_completion',
-                    tableValue: 'task_date_completion'
-                },
-                { 
-                    text: 'Дата последнего звонка', 
-                    sortable: true,
-                    close: false,
-                    tableValue: 'task_date_ended',
-                    value: 'task_date_ended'
+                    value: 'comment',
                 },
                 {
                     input: "select",
@@ -77,20 +91,13 @@ export default {
                     sortable: true,
                     role: null
                 },
-                { 
-                    text: 'Комментарий', 
-                    input: "text",
-                    tableValue: 'comment',
-                    sortable: true,
-                    value: 'comment',
-                },
-                { 
-                    text: 'Результат выполнения', 
-                    input: "text",
-                    tableValue: 'result',
-                    sortable: true,
-                    value: 'result'
-                }
+                // { 
+                //     text: 'Результат выполнения', 
+                //     input: "text",
+                //     tableValue: 'result',
+                //     sortable: true,
+                //     value: 'result'
+                // }
             ],
             filter: true,
             searchValue: ['clients', 'managers', 'task_date_completion', 'comment', 'statusName', 'result'],

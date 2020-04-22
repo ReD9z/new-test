@@ -80,7 +80,9 @@
                 :key="header.text"
                 :class="['column sortable', pagination.descending ? 'asc' : 'desc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
-            >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
+                >
+                {{ header.text }}<v-icon small>arrow_upward</v-icon>
+            </th>
             <th class="text-xs-left">
                 Действия
             </th>
@@ -224,8 +226,7 @@ export default {
                 this.pagination.descending = false
             }
         },
-        initialize () {
-            this.roleUserCity();
+        initialize() {
             axios({
                 method: 'get',
                 url: this.params.baseUrl,

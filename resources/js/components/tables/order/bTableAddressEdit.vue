@@ -112,7 +112,31 @@
     <v-navigation-drawer v-model="dialogImages" right hide-overlay stateless fixed width="700px">
         <v-card class="borderNone">
             <v-toolbar color="pink" dark>
-                <v-toolbar-title>Изображения</v-toolbar-title>
+                <v-menu v-if="hideElem()" :close-on-content-click="false" :nudge-width="300" offset-y bottom left>
+                    <template v-slot:activator="{ on }">
+                        <v-btn icon v-on="on">
+                            <v-icon>filter_list</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-card height="200px">
+                        <v-toolbar color="indigo" dark>
+                            <v-toolbar-title>Фильтр</v-toolbar-title>
+                            <v-spacer></v-spacer>
+                        </v-toolbar>
+                        <v-layout row wrap>
+                            <v-flex class="px-3" xs12>
+                                <v-combobox
+                                    v-model="chipsSurface"
+                                    :items="surfaceFilter"
+                                    item-value="id"
+                                    item-text="status"
+                                    multiple
+                                    label="Статус поверхностей"
+                                ></v-combobox>
+                            </v-flex>
+                        </v-layout>
+                    </v-card>
+                </v-menu>
                 <v-spacer></v-spacer>
                 <v-progress-circular
                     :rotate="360"
@@ -151,7 +175,7 @@
                                     <v-img :src="file.url" :lazy-src="file.url" aspect-ratio="1" class="grey lighten-2">
                                         <template>
                                             <v-layout v-show="file.entrances" fill-width align-center column ma-0>
-                                                <v-btn>
+                                                <v-btn :color="statusEntrances(file.entrances)" class="white--text">
                                                     Номер подъезда {{file.entrances ? file.entrances.number : null}}
                                                 </v-btn>
                                             </v-layout>
@@ -163,7 +187,7 @@
                                         </template>
                                         <template>
                                             <v-layout right align-start ma-0>
-                                                <v-btn icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
+                                                <v-btn v-if="hideElem()" icon class="white--text" :loading="deleteImage" :disabled="loadImages" @click='removeImg(file)'>
                                                     <v-icon>close</v-icon>
                                                 </v-btn>
                                             </v-layout>
@@ -265,7 +289,7 @@
                 </v-checkbox>
             </td>
             <td v-for="(param, key) in params.headers" :key="`A-${key}`" :class="param.visibility">
-                <v-flex v-if="param.input !== 'images' && param.value !== 'params'">
+                <v-flex v-if="param.input !== 'img'">
                     <v-flex v-if="param.selectText">
                         {{props.item[param.TableGetIdName]}}
                     </v-flex>
@@ -280,6 +304,13 @@
                             {{props.item[param.value]}}
                         </span>
                     </v-flex>
+                </v-flex>
+                <v-flex v-if="param.input == 'img' && !hideElem()">
+                    <div v-if="!hideElem()">
+                        <div v-for="(images, key) in props.item.images" :key="key">
+                            <v-img :src="images.url" :lazy-src="images.url" width="100px" class="grey lighten-2"></v-img>
+                        </div>
+                    </div>
                 </v-flex>
             </td>
             <td class="justify-center layout px-0">
@@ -306,7 +337,23 @@ export default {
     data: vm => ({
         imgBig: '',
         statusFilter: ['Занят', 'Свободен'],
+        surfaceFilter: [
+            { 
+                index: 0, 
+                status: "Поверхность сломана",
+            },
+            { 
+                index: 1, 
+                status: "В работе",
+            },
+            { 
+                index: 3, 
+                status: "Поверхность цела",
+            }
+        ],
         chipsStatus: [],
+        chipsSurface: [],
+        addFilterImg: [],
         dialogImg: false,
         search: '',
         dialogImages: false,
@@ -387,6 +434,28 @@ export default {
         },
         chipsStatus() {
             this.initialize();
+        },
+        chipsSurface(val) {
+            this.addOrderImages = this.addFilterImg;
+            if(val.length > 0) {
+                let arr = [];
+                val.forEach((chip) => {
+                    arr.push(chip.index);
+                });
+                var searchTerm = arr.join('||').trim().toLowerCase(),
+                useOr = 'and' == "or",
+                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                searchTest = new RegExp(regExExpression, "ig");
+                let array = [];
+           
+                this.addOrderImages = this.addOrderImages.filter(function(item) {
+                    if(item.entrances) {
+                        return searchTest.test([item.entrances.status]); 
+                    }
+                });
+            }
         }
     },
     async created () {
@@ -430,8 +499,7 @@ export default {
         hideElem() {
             if(this.isLoggedUser.clients) {
                 return false;
-            }
-            if(!this.isLoggedUser.clients) {
+            } else {
                 return true;
             }
         },
@@ -618,6 +686,24 @@ export default {
                 this.pagination.descending = false
             }
         },
+        statusEntrances(data) {
+            if(data) {
+                switch (data.status) {
+                    case 0:
+                        return 'red'
+                        break;
+                    case 1:
+                        return 'blue'
+                        break;
+                    case 3:
+                        return 'green'
+                        break;
+                    default:
+                        return 'blue'
+                        break;
+                }
+            }
+        },
         removeImg(data) {
             this.loadImages = true;
             const index = Array.from(this.addOrderImages).indexOf(data.id);
@@ -635,7 +721,6 @@ export default {
         },
         initialize() {
             this.loading = true;
-            
             axios({
                 method: 'get',
                 url: this.params.baseUrl,
@@ -679,7 +764,9 @@ export default {
                             {
                                 if(item.data) {
                                     if(item.data.order_id === this.order.id) {
-                                        return item;
+                                        if(item.entrancesStatus == 3) {
+                                            return item;
+                                        }
                                     }
                                 }
                             }
@@ -760,6 +847,8 @@ export default {
             this.statusEnded = Math.round(100 / (numberEntrances / number));
 
             this.addOrderImages = filter;
+            this.addFilterImg = filter;
+            
             this.addOrder = Object.assign({}, item.data);
             this.dialogImages = true;
         },

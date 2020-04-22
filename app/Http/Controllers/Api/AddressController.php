@@ -24,8 +24,6 @@ class AddressController extends Controller
      */
     public function index(Request $request)
     {
-        $toWorks = CitiesToWorks::get();
-        $areas = Areas::with('cities')->get();
        
         if($request->user) {
             if(json_decode($request->city)) {
@@ -33,11 +31,15 @@ class AddressController extends Controller
                 foreach (json_decode($request->city) as $key => $value) {
                     $arr[] = $value->city_id;
                 }
+                $toWorks = CitiesToWorks::whereIn('id', $arr)->get();
+                $areas = Areas::with('cities')->whereIn('city_id', $arr)->get();
                 $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('city_id', $arr)->get();   
             }
 
             if(!json_decode($request->city)) {
-                $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get();   
+                $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get(); 
+                $toWorks = CitiesToWorks::get();
+                $areas = Areas::with('cities')->get();  
             }
             $address = AddressRoleUserResource::collection($toAddress);
         }
@@ -48,10 +50,14 @@ class AddressController extends Controller
                     $arr[] = $value->city_id;
                 }
                 $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('city_id', $arr)->get();   
+                $toWorks = CitiesToWorks::whereIn('id', $arr)->get();
+                $areas = Areas::with('cities')->whereIn('city_id', $arr)->get();
             }
 
             if(!json_decode($request->city)) {
-                $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get();   
+                $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->get(); 
+                $toWorks = CitiesToWorks::get();
+                $areas = Areas::with('cities')->get();  
             }
             $address = AddressResource::collection($toAddress);
         }

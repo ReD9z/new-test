@@ -16,12 +16,18 @@ class AreasController extends Controller
      */
     public function index(Request $request)
     {
-        if($request->areaCity) {
-            $areas = Areas::with('cities')->where('city_id', $request->areaCity)->get();
+        if(json_decode($request->city)) {
+            $arr = [];
+            foreach (json_decode($request->city) as $key => $value) {
+                $arr[] = $value->city_id;
+            }
+            $areas = Areas::with('cities')->whereIn('city_id', $arr)->get();
         }
-        else {
+
+        if(!json_decode($request->city)) {
             $areas = Areas::with('cities')->get();
         }
+
         return AreasResource::collection($areas);
     }
 

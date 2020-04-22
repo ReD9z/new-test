@@ -100,7 +100,7 @@ export default {
                     },
                     { 
                         title: 'Задачи менеджерам', icon: 'assessment', src: 'tasksManager',
-                        role: {admin: 'admin'}
+                        role: {admin: 'admin', moderator: 'moderator'}
                     }
                 ],
                 role: {admin: 'admin', moderator: 'moderator'}
@@ -164,14 +164,14 @@ export default {
                     },
                     { 
                         title: 'Районы', icon: 'home', src: 'areas',
-                        role: {admin: 'admin'}
+                        role: {admin: 'admin', moderator: 'moderator'}
                     },
                     { 
                         title: 'Типы работы', icon: 'work', src: 'typestoworks',
                         role: {admin: 'admin'}
                     }
                 ],
-                role: {admin: 'admin'}
+                role: {admin: 'admin',  moderator: 'moderator'}
             },
         ],
         mini: true,

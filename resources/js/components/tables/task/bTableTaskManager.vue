@@ -19,7 +19,7 @@
                 type="file"
                 style="display: none"
                 ref="excelTask"
-                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .ods"
+                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 @change="loadExecelTask"
             >
         </v-btn>
@@ -231,7 +231,7 @@
             </th>
         </template>
         <template v-slot:items="props">
-            <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
+            <td @click="editItem(props.item)" v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
                 {{props.item[param.tableValue]}} 
             </td>
             <td class="justify-left layout">
@@ -401,6 +401,22 @@ export default {
                 return searchTest.test(arr.join(" ")); 
             });
         },
+        getModeratorId() {
+            if(this.isLoggedUser.moderators) {
+                return this.isLoggedUser.moderators.id;
+            } 
+            else {
+                return null
+            }
+        },
+        getManagerId() {
+            if(this.isLoggedUser.managers) {
+                return this.isLoggedUser.managers.id;
+            } 
+            else {
+                return null
+            }
+        },
         roleUserCity() {
             if(this.isLoggedUser.moderators) {
                 return this.isLoggedUser.moderators.city_id;
@@ -470,6 +486,8 @@ export default {
                 params: {
                     city: this.roleUserCity(),
                     user: this.roleUserId(),
+                    moderator: this.getModeratorId(),
+                    manager: this.getManagerId(),
                     dateStart: this.dateStartClient,
                     dateEnd: this.dateEndClient
                 }

@@ -15,6 +15,7 @@ use App\Imports\ManagerTaskExport;
 use App\Http\Resources\ManagerTask as ManagerTaskResource;
 use App\Http\Resources\Clients as ClientsResource;
 use App\Http\Resources\Managers as ManagersResource;
+use Illuminate\Support\Facades\Auth;
 
 class ManagerTaskController extends Controller
 {
@@ -25,10 +26,6 @@ class ManagerTaskController extends Controller
      */
     public function index(Request $request)
     {
-        $clients = Clients::with('cities', 'users' , 'comments')->get();
-
-        $managers = Managers::with('users', 'cities', 'moderator.users')->get();
-
         $status = [
             ['id' => 1, 'title' => 'В работе'], 
             ['id' => 2, 'title' => 'Завершена']
@@ -42,6 +39,19 @@ class ManagerTaskController extends Controller
         }
         else {
             $tasks = ManagerTask::with('clients.users', 'managers.users', 'managers')->get(); 
+        }
+
+        if($request->moderator) {
+            $clients = Clients::with('cities', 'users' , 'comments')->where('moderator_id', $request->moderator)->get();
+            $managers = Managers::with('users', 'cities', 'moderator.users')->where('moderator_id', $request->moderator)->get();
+        } 
+        else if($request->manager) {
+            $clients = Clients::with('cities', 'users' , 'comments')->where('manager_id', $request->manager)->get();
+            $managers = Managers::with('users', 'cities', 'moderator.users')->where('id', $request->manager)->get();
+        }
+        else {
+            $clients = Clients::with('cities', 'users' , 'comments')->get();
+            $managers = Managers::with('users', 'cities', 'moderator.users')->get();
         }
 
         $collection = collect($tasks);
@@ -95,7 +105,7 @@ class ManagerTaskController extends Controller
 
     public function addExcelTask(Request $request)
     {
-        Excel::import(new ManagerTaskExport($request->user), $request->file('file'));
+        Excel::import(new ManagerTaskExport(), $request->file('file'));
     }
 
     /**
