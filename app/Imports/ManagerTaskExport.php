@@ -11,6 +11,8 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Moderators;
+use App\Models\Managers;
 
 class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkReading
 {
@@ -26,10 +28,15 @@ class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkRead
         }
         if(Auth::user()->moderators) {
             $moderator = Auth::user()->moderators->id;
+            $managers = Managers::with('users', 'cities', 'moderator.users')->where('moderator_id', $moderator)->first(); 
+            if($managers) {
+                $manager = $managers->id;
+            }
         }
+
         foreach ($rows as $key => $row) 
         {
-            if($key != 0 && !empty($row[0]) && (!empty($row[7]) || !empty($row[5]))) {
+            if($key != 0) {
                 $cityName = !empty($row[2]) ? $row[2] : null;
                 $nameOrganization = !empty($row[3]) ? $row[3] : null; 
                 $nameClient = !empty($row[4]) ? $row[4] : null; 
@@ -48,6 +55,14 @@ class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkRead
         
                 if($cityName) {
                     $cityId = CitiesToWorks::createCity($cityName);
+                    if(!Auth::user()->managers || !Auth::user()->moderators) {
+                        $managers = Managers::with('users', 'cities', 'moderator.users')->where('city_id', $cityId)->first();
+                        if($managers) {
+                            $moderators = Moderators::with('users', 'addresses')->where('id', $managers->id)->first();
+                            $manager = $managers->id;
+                            $moderator = $moderators->id;
+                        }
+                    }
                 }
 
                 if($userId) {
@@ -60,8 +75,7 @@ class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkRead
                     'manager_id' => $manager,
                     'status' =>  $date ? 2 : 1,
                     'comment' => $comment
-                ]);
-                
+                ]);    
             }
         }
     }
@@ -73,6 +87,6 @@ class ManagerTaskExport implements ToCollection, WithBatchInserts, WithChunkRead
 
     public function chunkSize(): int
     {
-        return 1000000000;
+        return 100000;
     }
 }

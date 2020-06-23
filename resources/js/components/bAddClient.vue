@@ -115,7 +115,6 @@
                         label="Юридическое название" 
                         xs12 
                         class="pa-2"
-                        required
                     >
                     </v-text-field>
                     <v-text-field 
@@ -125,7 +124,6 @@
                         v-model="editedItem.actual_title" 
                         label="Фактическое название" 
                         class="pa-2"
-                        required
                     >
                     </v-text-field>
                 </v-flex>
@@ -138,7 +136,6 @@
                         label="Юридический адрес" 
                         xs12 
                         class="pa-2"
-                        required
                     >
                     </v-text-field>
                     <v-text-field 
@@ -148,7 +145,6 @@
                         v-model="editedItem.actual_address" 
                         label="Фактический адрес" 
                         class="pa-2"
-                        required
                     >
                     </v-text-field>
                 </v-flex>

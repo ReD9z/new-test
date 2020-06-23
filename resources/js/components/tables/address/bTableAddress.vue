@@ -30,7 +30,7 @@
                 type="file"
                 style="display: none"
                 ref="excel"
-                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                accept=".xls, .xlsx, .ods"
                 @change="elementLoadToFile"
                 multiple
             >

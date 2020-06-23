@@ -205,16 +205,8 @@ class Address extends Model
     {
         $status = 1;
         foreach ($entrances as $key => $value) {
-            if($value->file_id) {
-                if($value->status == 3) {
-                    $status = 3;
-                }
-                else if($value->status == 1) {
-                    $status = 1;
-                }
-                else{
-                    $status = 0;
-                }
+            if($value->status == 3 && $value->mood == 1 && $value->glass == 1 && $value->information == 1) {
+                $status = 3;
             }
         }
         return $status;

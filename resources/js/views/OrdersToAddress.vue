@@ -23,6 +23,13 @@ export default {
                     validate: 'required'
                 },
                 { 
+                    text: 'Количество фотографий', 
+                    input: "number_photos",
+                    close: false,
+                    value: 'number_photos',
+                    validate: ''
+                },
+                { 
                     text: 'Дата начала размещения', 
                     input: "dateStart",
                     close: false,
@@ -93,7 +100,7 @@ export default {
                     text: 'Изображения', 
                     sortable: true,
                     input: "img",
-                    value: 'img' 
+                    value: 'img', 
                 },
                 { 
                     value: 'files', 

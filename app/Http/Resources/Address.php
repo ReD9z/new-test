@@ -24,7 +24,7 @@ class Address extends JsonResource
             'house_number' => $this->house_number,
             'number_entrances' => $this->number_entrances,
             'management_company' => $this->management_company,
-            'addressName' => "г.{$this->cities->name}, ул.{$this->street}, {$this->house_number}",
+            'addressName' => "г.{ $this->cities ? $this->cities->name : null }, ул.{$this->street}, {$this->house_number}",
             'status' => $this->orderAddress,
             'images' => $this->getImages($this->id),
             'data' => null,

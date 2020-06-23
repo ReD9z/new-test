@@ -9,6 +9,9 @@ use App\Models\Files;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Response;
 use File;
+use App\Models\AddressToOrders;
+use App\Models\Entrances;
+use App\Models\ImagesToOrders;
 use ZipArchive;
 
 class FilesUploadController extends Controller
@@ -32,6 +35,40 @@ class FilesUploadController extends Controller
         }
         
         return response()->json(['errors' => [], 'files' => $loadfile, 'status' => 200], 200);
+    }
+
+    public function downloadAllFiles(Request $request) {
+        $torders = AddressToOrders::with('address', 'orders', 'files', 'entrances')->where('order_id', $request->input('id'))->pluck('id')->all();
+        $entrances = Entrances::where([
+            ['file_id', '!=', null],
+            ['status', '=', 3]
+        ])->whereIn('address_to_orders_id', $torders)->pluck('file_id')->all();
+
+        $address = ImagesToOrders::with('orders')->whereIn('address_to_orders_id', $torders)->where([
+            ['files_id', '!=', null],
+        ])->pluck('files_id')->all();
+        
+        $result = array_merge($entrances, $address);
+        
+        $files = Files::with('entrances.orderAddress')->whereIn('id', $result)->get();
+        
+        if($files) {
+            $zip = new ZipArchive;
+            $names = 'Заказ' . $request->input('id');
+            $fileName = "files/{$names}.zip";
+
+            File::delete($fileName);
+            if ($zip->open(public_path($fileName), ZipArchive::CREATE) === TRUE)
+            {
+                foreach ($files as $key => $value) {
+                    $zip->addFile(public_path($value['url'], str_replace("/storage/upload/", "", $value['url'])), str_replace("/storage/upload/", "", $value['url']));
+                }
+                
+                $zip->close();
+            }
+
+            return response()->download(public_path($fileName), $names);
+        }
     }
 
     public function downloadFiles(Request $request)

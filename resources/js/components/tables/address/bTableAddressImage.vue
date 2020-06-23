@@ -22,17 +22,26 @@
             </template>
             <v-card height="200px">
                 <v-toolbar color="indigo" dark>
-                    <v-toolbar-title>Города</v-toolbar-title>
+                    <v-toolbar-title>Фильтры</v-toolbar-title>
                     <v-spacer></v-spacer>
                 </v-toolbar>
                 <v-layout row wrap>
-                    <v-flex class="px-3" xs12>
+                    <v-flex class="px-3" xs6>
                         <v-combobox
                             v-model="chips"
                             :items="selectCity"
                             item-text="name"
                             multiple
                             label="Города"
+                        ></v-combobox>
+                    </v-flex>
+                    <v-flex class="px-3" xs6>
+                        <v-combobox
+                            v-model="chipsSurface"
+                            :items="surfaceFilter"
+                            item-value="id"
+                            item-text="status"
+                            label="Статус поверхностей"
                         ></v-combobox>
                     </v-flex>
                 </v-layout>
@@ -49,7 +58,6 @@
                 </v-btn> 
             </v-toolbar>
             <v-card-text>
-               
                 <v-layout row wrap>
                     <v-flex v-for="(file, key) in addOrderImages" :key="key" xs4 d-flex>
                         <v-card flat tile class="d-flex pr-1 pb-1">
@@ -135,6 +143,21 @@ export default {
         search: '',
         dialog: false,
         imgBig: '',
+        surfaceFilter: [
+            { 
+                index: 0, 
+                status: "Поверхность сломана",
+            },
+            { 
+                index: 1, 
+                status: "Поверхность цела",
+            },
+            { 
+                index: null, 
+                status: "Все",
+            }
+        ],
+        chipsSurface: [],
         addOrderImages: [],
         dialogImg: false,
         loading: true,
@@ -191,6 +214,9 @@ export default {
         'editedItem.city_id'(val) {
             this.selectArea = [];
             this.selectArea = this.areaArray.filter((item) => {return item.city_id == val});
+        },
+        chipsSurface(val) {
+            this.initialize();
         }
     },
     created() {
@@ -256,13 +282,15 @@ export default {
             regExExpression = useOr ? OR_RegEx : AND_RegEx,
             searchTest = new RegExp(regExExpression, "ig");
             let thisSearch = this.params.searchValue;
-            return this.desserts = this.desserts.filter(function(item) {
-                let arr = [];
-                thisSearch.forEach(function(val) {
-                    arr.push(item[val]);
-                })
-                return searchTest.test(arr.join(" ")); 
-            });
+            if(this.desserts) {
+                return this.desserts = this.desserts.filter(function(item) {
+                    let arr = [];
+                    thisSearch.forEach(function(val) {
+                        arr.push(item[val]);
+                    })
+                    return searchTest.test(arr.join(" ")); 
+                });
+            }
         },
         filtered(data) {
             if(this.chips.length > 0) {
@@ -288,7 +316,8 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: JSON.stringify(this.roleUserCity())
+                    city: JSON.stringify(this.roleUserCity()),
+                    surface: this.chipsSurface.index != null ? JSON.stringify(this.chipsSurface) : null,
                 }
             })
             .then(

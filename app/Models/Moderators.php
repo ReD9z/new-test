@@ -32,4 +32,10 @@ class Moderators extends Model
         }
         return $cities ? $cities : null;
     }
+
+    public static function getCities($id)
+    {
+        $cities = ModeratorAddresses::where('moderator_id', $id)->pluck('city_id')->all();
+        return $cities ? $cities : null;
+    }
 }

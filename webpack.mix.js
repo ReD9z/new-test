@@ -18,4 +18,4 @@ mix.js('resources/js/app.js', 'public/js')
       useBuiltIns: "usage",
       targets: { "firefox": "50", "ie": 11 }
 })
-.browserSync('http://127.0.0.1:8000/');
+.browserSync('http://new-test/');

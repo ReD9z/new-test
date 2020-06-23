@@ -17,11 +17,8 @@
         <v-card-text>
             <v-form ref="forms" v-model="valid" lazy-validation>
                 <v-layout row wrap>
-                    <v-flex v-for="(param, key) in params.headerOrders" :key="`Y-${key}`" xs12>
-                        <div v-if="param.input == 'text'" xs12>
-                            <v-text-field v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
-                        </div>
-                        <div v-if="param.input == 'select'" xs12>
+                    <v-flex v-for="(param, key) in params.headerOrders" :key="`Y-${key}`" v-if="param.input == 'select'" xs12 lg6>
+                        <div xs12>
                             <v-autocomplete
                                 :items="select"
                                 v-model="editedItem[param.value]"
@@ -29,9 +26,9 @@
                                 :data-vv-as="'`'+param.text+'`'" 
                                 :data-vv-name="param.value" 
                                 :error-messages="errors.collect(param.value)" 
+                                :disabled="loadClient"
                                 v-validate="param.validate"
                                 return-object
-                                :disabled="loadClient"
                                 item-value="id"
                                 :label="param.text"
                             >
@@ -45,6 +42,21 @@
                                     ></v-progress-circular>
                                 </template>
                             </v-autocomplete>
+                        </div>
+                    </v-flex>
+                    <v-flex v-for="(param, key) in params.headerOrders" :key="`Y-${key}`" v-if="param.input == 'number_photos'" xs12 lg6>
+                        <div xs12>
+                            <v-text-field 
+                                :data-vv-as="'`'+param.text+'`'" 
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate" 
+                                v-model="editedItem[param.value]" 
+                                :label="param.text" 
+                                v-if="param.input !== 'images' && param.edit != true" 
+                                xs12 
+                                required>
+                            </v-text-field>
                         </div>
                     </v-flex>
                     <v-flex v-for="(param, key) in params.headerOrders" v-if="param.input == 'dateStart'" :key="`C-${key}`" xs12 lg6>
@@ -115,7 +127,7 @@
         </v-flex>
         <v-spacer></v-spacer>
         <v-icon>filter_list</v-icon>
-       <div>
+        <div>
             <v-chip v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
             <v-chip v-for="(item, key) in chipsStatus" :key="'K'+ key" close @input="removeStatus(item)">{{item}}</v-chip>
         </div>
@@ -221,6 +233,7 @@ export default {
         order: [],
         selected: [],
         cityUser: null,
+        newDesserts: [],
         cityClient: null
     }),
     props: {
@@ -252,15 +265,6 @@ export default {
             this.initialize()
         }, 300),
         chips(val) {
-            this.initialize();
-        },
-        'editedItem.clients_id'(item) {
-            this.cityClient = null;
-            if(item) {
-                let arr = [];
-                arr.push({'city_id': item.city_id});
-                this.cityClient = arr;
-            }
             this.initialize();
         },
         chipsStatus() {
@@ -346,20 +350,15 @@ export default {
         },
         filteredStatus(data) {
             if(this.chipsStatus.length > 0) {
-                let arr = [];
-                this.chipsStatus.forEach((chip) => {
-                    arr.push(chip);
-                });
-                var searchTerm = arr.join('||').trim().toLowerCase(),
+                var searchTerm = this.chipsStatus.join('||').trim().toLowerCase(),
                 useOr = 'and' == "or",
                 AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
                 OR_RegEx = searchTerm.replace(/ +/g,"|"),
                 regExExpression = useOr ? OR_RegEx : AND_RegEx,
                 searchTest = new RegExp(regExExpression, "ig");
-                let array = [];
-           
+            
                 this.desserts = this.desserts.filter(function(item) {
-                    return searchTest.test([item.result]); 
+                    return searchTest.test([item.resultStatus]); 
                 });
             }
         },
@@ -378,6 +377,24 @@ export default {
            
                 this.desserts = this.desserts.filter(function(item) {
                     return searchTest.test([item.city]);
+                });
+            }
+        },
+        filteredCity(data) {
+           if(this.cityClient.length > 0) {
+                let arr = [];
+                this.cityClient.forEach((chip) => {
+                    arr.push(chip.city_id);
+                });
+                var searchTerm = arr.join('||').trim().toLowerCase(),
+                useOr = 'and' == "or",
+                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
+                OR_RegEx = searchTerm.replace(/ +/g,"|"),
+                regExExpression = useOr ? OR_RegEx : AND_RegEx,
+                searchTest = new RegExp(regExExpression, "ig");
+           
+                this.desserts = this.desserts.filter(function(item) {
+                    return searchTest.test([item.city_id]);
                 });
             }
         },
@@ -404,12 +421,13 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: JSON.stringify(this.roleUserCity())
+                    city: JSON.stringify(this.roleUserCity()),
                 }
             })
             .then(
                 response => {
                     this.desserts = response.data.address;
+                    this.newDesserts = response.data.address;
                     let vm = this;
                     if(!this.dateStartFormatted && !this.dateEndFormatted) {
                         this.initialize();

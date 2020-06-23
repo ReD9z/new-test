@@ -12,10 +12,15 @@ use App\Models\Managers;
 use App\User;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ManagerTaskExport;
+use App\Models\Moderators;
 use App\Http\Resources\ManagerTask as ManagerTaskResource;
 use App\Http\Resources\Clients as ClientsResource;
 use App\Http\Resources\Managers as ManagersResource;
+use App\Http\Resources\CitiesToWorks as CitiesToWorksResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+
 
 class ManagerTaskController extends Controller
 {
@@ -31,29 +36,30 @@ class ManagerTaskController extends Controller
             ['id' => 2, 'title' => 'Завершена']
         ];
 
-        if($request->city) {
-            $tasks = ManagerTask::with('clients.users', 'managers.users', 'managers')->get()->where('managers.city_id', $request->city); 
-        }
-        else if($request->user) {
-            $tasks = ManagerTask::with('clients.users', 'managers.users', 'managers')->get()->where('manager_id', $request->user); 
-        }
-        else {
-            $tasks = ManagerTask::with('clients.users', 'managers.users', 'managers')->get(); 
+        if(!empty(Auth::user()->moderators)) {
+            $moderator = Auth::user()->moderators->id;
+            $clients = Clients::with('cities', 'users' , 'comments')->where('moderator_id', $moderator)->get();
+            $managers = Managers::with('users', 'cities', 'moderator.users')->where('moderator_id', $moderator)->get();
+            $tasks = ManagerTask::with('clients.users', 'managers.users', 'managers')->get()->where('managers.moderator_id', $moderator); 
+            $cities = Moderators::getCities($moderator);
+            $toWorks = CitiesToWorks::whereIn('id', $cities)->get();
         }
 
-        if($request->moderator) {
-            $clients = Clients::with('cities', 'users' , 'comments')->where('moderator_id', $request->moderator)->get();
-            $managers = Managers::with('users', 'cities', 'moderator.users')->where('moderator_id', $request->moderator)->get();
-        } 
-        else if($request->manager) {
-            $clients = Clients::with('cities', 'users' , 'comments')->where('manager_id', $request->manager)->get();
-            $managers = Managers::with('users', 'cities', 'moderator.users')->where('id', $request->manager)->get();
+        if(!empty(Auth::user()->managers)) {
+            $manager = Auth::user()->managers->id;
+            $clients = Clients::with('cities', 'users' , 'comments')->where('manager_id', $manager)->get();
+            $managers = Managers::with('users', 'cities', 'moderator.users')->where('id', $manager)->get();
+            $tasks = ManagerTask::with('clients.users', 'managers.users', 'managers')->where('manager_id', $manager)->get(); 
+            $toWorks = CitiesToWorks::where('id', Auth::user()->managers->city_id)->get();
         }
-        else {
+
+        if(empty(Auth::user()->moderators) && empty(Auth::user()->managers)) {
             $clients = Clients::with('cities', 'users' , 'comments')->get();
             $managers = Managers::with('users', 'cities', 'moderator.users')->get();
+            $tasks = ManagerTask::with('clients.users', 'managers.users', 'managers')->get(); 
+            $toWorks = CitiesToWorks::get();
         }
-
+        
         $collection = collect($tasks);
 
         if($request->dateStart || $request->dateEnd) {
@@ -67,10 +73,12 @@ class ManagerTaskController extends Controller
                 } 
             });
         }
+
         
         return response()->json([
+            'cities' => CitiesToWorksResource::collection($toWorks), 
             'tasks' => ManagerTaskResource::collection($collection), 
-            'clients' => ClientsResource::collection($clients),
+            'clientsLegal' => ClientsResource::collection($clients),
             'managers' => ManagersResource::collection($managers),
             'statusName' => $status
         ]);
@@ -83,7 +91,7 @@ class ManagerTaskController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {  
         $tasks = $request->isMethod('put') ? ManagerTask::findOrFail($request->id) : new ManagerTask;
 
         $tasks->id = $request->input('id');
@@ -95,11 +103,26 @@ class ManagerTaskController extends Controller
         } else {
             $tasks->task_date_completion = $tasks->status == '2' ? date("Y-m-d 00:00:00") : null;
         }
+
         $tasks->comment = $request->input('comment');
         $tasks->result = $request->input('result');
-
+        
         if($tasks->save()) {
-            return new ManagerTaskResource($tasks);
+            $client = Clients::findOrFail($tasks->client_id);
+            $client->city_id = $request->input('city_id');
+            if($client->save()) {
+                if(!empty($request->input('email'))) {
+                    $this->validate($request, [
+                        'email' => 'unique:users',
+                        'email' => Rule::unique('users')->ignore($client->users_id),
+                    ]);
+                }
+                $user = User::findOrFail($client->users_id);
+                $user->email = $request->input('email') ? $request->input('email') : null;
+                $user->phone = $request->input('phone');
+                $user->save();
+                 return new ManagerTaskResource($tasks);
+            }
         }
     }
 

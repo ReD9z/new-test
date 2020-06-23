@@ -20,35 +20,41 @@ export default {
                     value: 'task_date_completion',
                     tableValue: 'task_date_completion'
                 },
-                { 
-                    text: 'Город', 
-                    sortable: true,
-                    close: false,
-                    tableValue: 'city',
-                    value: 'city'
-                },
                 {
-                    text: 'Контактное лицо',
+                    text: 'Город',
+                    align: 'left',
+                    sortable: true,
+                    value: 'city_id',
+                    childField: 'name',
+                    tableValue: 'cities',
+                    input: "select",
+                    // validate: 'required'
+                },       
+                {
+                    text: 'Наименование',
                     align: 'left',
                     sortable: true,
                     value: 'client_id',
                     childField: 'legal_name',
-                    tableValue: 'clients',
+                    tableValue: 'clientsLegal',
                     input: "select",
-                    validate: 'required'
+                    // validate: 'required'
                 },
-                // { 
-                //     text: 'Дата создания клинта', 
-                //     sortable: true,
-                //     close: false,
-                //     tableValue: 'created_at',
-                //     value: 'created_at'
-                // },
+                { 
+                    text: 'Контактное лицо', 
+                    sortable: true,
+                    close: false,
+                    tableValue: 'clients',
+                    value: 'clients',
+                    input: "text",
+                    // validate: 'required'
+                },
                 { 
                     text: 'Телефон', 
                     sortable: true,
                     tableValue: 'phone',
                     close: false,
+                    input: "text",
                     value: 'phone'
                 },
                 { 
@@ -56,7 +62,9 @@ export default {
                     sortable: true,
                     close: false,
                     tableValue: 'email',
-                    value: 'email'
+                    input: "text",
+                    value: 'email',
+                    // validate: 'email'
                 },
                 {
                     text: 'Менеджер',
@@ -67,13 +75,6 @@ export default {
                     tableValue: 'managers',
                     input: "select"
                 },
-                // { 
-                //     text: 'Дата последнего звонка', 
-                //     sortable: true,
-                //     close: false,
-                //     tableValue: 'task_date_ended',
-                //     value: 'task_date_ended'
-                // },
                 { 
                     text: 'Комментарий', 
                     input: "text",
@@ -87,17 +88,9 @@ export default {
                     tableValue: 'statusName',
                     childField: 'title',
                     text: 'Статус',
-                    validate: 'required',
+                    // validate: 'required',
                     sortable: true,
-                    role: null
-                },
-                // { 
-                //     text: 'Результат выполнения', 
-                //     input: "text",
-                //     tableValue: 'result',
-                //     sortable: true,
-                //     value: 'result'
-                // }
+                }
             ],
             filter: true,
             searchValue: ['clients', 'managers', 'task_date_completion', 'comment', 'statusName', 'result'],

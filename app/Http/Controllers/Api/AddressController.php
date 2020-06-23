@@ -8,7 +8,9 @@ use App\Imports\AddressImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Address;
 use App\Models\Areas;
+use App\Models\Entrances;
 use App\Models\CitiesToWorks;
+use App\Models\AddressToOrders;
 use App\Http\Resources\Address as AddressResource;
 use App\Http\Resources\AddressRoleUser as AddressRoleUserResource;
 use App\Http\Resources\CitiesToWorks as CitiesToWorksResource;
@@ -24,7 +26,6 @@ class AddressController extends Controller
      */
     public function index(Request $request)
     {
-       
         if($request->user) {
             if(json_decode($request->city)) {
                 $arr = [];
@@ -42,6 +43,56 @@ class AddressController extends Controller
                 $areas = Areas::with('cities')->get();  
             }
             $address = AddressRoleUserResource::collection($toAddress);
+        }
+        else if(json_decode($request->surface)) {
+            if(json_decode($request->city)) {
+                $index = json_decode($request->surface)->index;
+                $arr = [];
+                foreach (json_decode($request->city) as $key => $value) {
+                    $arr[] = $value->city_id;
+                }
+                
+                $entrances = Entrances::where([
+                    ['file_id', '!=', null],
+                    ['shield', '=',  $index],
+                ])->orWhere([
+                    ['file_id', '!=', null],
+                    ['information', '=',  $index]
+                ])->orWhere([
+                    ['file_id', '!=', null],
+                    ['glass', '=',  $index]
+                ])->orWhere([
+                    ['file_id', '!=', null],
+                    ['mood', '=',  $index]
+                ])->pluck('address_id')->all();
+              
+                $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('city_id', $arr)->whereIn('id', array_unique($entrances))->get();   
+                $toWorks = CitiesToWorks::whereIn('id', $arr)->get();
+                $areas = Areas::with('cities')->whereIn('city_id', $arr)->get();
+            }
+
+            if(!json_decode($request->city)) {
+                $index = json_decode($request->surface)->index;
+                
+                $entrances = Entrances::where([
+                    ['file_id', '!=', null],
+                    ['shield', '=',  $index],
+                ])->orWhere([
+                    ['file_id', '!=', null],
+                    ['information', '=',  $index]
+                ])->orWhere([
+                    ['file_id', '!=', null],
+                    ['glass', '=',  $index]
+                ])->orWhere([
+                    ['file_id', '!=', null],
+                    ['mood', '=',  $index]
+                ])->pluck('address_id')->all();
+              
+                $toAddress = Address::with('cities', 'areas', 'orderAddress', 'orderAddress.files', 'orderAddress.orders', 'entrances')->whereIn('id', array_unique($entrances))->get();
+                $toWorks = CitiesToWorks::get();
+                $areas = Areas::with('cities')->get();  
+            }
+            $address = AddressResource::collection($toAddress);
         }
         else {
             if(json_decode($request->city)) {
@@ -61,6 +112,7 @@ class AddressController extends Controller
             }
             $address = AddressResource::collection($toAddress);
         }
+
         
         return response()->json(
             [

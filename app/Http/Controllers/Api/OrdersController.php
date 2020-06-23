@@ -25,10 +25,10 @@ class OrdersController extends Controller
             foreach (json_decode($request->city) as $key => $value) {
                 $arr[] = $value->city_id;
             }
-            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get()->whereIn('clients.city_id', $arr); 
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks', 'orderManyAddress.address.entrances')->get()->whereIn('clients.city_id', $arr); 
         }
         else if(!json_decode($request->city) && !$request->client) {
-            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get();  
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks', 'orderManyAddress.address.entrances')->get();  
         }
         else if($request->client) {
             if(json_decode($request->city)) {
@@ -36,15 +36,15 @@ class OrdersController extends Controller
                 foreach (json_decode($request->city) as $key => $value) {
                     $arr[] = $value->city_id;
                 }
-                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->where('clients_id', $request->client)->get()->whereIn('clients.city_id', $arr); 
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks', 'orderManyAddress.address.entrances')->where('clients_id', $request->client)->get()->whereIn('clients.city_id', $arr); 
             }
 
             if(!json_decode($request->city)) {
-                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->where('clients_id', $request->client)->get();  
+                $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks', 'orderManyAddress.address.entrances')->where('clients_id', $request->client)->get();  
             }
         }
         else {
-            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks')->get(); 
+            $orders = Orders::with('clients', 'orderAddress', 'clients.users', 'tasks', 'orderManyAddress.address.entrances')->get(); 
         }
         
         return OrdersResource::collection($orders);
@@ -69,6 +69,7 @@ class OrdersController extends Controller
         
         $orders->order_start_date = date("Y-m-d 00:00:00", strtotime($request['dateStart']));
         $orders->order_end_date = date("Y-m-d 00:00:00", strtotime($request['dateEnd']));
+        $orders->number_photos = !empty($request['order']['number_photos']) ? $request['order']['number_photos'] : null;
         $orders->save();
        
         if($request['address']) {

@@ -13,15 +13,21 @@
         </v-btn>
         <v-btn color="info" large class="mb-2 white--text" to="/orders"><v-icon left>chevron_left</v-icon>К списку заказов</v-btn>
     </v-toolbar>
+    <v-toolbar
+      color="pink" 
+      dark
+      v-if="!hideElem() && !loading" 
+    >
+      <v-toolbar-title>{{getNumberAddress()}}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn color="success"  @click="downloadAllFiles()">Скачать отчет</v-btn>
+    </v-toolbar>
     <v-card v-if="hideElem()">
         <v-card-text>
             <v-form ref="forms" v-model="valid" lazy-validation>
                 <v-layout row wrap>
-                    <v-flex v-for="(param, key) in params.headerOrders" :key="`Y-${key}`" xs12>
-                        <div v-if="param.input == 'text'" xs12>
-                            <v-text-field v-model="editedItem[param.value]" :rules="param.validate" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
-                        </div>
-                        <div v-if="param.input == 'select'" xs12>
+                    <v-flex v-for="(param, key) in params.headerOrders" :key="`Y-${key}`" v-if="param.input == 'select'" xs12 lg6>
+                        <div xs12>
                             <v-autocomplete
                                 :items="select"
                                 v-model="editedItem[param.value]"
@@ -35,16 +41,31 @@
                                 item-value="id"
                                 :label="param.text"
                             >
-                            <template v-slot:append-outer>
-                                <v-progress-circular
-                                    v-show="loadClient"
-                                    :size="28"
-                                    :width="2"
-                                    indeterminate
-                                    color="red"
-                                ></v-progress-circular>
-                            </template>
+                                <template v-slot:append-outer>
+                                    <v-progress-circular
+                                        v-show="loadClient"
+                                        :size="28"
+                                        :width="2"
+                                        indeterminate
+                                        color="red"
+                                    ></v-progress-circular>
+                                </template>
                             </v-autocomplete>
+                        </div>
+                    </v-flex>
+                    <v-flex v-for="(param, key) in params.headerOrders" :key="`Y-${key}`" v-if="param.input == 'number_photos'" xs12 lg6>
+                        <div xs12>
+                            <v-text-field 
+                                :data-vv-as="'`'+param.text+'`'" 
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate" 
+                                v-model="editedItem[param.value]" 
+                                :label="param.text" 
+                                v-if="param.input !== 'images' && param.edit != true" 
+                                xs12 
+                                required>
+                            </v-text-field>
                         </div>
                     </v-flex>
                     <v-flex v-for="(param, key) in params.headerOrders" v-if="param.input == 'dateStart'"  :key="`T-${key}`" xs12 lg6>
@@ -112,32 +133,6 @@
     <v-navigation-drawer v-model="dialogImages" right hide-overlay stateless fixed width="700px">
         <v-card class="borderNone">
             <v-toolbar color="pink" dark>
-                <v-menu v-if="hideElem()" :close-on-content-click="false" :nudge-width="300" offset-y bottom left>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon v-on="on">
-                            <v-icon>filter_list</v-icon>
-                        </v-btn>
-                    </template>
-                    <v-card height="200px">
-                        <v-toolbar color="indigo" dark>
-                            <v-toolbar-title>Фильтр</v-toolbar-title>
-                            <v-spacer></v-spacer>
-                        </v-toolbar>
-                        <v-layout row wrap>
-                            <v-flex class="px-3" xs12>
-                                <v-combobox
-                                    v-model="chipsSurface"
-                                    :items="surfaceFilter"
-                                    item-value="id"
-                                    item-text="status"
-                                    multiple
-                                    label="Статус поверхностей"
-                                ></v-combobox>
-                            </v-flex>
-                        </v-layout>
-                    </v-card>
-                </v-menu>
-                <v-spacer></v-spacer>
                 <v-progress-circular
                     :rotate="360"
                     :size="50"
@@ -222,8 +217,8 @@
             <v-chip v-for="(item, key) in chips" :key="key" close @input="remove(item)">{{item}}</v-chip>
             <v-chip v-for="(item, key) in chipsStatus" :key="'K'+ key" close @input="removeStatus(item)">{{item}}</v-chip>
         </div>
-        <v-icon>filter_list</v-icon>
-        <v-menu :close-on-content-click="false" :nudge-width="500" offset-y bottom left>
+        <v-icon v-if="hideElem()">filter_list</v-icon>
+        <v-menu v-if="hideElem()" :close-on-content-click="false" :nudge-width="500" offset-y bottom left>
             <template v-slot:activator="{ on }">
                 <v-btn icon v-on="on">
                     <v-icon>more_vert</v-icon>
@@ -243,12 +238,21 @@
                             label="Город"
                         ></v-combobox>
                     </v-flex>
-                    <v-flex class="px-3" xs6>
+                    <v-flex  class="px-3" xs6>
                         <v-combobox
                             v-model="chipsStatus"
                             :items="statusFilter"
                             multiple
                             label="Статус"
+                        ></v-combobox>
+                    </v-flex>
+                    <v-flex class="px-3" xs6>
+                        <v-combobox
+                            v-model="chipsSurface"
+                            :items="surfaceFilter"
+                            item-value="id"
+                            item-text="status"
+                            label="Статус поверхностей"
                         ></v-combobox>
                     </v-flex>
                 </v-layout>
@@ -273,7 +277,16 @@
                 :key="header.text"
                 :class="['column sortable', pagination.descending ? 'asc' : 'desc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
                 @click="changeSort(header.value)"
-            >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
+            >
+                <span v-if="header.input !== 'images' && header.value !== 'params' && header.input !== 'img'">
+                     {{ header.text }}
+                    <v-icon small>arrow_upward</v-icon>
+                </span>
+                <span v-if="!hideElem() && header.input == 'img'">
+                    {{ header.text }}
+                    <v-icon small>arrow_upward</v-icon>
+                </span>
+            </th>
             <th class="text-xs-left">
                 Действия
             </th>
@@ -289,32 +302,74 @@
                 </v-checkbox>
             </td>
             <td v-for="(param, key) in params.headers" :key="`A-${key}`" :class="param.visibility">
-                <v-flex v-if="param.input !== 'img'">
+                <v-flex v-if="param.input !== 'images' && param.value !== 'params' && param.input !== 'img'">
                     <v-flex v-if="param.selectText">
                         {{props.item[param.TableGetIdName]}}
                     </v-flex>
                     <v-flex v-else>
-                        <span v-if="param.value == 'resultStatus' && props.item[param.value] === 'Занят'" style="font-weight: bold; color:red">
-                            {{props.item[param.value]}}
-                        </span>
-                        <span v-if="param.value == 'resultStatus' && props.item[param.value] === 'Свободен'" style="font-weight: bold; color:green">
-                            {{props.item[param.value]}}
-                        </span>
-                        <span v-if="param.value != 'resultStatus'">
-                            {{props.item[param.value]}}
-                        </span>
+                        <div>
+                            <span v-if="param.value == 'resultStatus' && props.item[param.value] === 'Занят' && hideElem()" style="font-weight: bold; color:red">
+                                {{props.item[param.value]}}
+                            </span>
+                            <span v-if="param.value == 'resultStatus' && props.item[param.value] === 'Свободен' && hideElem()" style="font-weight: bold; color:green">
+                                {{props.item[param.value]}}
+                            </span>
+                            <span v-if="param.value == 'resultStatus' && !hideElem()" style="font-weight: bold; color:green">
+                                <v-progress-circular
+                                    :rotate="360"
+                                    :size="50"
+                                    :width="6"
+                                    :value="statusEndedClient(props.item)"
+                                >
+                                    {{statusEndedClient(props.item)}}
+                                </v-progress-circular>
+                            </span>
+                            <span v-if="param.value != 'resultStatus'">
+                                {{props.item[param.value]}}
+                            </span>
+                        </div>
                     </v-flex>
                 </v-flex>
                 <v-flex v-if="param.input == 'img' && !hideElem()">
-                    <div v-if="!hideElem()">
-                        <div v-for="(images, key) in props.item.images" :key="key">
-                            <v-img :src="images.url" :lazy-src="images.url" width="100px" class="grey lighten-2"></v-img>
-                        </div>
-                    </div>
+                    <v-flex xs12 sm12>
+                        <v-layout row wrap>
+                            <v-flex v-for="(images, key) in props.item.images" :key="key" xs6>
+                                <v-img :src="images.url" :lazy-src="images.url" aspect-ratio="1" class="grey lighten-2" style="margin: 2px;">
+                                    <template v-slot:placeholder>
+                                        <v-layout left align-end ma-0>
+                                            <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                        </v-layout>
+                                    </template>
+                                    <template>
+                                        <v-layout>
+                                            <v-dialog v-model="dialogImg" width="1200px">
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn icon class="white--text" v-on="on" @click='filesImg(images)'><v-icon>search</v-icon></v-btn>
+                                                </template>
+                                                <v-card v-if="imgBig">
+                                                    <v-img :src="imgBig" :lazy-src="imgBig" aspect-ratio="1.7" class="grey lighten-2" contain></v-img>
+                                                </v-card>
+                                            </v-dialog>
+                                        </v-layout>
+                                    </template>
+                                </v-img>
+                            </v-flex>
+                        </v-layout>
+                    </v-flex>
                 </v-flex>
             </td>
             <td class="justify-center layout px-0">
-                <v-icon small class="mr-2" v-if="props.item.files !== null" @click="editPhotos(props.item)">
+                <v-icon 
+                    :loading="downLoadFile"
+                    :disabled="downLoadFile"
+                    @click="downloadFilesImg(props.item)" 
+                    class="mr-2" 
+                    v-if="props.item.images.length > 0 && !hideElem()" 
+                    title="Скачать отчет"
+                >
+                    file_copy
+                </v-icon>
+                <v-icon small class="mr-2" v-if="props.item.files !== null && hideElem()" @click="editPhotos(props.item)">
                     image
                 </v-icon>
                 <v-icon small class="mr-2" v-if="props.item.data !== null && hideElem()"  @click="deleteItem(props.item)">
@@ -344,15 +399,15 @@ export default {
             },
             { 
                 index: 1, 
-                status: "В работе",
+                status: "Поверхность цела",
             },
             { 
-                index: 3, 
-                status: "Поверхность цела",
+                index: null, 
+                status: "Все",
             }
         ],
-        chipsStatus: [],
         chipsSurface: [],
+        chipsStatus: [],
         addFilterImg: [],
         dialogImg: false,
         search: '',
@@ -389,6 +444,8 @@ export default {
         cityUser: null,
         selected: [],
         mapItems: [],
+        newDesserts: [],
+        newCity: [],
         downLoadFile: false,
         cityClient: null,
         addOrder: []
@@ -429,52 +486,17 @@ export default {
         chips() {
             this.initialize();
         },
-        'editedItem.client'(item) {
-            this.cityGet(item);
-        },
         chipsStatus() {
             this.initialize();
-        },
-        chipsSurface(val) {
-            this.addOrderImages = this.addFilterImg;
-            if(val.length > 0) {
-                let arr = [];
-                val.forEach((chip) => {
-                    arr.push(chip.index);
-                });
-                var searchTerm = arr.join('||').trim().toLowerCase(),
-                useOr = 'and' == "or",
-                AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
-                OR_RegEx = searchTerm.replace(/ +/g,"|"),
-                regExExpression = useOr ? OR_RegEx : AND_RegEx,
-                searchTest = new RegExp(regExExpression, "ig");
-                let array = [];
-           
-                this.addOrderImages = this.addOrderImages.filter(function(item) {
-                    if(item.entrances) {
-                        return searchTest.test([item.entrances.status]); 
-                    }
-                });
-            }
         }
     },
     async created () {
-        await this.initialize();
         await this.initializeOrder();
         await this.selectStatus();
         await this.getFiltered();
+        await this.initialize();
     },
     methods: {
-        cityGet(item) {
-            if(!this.isLoggedUser.clients) {
-                if(item) {
-                    let arr = [];
-                    arr.push({'city_id': item.city_id});
-                    this.cityClient = arr;
-                    this.initialize();
-                }   
-            }
-        },
         roleUserCity() {
             if(this.isLoggedUser.managers) {
                 let arr = [];
@@ -542,21 +564,17 @@ export default {
             });
         },
         filteredStatus(data) {
+            console.log(data);
             if(this.chipsStatus.length > 0) {
-                let arr = [];
-                this.chipsStatus.forEach((chip) => {
-                    arr.push(chip);
-                });
-                var searchTerm = arr.join('||').trim().toLowerCase(),
+                var searchTerm = this.chipsStatus.join('||').trim().toLowerCase(),
                 useOr = 'and' == "or",
                 AND_RegEx = "(?=.*" + searchTerm.replace(/ +/g, ")(?=.*") + ")",
                 OR_RegEx = searchTerm.replace(/ +/g,"|"),
                 regExExpression = useOr ? OR_RegEx : AND_RegEx,
                 searchTest = new RegExp(regExExpression, "ig");
-                let array = [];
            
                 this.desserts = this.desserts.filter(function(item) {
-                    return searchTest.test([item.result]); 
+                    return searchTest.test([item.resultStatus]); 
                 });
             }
         },
@@ -577,6 +595,9 @@ export default {
                     return searchTest.test([item.city]);
                 });
             }
+        },
+        getNumberAddress() {
+            return `Выполнено ${this.order.entrances_load + this.order.number_photos} из ${this.order.entrances}`
         },
         filteredItems(data) {
             this.desserts = data;
@@ -641,6 +662,27 @@ export default {
                 }
             );
         },
+        downloadAllFiles() {
+            axios({
+                method: 'post',
+                url: '/api/downloadAllFiles',
+                data: this.order,
+                responseType: 'blob',
+            }).then(
+                res => {
+                    const url = window.URL.createObjectURL(new Blob([res.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', `Заказ${this.order.id}.zip`);
+                    document.body.appendChild(link);
+                    link.click();
+                }
+            ).catch(
+                error => {
+                    console.log(error);
+                }
+            );
+        },
         downloadFiles(item) {
             this.downLoadFile = true;
             axios({
@@ -688,7 +730,7 @@ export default {
         },
         statusEntrances(data) {
             if(data) {
-                switch (data.status) {
+                switch (data.status || data.shield || data.information || data.glass || data.mood) {
                     case 0:
                         return 'red'
                         break;
@@ -728,11 +770,13 @@ export default {
                     city: JSON.stringify(this.roleUserCity()),
                     user: this.isLoggedUser.clients ? true : null,
                     order: this.$route.params.id,
+                    surface: this.chipsSurface.index != null ? JSON.stringify(this.chipsSurface) : null
                 }
             })
             .then(
                 response => {
                     this.desserts = response.data.address;
+                    this.newDesserts = response.data.address;
                     let vm = this;
                     if(!this.dateStartFormatted && !this.dateEndFormatted) {
                         this.initialize();
@@ -757,7 +801,6 @@ export default {
                         this.filteredItems(this.desserts);
                         this.filtered(this.desserts);
                         this.filteredStatus(this.desserts); 
-                        this.loading = false;
                     }
                     if(this.isLoggedUser.clients) {
                         this.desserts = this.desserts.filter(item => 
@@ -774,6 +817,7 @@ export default {
                     }
 
                     this.mapItems = this.desserts.filter(item => item.data);
+                    this.loading = false;
                 }
             ).catch(error => {
                 console.log(error);
@@ -795,38 +839,70 @@ export default {
         },
         selectStatus() {
             this.loadClient = true;
-            if(this.hideElem()) {
-                this.params.headerOrders.forEach(element => {
-                    if(element.selectApi != undefined) {
-                        axios({
-                            method: 'get',
-                            url: element.selectApi,
-                            params: {
-                                city: JSON.stringify(this.roleUserCity())
-                            }
-                        })
-                        .then(
-                            res => {
-                                if(res) {
-                                    this.select = res.data;
-                                    this.loadClient = false;
-                                }
-                            }
-                        ).catch(
-                            error => {
-                                console.log(error);
+            this.params.headerOrders.forEach(element => {
+                if(element.selectApi != undefined) {
+                    axios({
+                        method: 'get',
+                        url: element.selectApi,
+                        params: {
+                            city: JSON.stringify(this.roleUserCity())
+                        }
+                    })
+                    .then(
+                        res => {
+                            if(res) {
+                                this.select = res.data;
                                 this.loadClient = false;
                             }
-                        ); 
-                    }
-                });
-            }
+                        }
+                    ).catch(
+                        error => {
+                            console.log(error);
+                            this.loadClient = false;
+                        }
+                    ); 
+                }
+            });
         },
         editItem(item) {
             let vm = this;
             this.editedItem = Object.assign({}, item);
             this.dateStart = this.$moment(vm.order.order_start_date, "DD-MM-YYYY").format("YYYY-MM-DD");
             this.dateEnd =  this.$moment(vm.order.order_end_date, "DD-MM-YYYY").format("YYYY-MM-DD");
+        },
+        downloadFilesImg(element) {
+            this.getAddress = element;
+            const images = element.images;
+            const numberEntrances = Number(element.number_entrances);
+            const filter = images.filter(img => {
+                if(img.entrances) {
+                    if(img.entrances.order_address.order_id == element.data.order_id) {
+                        return img;
+                    }
+                } 
+                if(!img.entrances) {
+                    return img;
+                }
+            });
+            this.downloadFiles(filter);
+            
+        },
+        statusEndedClient(item) {
+            const numberEntrances = Number(item.number_entrances);
+            if(item.data) {
+                const filter = item.images.filter(img => {
+                    if(img.entrances) {
+                        if(img.entrances.order_address.order_id == item.data.order_id) {
+                            return img;
+                        }
+                    } 
+                    if(!img.entrances) {
+                        return img;
+                    }
+                });
+                let number = filter.filter(item => item.entrances != null).length;
+                return Math.round(100 / (numberEntrances / number));
+            }
         },
         editPhotos(item) {
             this.getAddress = item;
@@ -919,6 +995,13 @@ export default {
                 return false;
             }
         }
+    },
+    mounted() {
+        if(this.editedItem.client) {
+
+            // console.log(this.editedItem.client);
+        }
+        // this.newCity = this.editedItem.client.city_id;
     }
 }
 </script>

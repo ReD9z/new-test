@@ -37,20 +37,23 @@ export default {
     methods: {
         initializeYandexMap() { 
             let vm = this;
-            ymaps.ready().done(function (ym) {
-                var myMap = new ymaps.Map('orderMaps', {
-                    center: vm.city.split(', '),
-                    zoom:8
-                }, {
-                        searchControlProvider: 'yandex#search'
-                }),
-                objectManager = new ymaps.ObjectManager();
-                myMap.geoObjects.add(objectManager);
-              
-                objectManager.add(vm.newItems);
+            if(vm.city) {
+                ymaps.ready().done(function (ym) {
+                    var myMap = new ymaps.Map('orderMaps', {
+                        center: vm.city.split(', '),
+                        zoom:8
+                    }, {
+                            searchControlProvider: 'yandex#search'
+                    }),
+                    objectManager = new ymaps.ObjectManager();
+                    myMap.geoObjects.add(objectManager);
+                  
+                    objectManager.add(vm.newItems);
+                    vm.mapLoader = false;
+                });
+            } else {
                 vm.mapLoader = false;
-            });
-            
+            }
         }
     },
     created () {

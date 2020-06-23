@@ -19,7 +19,7 @@
                 type="file"
                 style="display: none"
                 ref="excelTask"
-                accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                accept=".xls, .xlsx, .ods"
                 @change="loadExecelTask"
             >
         </v-btn>
@@ -40,7 +40,7 @@
                         <div v-if="param.input == 'text'">
                             <v-text-field :data-vv-as="'`'+param.text+'`'" :data-vv-name="param.value" :error-messages="errors.collect(param.value)" v-validate="param.validate" v-model="editedItem[param.value]" :label="param.text" v-if="param.input !== 'images' && param.edit != true" xs12 required></v-text-field>
                         </div>
-                        <div v-if="param.input == 'select'">
+                        <div v-if="param.tableValue == 'clientsLegal'">
                             <v-autocomplete
                                 :items="formFilds[param.tableValue]"
                                 v-model="editedItem[param.value]"
@@ -63,6 +63,34 @@
                                         <v-icon small>add</v-icon>
                                     </v-btn>
                                 </template>
+                            </v-autocomplete>
+                        </div>
+                        <div v-if="param.tableValue == 'cities'">
+                            <v-autocomplete
+                                :items="formFilds[param.tableValue]"
+                                v-model="editedItem[param.value]"
+                                :item-text="param.childField"
+                                item-value="id"
+                                :label="param.text"
+                                :data-vv-as="'`'+param.text+'`'" 
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate"
+                            >
+                            </v-autocomplete>
+                        </div>
+                        <div v-if="param.tableValue == 'managers'">
+                            <v-autocomplete
+                                :items="formFilds[param.tableValue]"
+                                v-model="editedItem[param.value]"
+                                :item-text="param.childField"
+                                item-value="id"
+                                :label="param.text"
+                                :data-vv-as="'`'+param.text+'`'" 
+                                :data-vv-name="param.value" 
+                                :error-messages="errors.collect(param.value)" 
+                                v-validate="param.validate"
+                            >
                             </v-autocomplete>
                         </div>
                         <div v-if="param.input == 'date'">
@@ -131,6 +159,9 @@
                 <v-toolbar color="indigo" dark>
                     <v-toolbar-title>Фильтры</v-toolbar-title>
                     <v-spacer></v-spacer>
+                    <v-btn @click="actionFilter" pb-2 color="error">
+                        Применить
+                    </v-btn> 
                 </v-toolbar>
                 <v-layout row wrap>
                     <v-flex class="px-3" xs3>
@@ -210,7 +241,7 @@
                             <v-icon>close</v-icon>
                         </v-btn>                
                     </v-flex>
-                </v-layout>
+                </v-layout>      
             </v-card>
         </v-menu>
     </v-toolbar>
@@ -330,10 +361,22 @@ export default {
             this.editedItem.task_date_completion = this.formatDate(this.picker);
         },
         chipsClients(val) {
-            this.initialize();
+            // this.initialize();
         },
         chipsStatus(val) {
-            this.initialize();
+            // this.initialize();
+        },
+        'editedItem.client_id'(val) {
+            const arr = [];
+            if(val) {
+                const arr = this.formFilds.clientsLegal.filter(item=>{return item.id == val});
+            } 
+        },
+        'editedItem.city_id'(val) {
+            this.formFilds.clientsLegal = [...this.clients.filter(item=>{return item.city_id == val})];
+            if(!(this.isLoggedUser.moderators || this.isLoggedUser.managers)) {
+                this.formFilds.managers = [...this.managers.filter(item=>{return item.city_id == val})];
+            } 
         },
         clientNew(newVal, oldVal) {
             this.initialize();
@@ -346,6 +389,9 @@ export default {
         await this.initialize();
     },
     methods: {
+        actionFilter() {
+            this.initialize();
+        },
         filteredStatus() {
             if(this.chipsStatus.length > 0) {
                 let status = [];
@@ -406,7 +452,7 @@ export default {
                 return this.isLoggedUser.moderators.id;
             } 
             else {
-                return null
+                return false;
             }
         },
         getManagerId() {
@@ -414,7 +460,7 @@ export default {
                 return this.isLoggedUser.managers.id;
             } 
             else {
-                return null
+                return false;
             }
         },
         roleUserCity() {
@@ -484,10 +530,6 @@ export default {
                 method: 'get',
                 url: this.params.baseUrl,
                 params: {
-                    city: this.roleUserCity(),
-                    user: this.roleUserId(),
-                    moderator: this.getModeratorId(),
-                    manager: this.getManagerId(),
                     dateStart: this.dateStartClient,
                     dateEnd: this.dateEndClient
                 }
@@ -497,7 +539,9 @@ export default {
                     this.desserts = response.data.tasks; 
                     this.statusFilter = response.data.statusName;
                     this.formFilds = response.data;
-                    this.clients = response.data.clients;
+                    this.clients = response.data.clientsLegal;
+                    this.managers = response.data.managers;
+                    this.cities = response.data.cities;
                     
                     this.filteredItems(this.desserts);
                     this.filteredClient(this.desserts); 
@@ -542,7 +586,7 @@ export default {
                 }
             ); 
         },
-        editItem (item) {
+        editItem(item) {
             this.editedIndex = this.desserts.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
@@ -594,10 +638,24 @@ export default {
                             this.loaderSaveBtn = null;
                             this.loadingSaveBtn = false;
                             this.close();
-                            this.$refs.forms.reset();
                         }
-                    ).catch(error => {
-                        console.log(error);
+                    ).catch((error) => {
+                        if(error.response.status == 422) {
+                            if(error.response.data.errors.email) {
+                                const error = {
+                                    field: "email",
+                                    msg: 'Такой email уже есть!',
+                                    rule: 'required', 
+                                    scope: null,
+                                    regenerate: () => 'some string', 
+                                    vmId: 93,
+                                    id: "9"
+                                };
+                                this.errors.items.push(error);
+                                this.loaderSaveBtn = null;
+                                this.loadingSaveBtn = false;
+                            }
+                        }
                     })  
                 } else {
                     this.snackbar = true
