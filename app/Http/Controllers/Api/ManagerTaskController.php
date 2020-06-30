@@ -74,7 +74,6 @@ class ManagerTaskController extends Controller
             });
         }
 
-        
         return response()->json([
             'cities' => CitiesToWorksResource::collection($toWorks), 
             'tasks' => ManagerTaskResource::collection($collection), 
@@ -103,9 +102,10 @@ class ManagerTaskController extends Controller
         } else {
             $tasks->task_date_completion = $tasks->status == '2' ? date("Y-m-d 00:00:00") : null;
         }
-
+        
         $tasks->comment = $request->input('comment');
         $tasks->result = $request->input('result');
+        $tasks->priority = $request->input('priority');
         
         if($tasks->save()) {
             $client = Clients::findOrFail($tasks->client_id);

@@ -93,6 +93,11 @@
                             >
                             </v-autocomplete>
                         </div>
+                        <div v-if="param.input == 'priority'">
+                            <v-text-field v-model="editedItem[param.value] = colors.hex" type="hidden"></v-text-field>
+                            <v-btn block :color="colors.hex" @click="colorToggle" dark>Приоритет</v-btn>
+                            <chrome-picker v-show="isOpen" v-model="colors"></chrome-picker>
+                        </div>
                         <div v-if="param.input == 'date'">
                             <v-menu
                                 v-model="param.close"
@@ -263,7 +268,14 @@
         </template>
         <template v-slot:items="props">
             <td @click="editItem(props.item)" v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
-                {{props.item[param.tableValue]}} 
+                <div v-if="!(param.input == 'priority')">
+                    {{props.item[param.tableValue]}} 
+                </div>
+                <div v-else>
+                    <v-btn fab dark small :color="props.item[param.tableValue]">
+                        <v-icon dark>priority_high</v-icon>
+                    </v-btn>
+                </div>
             </td>
             <td class="justify-left layout">
                 <v-icon small class="mr-2"  @click="editItem(props.item)">	
@@ -278,19 +290,29 @@
             <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
     </v-data-table>
+    <div class="text-xs-center pt-2">
+        <v-pagination v-model="pagination.page" :length="pages" :total-visible="7"></v-pagination>
+    </div>
 </div>
 </template>
 <script>
-import Vue from 'vue'
-import VeeValidate from 'vee-validate'
-
+import Vue from 'vue';
+import VeeValidate from 'vee-validate';
+import { Chrome } from 'vue-color';
 Vue.use(VeeValidate);
 
 export default {
     $_veeValidate: {
         validator: 'new'
     },
+    components: {
+        'chrome-picker': Chrome
+    },
     data: (vm) => ({
+        isOpen: false,
+        colors: {
+			hex: '#000000',
+        },
         search: '',
         clientNew: null,
         loadingExcelTask: false,
@@ -340,6 +362,13 @@ export default {
         },
         isLoggedUser: function(){ 
             return this.$store.getters.isLoggedUser;
+        },
+        pages() {
+            this.pagination.totalItems = this.desserts.length;
+            if (this.pagination.rowsPerPage == null ||
+                this.pagination.totalItems == null
+            ) return 0
+            return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage)
         }
     },
     watch: {
@@ -524,6 +553,9 @@ export default {
                 this.pagination.descending = false;
             }
         },
+        colorToggle: function() {
+            this.isOpen = !this.isOpen;
+        },
         initialize() {
             this.loading = true;
             axios({
@@ -589,6 +621,11 @@ export default {
         editItem(item) {
             this.editedIndex = this.desserts.indexOf(item);
             this.editedItem = Object.assign({}, item);
+            if(this.editedItem.priority) {
+                this.colors = {
+			        hex: this.editedItem.priority,
+                }
+            }
             this.dialog = true;
         },
         deleteItem (item) {

@@ -82,6 +82,13 @@ export default {
                     sortable: true,
                     value: 'comment',
                 },
+                { 
+                    text: 'Приоритет', 
+                    input: "priority",
+                    tableValue: 'priority',
+                    sortable: true,
+                    value: 'priority',
+                },
                 {
                     input: "select",
                     value: "status",
@@ -93,7 +100,7 @@ export default {
                 }
             ],
             filter: true,
-            searchValue: ['clients', 'managers', 'task_date_completion', 'comment', 'statusName', 'result'],
+            searchValue: ['clients', 'managers', 'task_date_completion', 'comment', 'statusName', 'result', 'priority'],
             search: true,
             pagination: true,
             excel: false

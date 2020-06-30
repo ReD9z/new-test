@@ -141,7 +141,7 @@
             </v-card>
         </v-menu>
     </v-toolbar>
-        <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
+        <v-data-table :pagination.sync="pagination" :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
         <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
         <template v-slot:headers="props">
             <th
@@ -184,6 +184,9 @@
             <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
     </v-data-table>
+    <div class="text-xs-center pt-2">
+        <v-pagination v-model="pagination.page" :length="pages" :total-visible="7"></v-pagination>
+    </div>
 </div>
 </template>
 <script>
@@ -230,6 +233,14 @@ export default {
         },
         isLoggedUser: function(){ 
             return this.$store.getters.isLoggedUser;
+        },
+        pages() {
+            this.pagination.totalItems = this.desserts.length;
+            console.log(this.pagination);
+            if (this.pagination.rowsPerPage == null ||
+                this.pagination.totalItems == null
+            ) return 0
+            return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage)
         }
     },
     watch: {

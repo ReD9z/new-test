@@ -115,6 +115,9 @@
             <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
     </v-data-table>
+    <div class="text-xs-center pt-2">
+        <v-pagination v-model="pagination.page" :length="pages" :total-visible="7"></v-pagination>
+    </div>
 </div>
 </template>
 <script>
@@ -159,6 +162,13 @@ export default {
         },
         isLoggedUser: function(){ 
             return this.$store.getters.isLoggedUser;
+        },
+        pages() {
+            this.pagination.totalItems = this.desserts.length;
+            if (this.pagination.rowsPerPage == null ||
+                this.pagination.totalItems == null
+            ) return 0
+            return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage)
         }
     },
     watch: {

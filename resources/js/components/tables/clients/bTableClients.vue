@@ -146,19 +146,7 @@
             <v-text-field v-model="search" append-icon="search" label="Поиск" v-show="params.search" single-line hide-details></v-text-field>
         </v-flex>
     </v-toolbar>
-    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :pagination.sync="pagination" item-key="name" :headers="params.headers" :items="desserts" :loading="loading" class="elevation-1">
-        <v-progress-linear v-slot:progress color="blue" indeterminate></v-progress-linear>
-        <template v-slot:headers="props">
-            <th
-                v-for="header in props.headers"
-                :key="header.text"
-                :class="['column sortable', pagination.descending ? 'asc' : 'desc', header.value === pagination.sortBy ? 'active' : '' , 'text-xs-left', header.visibility]"
-                @click="changeSort(header.value)"
-            >{{ header.text }}<v-icon small>arrow_upward</v-icon></th>
-            <th class="text-xs-left">
-                Действия
-            </th>
-        </template>
+    <v-data-table :rows-per-page-items='[25, 35, 45, {text: "Все", value: -1}]' :pagination.sync="pagination" :headers="params.headers" :items="desserts">
         <template v-slot:items="props">
             <td v-for="(param, key) in params.headers" :key="key" :class="param.visibility">
                 <v-flex v-if="param.input !== 'images'">
@@ -182,6 +170,9 @@
             <v-btn color="primary" @click="refreshSearch">Сброс</v-btn>
         </template>
     </v-data-table>
+    <div class="text-xs-center pt-2">
+        <v-pagination v-model="pagination.page" :length="pages" :total-visible="7"></v-pagination>
+    </div>
 </div>
 </template>
 <script>
@@ -230,6 +221,13 @@ export default {
         },
         isLoggedUser: function(){ 
             return this.$store.getters.isLoggedUser;
+        },
+        pages() {
+            this.pagination.totalItems = this.desserts.length;
+            if (this.pagination.rowsPerPage == null ||
+                this.pagination.totalItems == null
+            ) return 0
+            return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage)
         }
     },
     watch: {
