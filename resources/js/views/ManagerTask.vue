@@ -76,6 +76,13 @@ export default {
                     input: "select"
                 },
                 { 
+                    text: 'Время звонка', 
+                    input: "time_call",
+                    tableValue: 'time_call',
+                    sortable: true,
+                    value: 'time_call',
+                },
+                { 
                     text: 'Комментарий', 
                     input: "text",
                     tableValue: 'comment',

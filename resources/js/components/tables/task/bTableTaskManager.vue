@@ -94,9 +94,40 @@
                             </v-autocomplete>
                         </div>
                         <div v-if="param.input == 'priority'">
-                            <v-text-field v-model="editedItem[param.value] = colors.hex" type="hidden"></v-text-field>
+                            <v-text-field v-model="editedItem[param.value] = colors.hex" type="hidden" style="display:none"></v-text-field>
                             <v-btn block :color="colors.hex" @click="colorToggle" dark>Приоритет</v-btn>
                             <chrome-picker v-show="isOpen" v-model="colors"></chrome-picker>
+                        </div>
+                        <div v-if="param.input == 'time_call'">
+                             <v-flex>
+                                <v-dialog
+                                    ref="dialog2"
+                                    v-model="modal2"
+                                    :return-value.sync="editedItem[param.value]"
+                                    persistent
+                                    lazy
+                                    full-width
+                                    width="290px"
+                                >
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                            v-model="editedItem[param.value]"
+                                            :label="param.text"
+                                            prepend-icon="access_time"
+                                            readonly
+                                            v-on="on"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-time-picker
+                                        v-if="modal2"
+                                        v-model="editedItem[param.value]"
+                                    >
+                                        <v-spacer></v-spacer>
+                                        <v-btn flat color="primary" @click="modal2 = false">Отмена</v-btn>
+                                        <v-btn flat color="primary" @click="saveTime(editedItem[param.value])">Добавить</v-btn>
+                                    </v-time-picker>
+                                </v-dialog>
+                            </v-flex>
                         </div>
                         <div v-if="param.input == 'date'">
                             <v-menu
@@ -272,7 +303,7 @@
                     {{props.item[param.tableValue]}} 
                 </div>
                 <div v-else>
-                    <v-btn fab dark small :color="props.item[param.tableValue]">
+                    <v-btn v-if="props.item[param.tableValue]" fab dark small :color="props.item[param.tableValue]">
                         <v-icon dark>priority_high</v-icon>
                     </v-btn>
                 </div>
@@ -309,6 +340,9 @@ export default {
         'chrome-picker': Chrome
     },
     data: (vm) => ({
+        time: null,
+        menu2: false,
+        modal2: false,
         isOpen: false,
         colors: {
 			hex: '#000000',
@@ -420,6 +454,9 @@ export default {
     methods: {
         actionFilter() {
             this.initialize();
+        },
+        saveTime(time) {
+            this.$refs.dialog2[0].save(time);
         },
         filteredStatus() {
             if(this.chipsStatus.length > 0) {
@@ -689,10 +726,10 @@ export default {
                                     id: "9"
                                 };
                                 this.errors.items.push(error);
-                                this.loaderSaveBtn = null;
-                                this.loadingSaveBtn = false;
                             }
                         }
+                        this.loaderSaveBtn = null;
+                        this.loadingSaveBtn = false;
                     })  
                 } else {
                     this.snackbar = true

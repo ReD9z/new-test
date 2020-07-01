@@ -32,6 +32,7 @@ class ManagerTask extends JsonResource
             'created_at' => $this->clients ? date("d.m.Y", strtotime($this->clients->created_at)) : null,
             'status' => $this->status,
             'priority' => $this->priority,
+            'time_call' => $this->time_call,
             'statusName' => $this->status == '1' ? 'В работе' : 'Завершена'
         ];
     }

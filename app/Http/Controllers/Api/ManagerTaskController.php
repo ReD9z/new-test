@@ -106,22 +106,28 @@ class ManagerTaskController extends Controller
         $tasks->comment = $request->input('comment');
         $tasks->result = $request->input('result');
         $tasks->priority = $request->input('priority');
+        $tasks->time_call = $request->input('time_call');
         
         if($tasks->save()) {
-            $client = Clients::findOrFail($tasks->client_id);
-            $client->city_id = $request->input('city_id');
-            if($client->save()) {
-                if(!empty($request->input('email'))) {
-                    $this->validate($request, [
-                        'email' => 'unique:users',
-                        'email' => Rule::unique('users')->ignore($client->users_id),
-                    ]);
-                }
-                $user = User::findOrFail($client->users_id);
-                $user->email = $request->input('email') ? $request->input('email') : null;
-                $user->phone = $request->input('phone');
-                $user->save();
-                 return new ManagerTaskResource($tasks);
+            if(isset($tasks->client_id)) {
+                $client = Clients::findOrFail($tasks->client_id);
+                $client->city_id = $request->input('city_id');
+                if($client->save()) {
+                    if(!empty($request->input('email'))) {
+                        $this->validate($request, [
+                            'email' => 'unique:users',
+                            'email' => Rule::unique('users')->ignore($client->users_id),
+                        ]);
+                    }
+                    $user = User::findOrFail($client->users_id);
+                    $user->email = $request->input('email') ? $request->input('email') : null;
+                    $user->phone = $request->input('phone');
+                    $user->save();
+                    return new ManagerTaskResource($tasks);
+                } 
+            }
+            else {
+                return new ManagerTaskResource($tasks);
             }
         }
     }
