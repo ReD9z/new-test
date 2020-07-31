@@ -79,12 +79,14 @@ export default {
                     input: "text",
                     sortable: true,
                     value: 'legal_name',
+                    validate: 'required'
                 },
                 { 
                     text: 'Фактическое название', 
                     input: "text",
                     sortable: true,
                     value: 'actual_title',
+                    validate: 'required'
                 },
                 { 
                     text: 'Юридический адрес', 

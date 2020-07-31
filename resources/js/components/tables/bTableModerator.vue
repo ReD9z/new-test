@@ -264,6 +264,7 @@ export default {
                 method: 'get',
                 url: '/api/cities_to_works',
                 params: {
+                    moderator: true,
                     user: this.roleUserId(),
                     city: this.roleUserCity()
                 }

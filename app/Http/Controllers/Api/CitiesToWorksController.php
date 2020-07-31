@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\CitiesToWorks;
 use App\Http\Resources\CitiesToWorks as CitiesToWorksResource;
+use App\Models\ModeratorAddresses;
 
 class CitiesToWorksController extends Controller
 {
@@ -24,8 +25,15 @@ class CitiesToWorksController extends Controller
             $toWorks = CitiesToWorks::whereIn('id', $arr)->get();   
         }
 
-        if(!json_decode($request->city)) {
+        if(!json_decode($request->city) && !$request->moderator) {
             $toWorks = CitiesToWorks::get();   
+        }
+
+        if($request->moderator) {
+            $id = CitiesToWorks::pluck('id')->all();
+            $arr = ModeratorAddresses::whereIn('city_id', $id)->pluck('city_id')->all();
+            
+            $toWorks = CitiesToWorks::whereNotIn('id', $arr)->get();   
         }
        
         return CitiesToWorksResource::collection($toWorks);

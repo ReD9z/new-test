@@ -120,6 +120,7 @@
                                     </template>
                                     <v-time-picker
                                         v-if="modal2"
+                                        format="24hr"
                                         v-model="editedItem[param.value]"
                                     >
                                         <v-spacer></v-spacer>
